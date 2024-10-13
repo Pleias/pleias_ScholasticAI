@@ -1,23 +1,31 @@
 import json
 
 from PySide6.QtCore import (QCoreApplication, Qt)
-from PySide6.QtWidgets import (QApplication, QLabel, QSizePolicy, QVBoxLayout, QHBoxLayout, QWidget)
+from PySide6.QtWidgets import (QApplication, QLabel, QSizePolicy, QVBoxLayout, QHBoxLayout, QWidget, QSpacerItem)
 
 
 class ChatDialog(QWidget):
-    def __init__(self, index=0):
+    """
+    Take in chat data dict and displays it
+    """
+
+    def __init__(self, chat_data):
         super().__init__()
         self.setupUi()
-        with open('data.json', 'r') as f:
-            self.chats_data = json.load(f)[index]
+        self.chats_data = chat_data
         self.show_chats()
 
     def setupUi(self):
         # Set up the window properties
         self.setWindowTitle(QCoreApplication.translate("Form", "Chat Dialog"))
+
         # Main vertical layout for stacking messages
         self.verticalLayout = QVBoxLayout(self)
         self.verticalLayout.setObjectName("verticalLayout")
+
+        # Add a spacer item at the bottom to push messages upwards
+        self.verticalSpacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+        self.verticalLayout.addItem(self.verticalSpacer)
 
     def show_chats(self):
         chat_list = self.chats_data.get("chat_list")
@@ -41,7 +49,9 @@ class ChatDialog(QWidget):
         message_label = QLabel(self)
         message_label.setText(message)
         message_label.setWordWrap(True)  # Allow text to wrap
-        message_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.MinimumExpanding)
+
+        # Set a size policy to prevent unnecessary expansion
+        message_label.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Minimum)
 
         if user:
             # User input (aligned right)
@@ -67,13 +77,13 @@ class ChatDialog(QWidget):
             message_layout.addStretch()  # Push the label to the left
 
         # Add the message layout to the main vertical layout
-        self.verticalLayout.addLayout(message_layout)
+        self.verticalLayout.insertLayout(self.verticalLayout.count() - 1, message_layout)
 
 
 if __name__ == "__main__":
     import sys
-
+    chat_data = [{"title": "Hi, how are you?", "chat_list": [{"input_str": "Hi, how are you?", "out_str": "16 This is model answer"}, {"input_str": "Good and you?", "out_str": "13 This is model answer"}, {"input_str": "Dark is a dark appearance that doesn\u2019t change. Dark Mode darkens the colour scheme so the content you\u2019re working on stands out, while windows and controls seem to recede into the background. It\u2019s effective for viewing documents, presentations, photos, films, web pages and more.", "out_str": "278 This is model answer"}]}]
     app = QApplication(sys.argv)
-    window = ChatDialog()
+    window = ChatDialog(chat_data[0])
     window.show()
     sys.exit(app.exec())

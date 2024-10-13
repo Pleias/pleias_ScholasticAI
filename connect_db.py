@@ -4,7 +4,7 @@ import json
 
 class ConnectDB:
     def __init__(self):
-        self.chat_db_path = "data.json"
+        self.chat_db_path = "data/data.json"
 
     def get_chat_data(self):
         with open(self.chat_db_path, "r") as f:
