@@ -36,7 +36,7 @@ class CustomWidget(QWidget):
         layout.setContentsMargins(5, 0, 0, 0)
 
         # create icon widget of chat title
-        chat_icon = QIcon("static/icons/chat-left.svg")
+        chat_icon = QIcon("static/icons/icons8-chat-96.png")
         chat_icon_btn = QPushButton(self)
         chat_icon_btn.setIcon(chat_icon)
 
@@ -47,10 +47,10 @@ class CustomWidget(QWidget):
 
         # Create delete and edit button for chat title
         delete_btn = QPushButton(self)
-        delete_btn.setIcon(QIcon("static/icons/delete.svg"))
+        delete_btn.setIcon(QIcon("static/icons/icons8-delete-32.png"))
 
         edit_btn = QPushButton(self)
-        edit_btn.setIcon(QIcon("static/icons/edit.svg"))
+        edit_btn.setIcon(QIcon("static/icons/icons8-edit-32.png"))
 
         # StyleSheet for QPushButton in chat title
         style_str = """
