@@ -84,7 +84,7 @@
       <string/>
      </property>
      <property name="pixmap">
-      <pixmap resource="../static/resource.qrc">:/icons/icons8-document-ios-17-outlined-50.png</pixmap>
+      <pixmap>:/icons/icons8-document-ios-17-outlined-50.png</pixmap>
      </property>
      <property name="scaledContents">
       <bool>true</bool>

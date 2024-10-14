@@ -4,3 +4,5 @@ to run the code you need llamafile running on the background, or get response ke
 python main.py
 ```
 
+[//]: # (Usful links for implemetation )
+[//]: # (https://thepythoncode.com/article/make-pdf-viewer-with-tktinter-in-python)

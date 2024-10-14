@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1202</width>
+    <width>1172</width>
     <height>845</height>
    </rect>
   </property>
@@ -100,22 +100,7 @@ QPushButton:hover {
       <property name="lineWidth">
        <number>0</number>
       </property>
-      <layout class="QGridLayout" name="gridLayout_6">
-       <property name="leftMargin">
-        <number>0</number>
-       </property>
-       <property name="topMargin">
-        <number>0</number>
-       </property>
-       <property name="rightMargin">
-        <number>0</number>
-       </property>
-       <property name="bottomMargin">
-        <number>0</number>
-       </property>
-       <property name="spacing">
-        <number>0</number>
-       </property>
+      <layout class="QGridLayout" name="gridLayout_2">
        <item row="0" column="0">
         <widget class="QPushButton" name="pushButton_4">
          <property name="minimumSize">
@@ -128,19 +113,6 @@ QPushButton:hover {
           <string>Logo</string>
          </property>
         </widget>
-       </item>
-       <item row="0" column="4">
-        <spacer name="horizontalSpacer_3">
-         <property name="orientation">
-          <enum>Qt::Orientation::Horizontal</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>678</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
        </item>
        <item row="0" column="1">
         <widget class="QPushButton" name="pushButton_3">
@@ -165,6 +137,45 @@ QPushButton:hover {
          </property>
          <property name="text">
           <string>Conversations</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="3">
+        <spacer name="horizontalSpacer_3">
+         <property name="orientation">
+          <enum>Qt::Orientation::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>678</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="0" column="4">
+        <widget class="QPushButton" name="pushButton_5">
+         <property name="minimumSize">
+          <size>
+           <width>100</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>About</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="5">
+        <widget class="QPushButton" name="pushButton_7">
+         <property name="minimumSize">
+          <size>
+           <width>100</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Log In</string>
          </property>
         </widget>
        </item>
@@ -670,8 +681,8 @@ background:transparent;
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>680</width>
-               <height>524</height>
+               <width>650</width>
+               <height>511</height>
               </rect>
              </property>
              <layout class="QGridLayout" name="gridLayout_9">
@@ -798,6 +809,9 @@ background:transparent;
                <property name="focusPolicy">
                 <enum>Qt::FocusPolicy::NoFocus</enum>
                </property>
+               <property name="whatsThis">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
                <property name="styleSheet">
                 <string notr="true">background-color: rgba(255, 255, 255, 0);</string>
                </property>
@@ -896,8 +910,8 @@ background:transparent;
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1202</width>
-     <height>24</height>
+     <width>1172</width>
+     <height>37</height>
     </rect>
    </property>
   </widget>
