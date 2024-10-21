@@ -411,7 +411,7 @@ class MainWindow(QMainWindow):
         chat_db = self.connect_db.get_chat_data()
 
         if message_input:
-            source_documents, response_str = get_response(message_input, debug=True)
+            source_documents, response_str = get_response(message_input, debug=False)
             source_documents.append("attention is all you need.pdf")
             # Check if open a chat
             if self.ui.chat_list.selectedIndexes():
