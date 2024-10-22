@@ -8,6 +8,7 @@ from dialog_display import ChatDialog
 from ui_froms.ui_main_window import Ui_MainWindow
 from ui_froms.reference_ui import Ui_Form as ReferenceForm
 from connect_db import ConnectDB
+from file_management_window import FileManagementWindow  # Import the file management window
 
 from PySide6.QtWidgets import QWidget, QHBoxLayout, QPushButton, QLineEdit
 from PySide6.QtGui import QIcon
@@ -98,6 +99,12 @@ class MainWindow(QMainWindow):
 
         # Instantiate the database object
         self.connect_db = ConnectDB()
+        
+        # Initialize file management window but keep it hidden
+        self.file_management_window = None
+
+        # Connect the Library button to open the file management window
+        self.ui.pushButton_3.clicked.connect(self.open_file_management_window)
 
         # Get objects from main window
         self.message_input = self.ui.input_textEdit_2
@@ -448,6 +455,13 @@ class MainWindow(QMainWindow):
             ## Clear input after get response
             self.message_input.clear()
             return
+    
+    ## Functions for chat list ///////////////////////////////
+    def open_file_management_window(self):
+        # Create and show the file management window if not already open
+        if self.file_management_window is None:
+            self.file_management_window = FileManagementWindow()
+        self.file_management_window.show()
 
 
 if __name__ == "__main__":
