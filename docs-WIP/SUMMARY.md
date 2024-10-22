@@ -2,8 +2,9 @@
 
 * [Creating app for mozzila](README.md)
   * [Fronted development page](creating-app-for-mozzila/fronted-development-page/README.md)
-    * [PySide local app development ](creating-app-for-mozzila/fronted-development-page/pyside-local-app-development.md)
+    * [PySide local app development](creating-app-for-mozzila/fronted-development-page/pyside-local-app-development.md)
     * [open\_alex\_sripts](creating-app-for-mozzila/fronted-development-page/open\_alex\_sripts.md)
+    * [UI / UX](readme/fronted-development-page/ui-ux.md)
   * [How to make a friend with front](creating-app-for-mozzila/how-to-make-a-friend-with-front.md)
   * [Backend development](creating-app-for-mozzila/backend-development/README.md)
     * [Local RAG for PDFs](creating-app-for-mozzila/backend-development/local-rag-for-pdfs.md)
