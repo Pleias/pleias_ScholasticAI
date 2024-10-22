@@ -1,8 +1,8 @@
 import json
-
 from llama_index.retrievers.bm25 import BM25Retriever
 from llama_index.llms.llamafile import Llamafile
 import httpx
+from openai import OpenAI
 
 
 def get_response(user_input, debug=False):
@@ -49,6 +49,27 @@ def get_answer(user_input="Hi, tell me a joke"):
         print(f"HTTP error occurred: {e}")
     except httpx.RequestError as e:
         print(f"Request error occurred: {e}")
+
+
+def get_open_ai_answer(user_input="Hi, tell me a joke"):
+    bm25_retriever = BM25Retriever.from_persist_dir("data/bm25_retriever")
+    retrieved_nodes = bm25_retriever.retrieve(user_input)
+    retrieved_context = retrieved_nodes[0].text
+    prompt = "\n".join([retrieved_context, "Question: " + user_input])
+
+    client = OpenAI(
+        base_url="http://localhost:8080/v1",  # base_url="http://localhost:8080/v1",
+        api_key="sk-no-key-required"
+    )
+    completion = client.chat.completions.create(
+        model="LLaMA_CPP",
+        messages=[
+            {"role": "system",
+             "content": "You are an Q&A assistant, answer the user question given the following context"},
+            {"role": "user", "content": prompt}
+        ]
+    )
+    return completion.choices[0].message
 
 
 if __name__ == "__main__":
