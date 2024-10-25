@@ -1,15 +1,22 @@
 # Table of contents
 
-* [Creating app for mozzila](README.md)
-  * [Fronted development page](creating-app-for-mozzila/fronted-development-page/README.md)
-    * [PySide local app development](creating-app-for-mozzila/fronted-development-page/pyside-local-app-development.md)
-    * [open\_alex\_sripts](creating-app-for-mozzila/fronted-development-page/open\_alex\_sripts.md)
-    * [UI / UX](readme/fronted-development-page/ui-ux.md)
-  * [How to make a friend with front](creating-app-for-mozzila/how-to-make-a-friend-with-front.md)
-  * [Backend development](creating-app-for-mozzila/backend-development/README.md)
-    * [Local RAG for PDFs](creating-app-for-mozzila/backend-development/local-rag-for-pdfs.md)
-    * [Embeddings](creating-app-for-mozzila/backend-development/embeddings.md)
-    * [Current YOLOv8 RAG pipeline](creating-app-for-mozzila/backend-development/current-yolov8-rag-pipeline.md)
-    * [Llama files compared with MLX inference](creating-app-for-mozzila/backend-development/llama-files-compared-with-mlx-inference.md)
-    * [Llama Index - Script](creating-app-for-mozzila/backend-development/llama-index-script.md)
-    * [Script with openai api and llamafiles](creating-app-for-mozzila/backend-development/script-with-openai-api-and-llamafiles.md)
+* [General](README.md)
+
+## 🖼️ Front development
+
+* [How to make a friend with front](front-development/how-to-make-a-friend-with-front.md)
+* [Fronted development page](front-development/fronted-development-page/README.md)
+  * [PySide local app development](front-development/fronted-development-page/pyside-local-app-development.md)
+  * [open\_alex\_sripts](front-development/fronted-development-page/open\_alex\_sripts.md)
+  * [UI / UX](front-development/fronted-development-page/ui-ux.md)
+
+## 💻 Backend development
+
+* [Model & Framework](backend-development/model-and-framework/README.md)
+  * [Llama files compared with MLX inference](backend-development/model-and-framework/llama-files-compared-with-mlx-inference.md)
+* [Local RAG](backend-development/local-rag/README.md)
+  * [Script with openai api and llamafiles](backend-development/local-rag/script-with-openai-api-and-llamafiles.md)
+  * [Local RAG for PDFs](backend-development/local-rag/local-rag-for-pdfs.md)
+  * [Embeddings](backend-development/local-rag/embeddings.md)
+  * [Current YOLOv8 RAG pipeline](backend-development/local-rag/current-yolov8-rag-pipeline.md)
+  * [Llama Index - Script](backend-development/local-rag/llama-index-script.md)

@@ -1,7 +1,6 @@
 # Current YOLOv8 RAG pipeline
 
-Three main scripts + 1 json parsing script for processing from PDF files to chunks ready to be embedded.\
-
+Three main scripts + 1 json parsing script for processing from PDF files to chunks ready to be embedded.\\
 
 ## Section 1: PDF to Image Conversion and Table Extraction
 
@@ -15,17 +14,12 @@ Three main scripts + 1 json parsing script for processing from PDF files to chun
    * We use pdfplumber to recognize the tables present in the PDF.
    * The script saves the coordinates of the tables, extracts the text inside them, and saves the content to TSV files, trying to keep the table structure when possible.
    * Note: The results here are mixed, but for now it's the simplest Python solution that seems to work the best and the fastest.
-3.  Create blank versions of PDFs with tables covered
+3. Create blank versions of PDFs with tables covered
+   * Once we extract the table information, we use the coordinates to add white rectangles to the images.
+   * This step allows YOLO to work more efficiently in the next section by ignoring the table areas.
+   * Note: We need to benchmark how efficient the Table Recognition capacities from YOLO are. From empirical tests, they also give mixed results.
 
-    * Once we extract the table information, we use the coordinates to add white rectangles to the images.
-    * This step allows YOLO to work more efficiently in the next section by ignoring the table areas.
-    * Note: We need to benchmark how efficient the Table Recognition capacities from YOLO are. From empirical tests, they also give mixed results.
-
-
-
-
-
-```
+```python
 // 
 
 import pdfplumber
@@ -187,8 +181,6 @@ if __name__ == "__main__":
 ```
 
 ## Section 2: Image Layout Analysis with YOLO
-
-
 
 ### Key Steps:
 
@@ -368,7 +360,7 @@ if __name__ == "__main__":
 
 Section 3:
 
-* In this section we use PyMuPDF to extract the text from the boxes identified by Yolo and add this text to the entries of the tsv files.&#x20;
+* In this section we use PyMuPDF to extract the text from the boxes identified by Yolo and add this text to the entries of the tsv files.
 * The script also creates a CVAT.xml file which contains the coordinates and labels of each page, ready to be imported to CVAT (the client we used to annotate) if we want to manually modifiy the boxes for better chunking or fine tuning.
 
 json\_parsing
