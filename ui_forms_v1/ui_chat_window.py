@@ -18,7 +18,7 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
 from PySide6.QtWidgets import (QApplication, QFrame, QGridLayout, QHBoxLayout,
                                QLabel, QMainWindow, QMenuBar, QPushButton,
                                QScrollArea, QSizePolicy, QSpacerItem, QTextEdit,
-                               QVBoxLayout, QWidget)
+                               QVBoxLayout, QWidget, QStackedWidget, QListWidget)
 from static import resource_rc
 
 
@@ -315,7 +315,26 @@ class Ui_MainWindow(object):
         self.menubar.setObjectName(u"menubar")
         self.menubar.setGeometry(QRect(0, 0, 1247, 37))
         MainWindow.setMenuBar(self.menubar)
+        
+        ######### ADD LIBRARY TAB #########
+        # Add a QStackedWidget to switch between different sections (Library, Conversations, etc.)
+        self.stackedWidget = QStackedWidget(self.centralwidget)  # Create a QStackedWidget
+        self.gridLayout.addWidget(self.stackedWidget, 0, 1, 1, 2)  # Add it to the layout
 
+        # Create the "Library" view
+        self.library_widget = QWidget()  # Widget for Library
+        self.library_layout = QVBoxLayout(self.library_widget)
+        self.pdf_list_widget = QListWidget()  # This widget will list the processed PDFs
+        self.library_layout.addWidget(self.pdf_list_widget)
+
+        # Add the Library view to the QStackedWidget
+        self.stackedWidget.addWidget(self.library_widget)
+
+        # Create the "Conversations" view (You can add widgets to this view later)
+        self.conversations_widget = QWidget()  # Widget for Conversations
+        self.stackedWidget.addWidget(self.conversations_widget)
+
+        
         self.retranslateUi(MainWindow)
 
         QMetaObject.connectSlotsByName(MainWindow)
