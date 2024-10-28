@@ -5,13 +5,11 @@ import os
 
 class ConnectDB:
     def __init__(self):
-        self.chat_db_path = "app_storage/chat-data/data.json"
-        
+        self.chat_db_path = "app_storage/chat_data/data.json"
+
         # New database for PDF metadata storage
         self.pdf_db_path = "app_storage/metadata/pdf_documents.db"
         self.init_pdf_database()
-
-    ### Chat Storage Methods ###
 
     def get_chat_data(self):
         with open(self.chat_db_path, "r") as f:
@@ -42,9 +40,9 @@ class ConnectDB:
         chat_db.pop(index)
 
         self.save_chat_data(chat_db)
-        
+
     ### PDF Metadata Storage Methods ###
-    
+
     def init_pdf_database(self):
         """Creates the SQLite database for PDF metadata if it doesn’t already exist."""
         if not os.path.exists(self.pdf_db_path):
@@ -95,8 +93,7 @@ class ConnectDB:
         cursor.execute('DELETE FROM pdf_metadata WHERE id = ?', (pdf_id,))
         connection.commit()
         connection.close()
-        
-    def close(self):
-    # Placeholder close method to prevent errors; add actual cleanup if needed
-        pass
 
+    def close(self):
+        # Placeholder close method to prevent errors; add actual cleanup if needed
+        pass

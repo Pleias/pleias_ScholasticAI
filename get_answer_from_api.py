@@ -5,11 +5,11 @@ import httpx
 from openai import OpenAI
 
 
-def get_response(user_input, debug=False):
+def get_response(user_input, debug=True):
     if debug:
-        return ["reference"], f"{len(user_input)} This is model answer"
+        return ["reference", "reference"], f"{len(user_input)} This is model answer"
     else:
-        return get_answer_from_user_input(user_input)
+        return get_open_ai_answer(user_input)
 
 
 def get_answer_from_user_input(user_input):
@@ -58,7 +58,7 @@ def get_open_ai_answer(user_input="Hi, tell me a joke"):
     prompt = "\n".join([retrieved_context, "Question: " + user_input])
 
     client = OpenAI(
-        base_url="http://localhost:8080/v1",  # base_url="http://localhost:8080/v1",
+        base_url="http://localhost:8080/v1",
         api_key="sk-no-key-required"
     )
     completion = client.chat.completions.create(
@@ -69,9 +69,9 @@ def get_open_ai_answer(user_input="Hi, tell me a joke"):
             {"role": "user", "content": prompt}
         ]
     )
-    return completion.choices[0].message
+    return completion.choices[0].message.content
 
 
 if __name__ == "__main__":
-    user_input = "Hi, tell me a joke"
-    print(get_answer(user_input))
+    user_input = "Who is Anna?"
+    print(get_response(user_input))
