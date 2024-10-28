@@ -1,5 +1,16 @@
 <RCC>
   <qresource prefix="icons">
+
+    <file>icons/logo_openalex.png</file>
+    <file>icons/icon_arrow_up_white.png</file>
+    <file>icons/icon_arrow_up_white.svg</file>
+    <file>icons/icon_add.png</file>
+    <file>icons/icon_add.svg</file>
+    <file>icons/icon_arrow_back.png</file>
+    <file>icons/icon_arrow_back.svg</file>
+    <file>icons/icon_file.png</file>
+    <file>icons/icon_file.svg</file>
+
     <file>icons/icons8-document-ios-17-outlined-50.png</file>
     <file>icons/icons8-chat-96.png</file>
     <file>icons/icons8-delete-32.png</file>
