@@ -9,7 +9,7 @@ from PySide6.QtWidgets import QApplication, QMainWindow, QGridLayout, QLabel, QL
     QVBoxLayout, QListWidget
 from PySide6.QtGui import QStandardItem, QStandardItemModel
 from dialog_display import ChatDialog
-from ui_forms_v1.ui_chat_window import Ui_MainWindow as ChatWindow
+from ui_forms_v1.ui_chat_window2 import Ui_MainWindow as ChatWindow
 from ui_forms_v1.uploaded_docs_widget import Ui_Frame as DocsWidget
 from ui_forms_v1.reference_ui import Ui_Form as ReferenceForm
 from connect_db import ConnectDB
