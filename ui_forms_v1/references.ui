@@ -14,7 +14,19 @@
    <string>Form</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">#references {
+   <string notr="true"/>
+  </property>
+  <widget class="QFrame" name="references">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>20</y>
+     <width>801</width>
+     <height>382</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">#references {
 	background: #FFF;
 	border-radius: 8px;
 	border: none;
@@ -61,15 +73,6 @@ QLabel[class=&quot;reference&quot;] {
 	background: #F2F2F2;
 }
 </string>
-  </property>
-  <widget class="QFrame" name="references">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>20</y>
-     <width>801</width>
-     <height>382</height>
-    </rect>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout">
     <property name="spacing">
@@ -183,7 +186,7 @@ QLabel[class=&quot;reference&quot;] {
           <string>File_name.pdf</string>
          </property>
          <property name="icon">
-          <iconset resource="static/resource.qrc">
+          <iconset resource="../static/resource.qrc">
            <normaloff>:/icons/icons/icon_file.png</normaloff>:/icons/icons/icon_file.png</iconset>
          </property>
         </widget>
@@ -345,7 +348,7 @@ QLabel[class=&quot;reference&quot;] {
           <string>File_name.pdf</string>
          </property>
          <property name="icon">
-          <iconset resource="static/resource.qrc">
+          <iconset resource="../static/resource.qrc">
            <normaloff>:/icons/icons/icon_file.png</normaloff>:/icons/icons/icon_file.png</iconset>
          </property>
         </widget>
@@ -507,7 +510,7 @@ QLabel[class=&quot;reference&quot;] {
           <string>File_name.pdf</string>
          </property>
          <property name="icon">
-          <iconset resource="static/resource.qrc">
+          <iconset resource="../static/resource.qrc">
            <normaloff>:/icons/icons/icon_web.png</normaloff>:/icons/icons/icon_web.png</iconset>
          </property>
         </widget>
@@ -560,7 +563,7 @@ QLabel[class=&quot;reference&quot;] {
              <string/>
             </property>
             <property name="pixmap">
-             <pixmap resource="static/resource.qrc">:/icons/images/logo_openalex.png</pixmap>
+             <pixmap resource="../static/resource.qrc">:/icons/images/logo_openalex.png</pixmap>
             </property>
            </widget>
           </item>
@@ -603,7 +606,7 @@ QLabel[class=&quot;reference&quot;] {
   </widget>
  </widget>
  <resources>
-  <include location="static/resource.qrc"/>
+  <include location="../static/resource.qrc"/>
  </resources>
  <connections/>
 </ui>
