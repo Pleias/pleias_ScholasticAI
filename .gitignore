@@ -1,0 +1,4 @@
+**/.DS_Store
+*.db
+__pycache__/
+tmp.json
