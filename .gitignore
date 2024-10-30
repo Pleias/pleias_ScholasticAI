@@ -1,5 +1,4 @@
+.DS_Store
 **/.DS_Store
 *.db
 __pycache__/
-tmp.json
-**/.DS_Store
