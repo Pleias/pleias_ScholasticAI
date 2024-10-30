@@ -2,3 +2,4 @@
 *.db
 __pycache__/
 tmp.json
+**/.DS_Store
