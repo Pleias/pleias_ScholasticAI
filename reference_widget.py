@@ -1,5 +1,5 @@
 from PySide6.QtGui import QPixmap, Qt
-from PySide6.QtWidgets import QApplication, QWidget, QFrame, QVBoxLayout
+from PySide6.QtWidgets import QApplication, QWidget, QFrame, QVBoxLayout, QLabel
 import sys
 from ui_one_reference_frame import Ui_one_reference
 
@@ -49,6 +49,11 @@ class OneReferenceFrame(QFrame):
             print("Frame clicked!")  # Handle frame click here
         super().mousePressEvent(event)
 
+    # def mouseReleaseEvent(self, event):
+    #     if event.button() == Qt.LeftButton:
+    #         self.setStyleSheet(f"background-color: (255, 255, 255);")  # Reset color on release
+    #     super().mouseReleaseEvent(event)
+
 
 class ReferenceWidget(QWidget):
     def __init__(self):
@@ -77,6 +82,18 @@ class ReferenceWidget(QWidget):
             'source_authors': 'Authors info found on archive',
             'source_database': 'archive',
         }
+        text = """
+        The primary feature of the Transformers architecture is the self-attention mechanism <span style="border: 1px solid #007bff; padding: 2px; border-radius: 3px; background-color: #e7f3ff; color: #007bff; font-size: 12px;">1</span>.
+        This allows the model to weigh the importance of different words dynamically, capturing long-range dependencies efficiently
+        <span style="border: 1px solid #6c757d; padding: 2px; border-radius: 3px; background-color: #f1f1f1; color: #6c757d; font-size: 12px;">2</span>.
+        Transformers also use an encoder-decoder architecture that avoids sequential operations
+        <span style="border: 1px solid #6c757d; padding: 2px; border-radius: 3px; background-color: #f1f1f1; color: #6c757d; font-size: 12px;">2</span> <span style="border: 1px solid #ffc107; padding: 2px; border-radius: 3px; background-color: #fff3cd; color: #856404; font-size: 12px;">3</span>.
+        """
+        response_label = QLabel()
+        response_label.setText(text)
+        response_label.setWordWrap(True)
+        self.layout.addWidget(response_label)
+
         reference = OneReferenceFrame(**example_local)
         reference1 = OneReferenceFrame(**example_open_alex)
         reference2 = OneReferenceFrame(**example_archive)

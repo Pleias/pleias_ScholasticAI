@@ -3,7 +3,8 @@ import json
 from PySide6.QtCore import QCoreApplication, Qt
 from PySide6.QtWidgets import QApplication, QLabel, QSizePolicy, QVBoxLayout, QHBoxLayout, QWidget, QSpacerItem, \
     QScrollArea
-from answer_wigdet import ResponseFrame
+
+from reference_widget import ReferenceWidget
 
 
 class ChatDialog(QScrollArea):
@@ -66,7 +67,7 @@ class ChatDialog(QScrollArea):
             message_layout.addWidget(message_label)
         else:
             # System output (aligned left) using ResponseFrame
-            response_frame = ResponseFrame(self)
+            response_frame = ReferenceWidget()
             response_frame.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Expanding)
             message_layout.addWidget(response_frame)
             message_layout.addStretch()  # Push the label to the left

@@ -9,17 +9,17 @@
 ################################################################################
 
 from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
-    QMetaObject, QObject, QPoint, QRect,
-    QSize, QTime, QUrl, Qt)
+                            QMetaObject, QObject, QPoint, QRect,
+                            QSize, QTime, QUrl, Qt)
 from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
-    QFont, QFontDatabase, QGradient, QIcon,
-    QImage, QKeySequence, QLinearGradient, QPainter,
-    QPalette, QPixmap, QRadialGradient, QTransform)
+                           QFont, QFontDatabase, QGradient, QIcon,
+                           QImage, QKeySequence, QLinearGradient, QPainter,
+                           QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QAbstractScrollArea, QApplication, QFrame, QGridLayout,
-    QHBoxLayout, QLabel, QLayout, QListView,
-    QMainWindow, QMenuBar, QPushButton, QScrollArea,
-    QSizePolicy, QSpacerItem, QTextEdit, QVBoxLayout,
-    QWidget)
+                               QHBoxLayout, QLabel, QLayout, QListView,
+                               QMainWindow, QMenuBar, QPushButton, QScrollArea,
+                               QSizePolicy, QSpacerItem, QTextEdit, QVBoxLayout,
+                               QWidget)
 from static import resource_rc
 
 
@@ -31,94 +31,94 @@ class Ui_MainWindow(object):
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
         self.centralwidget.setStyleSheet(u"QLabel {\n"
-"    font-family: \"San Francisco\", sans-serif;\n"
-"    color: #333;\n"
-"    font-size: 14px;\n"
-"    font-style: normal;\n"
-"    font-weight: 400;\n"
-"    line-height: normal;\n"
-"}\n"
-"\n"
-"QLabel[class=\"placeholder\"] {\n"
-"	color: #828282;\n"
-"	font-weight: 400;\n"
-"	text-align: center;\n"
-"}\n"
-"\n"
-"QLabel[class=\"subheader\"] {\n"
-"    color: #333;\n"
-"    font-weight: 700;\n"
-"}\n"
-"\n"
-"QLabel[class=\"caption\"] {\n"
-"    color: #828282;\n"
-"    font-size: 12px;\n"
-"    font-weight: 400;\n"
-"}\n"
-"\n"
-"QPushButton {\n"
-"	border-radius: 8px;\n"
-"	font-family: \"San Francisco\", sans-serif;\n"
-"	font-size: 14px;\n"
-"	border: 1px solid #BDBDBD;\n"
-"	padding: 7px 12px;\n"
-"}\n"
-"\n"
-"#msg_input_frame QPushButton {\n"
-"	width: 32px;\n"
-"	height: 32px;\n"
-"	background: #333;\n"
-"	padding: 0px;\n"
-"	border: none\n"
-"}\n"
-"\n"
-"QLineEdit {\n"
-"	font-family: \"San Francisco\", sans-serif;\n"
-"	color: #828282;\n"
-"	font-size: 14pt;\n"
-"	font-weight: 400; \n"
-"}\n"
-"\n"
-"\n"
-"/* Central widget: Lig"
-                        "ht grey background */\n"
-"#msg_input_frame {\n"
-"background-color: rgba(161, 163, 163, 82); \n"
-"border: none;  \n"
-"border-radius: 8px;   \n"
-"}\n"
-"#msg_input_text_edit {\n"
-"background-color: rgba(161, 163, 163, 0); \n"
-"border: none;  \n"
-"border-radius: 8px;   \n"
-"}\n"
-"\n"
-"QFrame {border:none}\n"
-"#upper_frame {border: none}\n"
-"#conversation_frame {border: none}\n"
-"#central_widget {\n"
-"    background-color: rgb(211, 211, 211); /* Light grey */\n"
-"}\n"
-"\n"
-"/* Side widgets: White background with slightly rounded borders */\n"
-"#side_widget_left, #side_widget_right,  #main_widget, #scrollArea_2  {\n"
-"    background-color: rgb(255, 255, 255); /* White */\n"
-"    border: 1px solid rgb(255, 255, 255);    /* Greenish border */\n"
-"    border-radius: 8px;                  /* Slightly rounded corners */\n"
-"}\n"
-"\n"
-"\n"
-"#new_chat_btn{\n"
-"    border: 1px solid rgb(211, 211, 211);     /* Greenish border */\n"
-"    border-radius: 8px;\n"
-"}\n"
-"\n"
-"#side_widget_left, #side_widget_right,  #main_widget, "
-                        "#scrollArea_2  {\n"
-"    padding: 10px;\n"
-"}\n"
-"\n"
-"")
+                                         "    font-family: \"San Francisco\", sans-serif;\n"
+                                         "    color: #333;\n"
+                                         "    font-size: 14px;\n"
+                                         "    font-style: normal;\n"
+                                         "    font-weight: 400;\n"
+                                         "    line-height: normal;\n"
+                                         "}\n"
+                                         "\n"
+                                         "QLabel[class=\"placeholder\"] {\n"
+                                         "	color: #828282;\n"
+                                         "	font-weight: 400;\n"
+                                         "	text-align: center;\n"
+                                         "}\n"
+                                         "\n"
+                                         "QLabel[class=\"subheader\"] {\n"
+                                         "    color: #333;\n"
+                                         "    font-weight: 700;\n"
+                                         "}\n"
+                                         "\n"
+                                         "QLabel[class=\"caption\"] {\n"
+                                         "    color: #828282;\n"
+                                         "    font-size: 12px;\n"
+                                         "    font-weight: 400;\n"
+                                         "}\n"
+                                         "\n"
+                                         "QPushButton {\n"
+                                         "	border-radius: 8px;\n"
+                                         "	font-family: \"San Francisco\", sans-serif;\n"
+                                         "	font-size: 14px;\n"
+                                         "	border: 1px solid #BDBDBD;\n"
+                                         "	padding: 7px 12px;\n"
+                                         "}\n"
+                                         "\n"
+                                         "#msg_input_frame QPushButton {\n"
+                                         "	width: 32px;\n"
+                                         "	height: 32px;\n"
+                                         "	background: #333;\n"
+                                         "	padding: 0px;\n"
+                                         "	border: none\n"
+                                         "}\n"
+                                         "\n"
+                                         "QLineEdit {\n"
+                                         "	font-family: \"San Francisco\", sans-serif;\n"
+                                         "	color: #828282;\n"
+                                         "	font-size: 14pt;\n"
+                                         "	font-weight: 400; \n"
+                                         "}\n"
+                                         "\n"
+                                         "\n"
+                                         "/* Central widget: Lig"
+                                         "ht grey background */\n"
+                                         "#msg_input_frame {\n"
+                                         "background-color: rgba(161, 163, 163, 82); \n"
+                                         "border: none;  \n"
+                                         "border-radius: 8px;   \n"
+                                         "}\n"
+                                         "#msg_input_text_edit {\n"
+                                         "background-color: rgba(161, 163, 163, 0); \n"
+                                         "border: none;  \n"
+                                         "border-radius: 8px;   \n"
+                                         "}\n"
+                                         "\n"
+                                         "QFrame {border:none}\n"
+                                         "#upper_frame {border: none}\n"
+                                         "#conversation_frame {border: none}\n"
+                                         "#central_widget {\n"
+                                         "    background-color: rgb(211, 211, 211); /* Light grey */\n"
+                                         "}\n"
+                                         "\n"
+                                         "/* Side widgets: White background with slightly rounded borders */\n"
+                                         "#side_widget_left, #side_widget_right,  #main_widget, #scrollArea_2  {\n"
+                                         "    background-color: rgb(255, 255, 255); /* White */\n"
+                                         "    border: 1px solid rgb(255, 255, 255);    /* Greenish border */\n"
+                                         "    border-radius: 8px;                  /* Slightly rounded corners */\n"
+                                         "}\n"
+                                         "\n"
+                                         "\n"
+                                         "#new_chat_btn{\n"
+                                         "    border: 1px solid rgb(211, 211, 211);     /* Greenish border */\n"
+                                         "    border-radius: 8px;\n"
+                                         "}\n"
+                                         "\n"
+                                         "#side_widget_left, #side_widget_right,  #main_widget, "
+                                         "#scrollArea_2  {\n"
+                                         "    padding: 10px;\n"
+                                         "}\n"
+                                         "\n"
+                                         "")
         self.verticalLayout_3 = QVBoxLayout(self.centralwidget)
         self.verticalLayout_3.setObjectName(u"verticalLayout_3")
         self.upper_frame = QFrame(self.centralwidget)
@@ -126,13 +126,13 @@ class Ui_MainWindow(object):
         self.upper_frame.setMinimumSize(QSize(911, 71))
         self.upper_frame.setMaximumSize(QSize(16777215, 71))
         self.upper_frame.setStyleSheet(u"QPushButton {\n"
-"    border: none;\n"
-"    padding: 5px;\n"
-"}\n"
-"\n"
-"QPushButton:hover {\n"
-"    background-color: #f0f0f0;\n"
-"}")
+                                       "    border: none;\n"
+                                       "    padding: 5px;\n"
+                                       "}\n"
+                                       "\n"
+                                       "QPushButton:hover {\n"
+                                       "    background-color: #f0f0f0;\n"
+                                       "}")
         self.upper_frame.setFrameShape(QFrame.Shape.NoFrame)
         self.upper_frame.setLineWidth(0)
         self.gridLayout_2 = QGridLayout(self.upper_frame)
@@ -170,7 +170,6 @@ class Ui_MainWindow(object):
         self.login_btn.setMinimumSize(QSize(100, 0))
 
         self.gridLayout_2.addWidget(self.login_btn, 0, 5, 1, 1)
-
 
         self.verticalLayout_3.addWidget(self.upper_frame)
 
@@ -275,16 +274,16 @@ class Ui_MainWindow(object):
         self.msg_send_btn.setMinimumSize(QSize(32, 32))
         self.msg_send_btn.setMaximumSize(QSize(32, 32))
         self.msg_send_btn.setStyleSheet(u"#send_btn {\n"
-"border: none;\n"
-"padding:10px;\n"
-"border-radius: 5px;\n"
-"background: #333;\n"
-"\n"
-"}\n"
-"\n"
-"#send_btn:hover {\n"
-"	background: #ececf1;\n"
-"}")
+                                        "border: none;\n"
+                                        "padding:10px;\n"
+                                        "border-radius: 5px;\n"
+                                        "background: #333;\n"
+                                        "\n"
+                                        "}\n"
+                                        "\n"
+                                        "#send_btn:hover {\n"
+                                        "	background: #ececf1;\n"
+                                        "}")
         icon = QIcon()
         icon.addFile(u"static/icons/icon_arrow_up_white.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
         self.msg_send_btn.setIcon(icon)
@@ -293,12 +292,9 @@ class Ui_MainWindow(object):
 
         self.verticalLayout.addWidget(self.msg_send_btn)
 
-
         self.horizontalLayout.addWidget(self.frame)
 
-
         self.verticalLayout_2.addWidget(self.msg_input_frame)
-
 
         self.gridLayout.addWidget(self.frame_3, 0, 0, 2, 1)
 
@@ -310,7 +306,6 @@ class Ui_MainWindow(object):
         self.save_notes_btn.setObjectName(u"save_notes_btn")
 
         self.gridLayout.addWidget(self.save_notes_btn, 1, 1, 1, 1)
-
 
         self.horizontalLayout_2.addWidget(self.main_widget)
 
@@ -338,7 +333,6 @@ class Ui_MainWindow(object):
         self.label_2.setObjectName(u"label_2")
 
         self.verticalLayout_6.addWidget(self.label_2)
-
 
         self.verticalLayout_5.addWidget(self.frame_2)
 
@@ -376,7 +370,6 @@ class Ui_MainWindow(object):
         self.archive_btn = QPushButton(self.frame_8)
         self.archive_btn.setObjectName(u"archive_btn")
 
-
         self.gridLayout_4.addWidget(self.archive_btn, 5, 0, 1, 1)
 
         self.open_alex_btn = QPushButton(self.frame_8)
@@ -398,9 +391,7 @@ class Ui_MainWindow(object):
 
         self.gridLayout_4.addWidget(self.upload_pdf_btn, 0, 0, 1, 1)
 
-
         self.verticalLayout_5.addWidget(self.frame_8)
-
 
         self.horizontalLayout_2.addWidget(self.side_widget_left)
 
@@ -418,6 +409,7 @@ class Ui_MainWindow(object):
         self.retranslateUi(MainWindow)
 
         QMetaObject.connectSlotsByName(MainWindow)
+
     # setupUi
 
     def retranslateUi(self, MainWindow):
@@ -428,14 +420,17 @@ class Ui_MainWindow(object):
         self.about_btn.setText(QCoreApplication.translate("MainWindow", u"About", None))
         self.login_btn.setText(QCoreApplication.translate("MainWindow", u"Log In", None))
         self.main_sroll_area.setProperty(u"class", QCoreApplication.translate("MainWindow", u"subheader", None))
-        self.label_5.setText(QCoreApplication.translate("MainWindow", u"Select the sources for your search and start new conversation", None))
+        self.label_5.setText(
+            QCoreApplication.translate("MainWindow", u"Select the sources for your search and start new conversation",
+                                       None))
         self.label_5.setProperty(u"class", QCoreApplication.translate("MainWindow", u"placeholder", None))
         self.msg_input_text_edit.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Type a message ", None))
         self.msg_send_btn.setText("")
         self.save_notes_btn.setText(QCoreApplication.translate("MainWindow", u"Save to notes", None))
         self.label.setText(QCoreApplication.translate("MainWindow", u"Local sources", None))
         self.label.setProperty(u"class", QCoreApplication.translate("MainWindow", u"subheader", None))
-        self.label_2.setText(QCoreApplication.translate("MainWindow", u"Add pdf files to be included to your search", None))
+        self.label_2.setText(
+            QCoreApplication.translate("MainWindow", u"Add pdf files to be included to your search", None))
         self.label_2.setProperty(u"class", QCoreApplication.translate("MainWindow", u"caption", None))
         self.label_3.setText(QCoreApplication.translate("MainWindow", u"Include online databases in your search", None))
         self.label_3.setProperty(u"class", QCoreApplication.translate("MainWindow", u"caption", None))
@@ -446,4 +441,3 @@ class Ui_MainWindow(object):
         self.open_alex_btn.setText(QCoreApplication.translate("MainWindow", u"Open Alex", None))
         self.upload_pdf_btn.setText(QCoreApplication.translate("MainWindow", u"Add new file", None))
     # retranslateUi
-

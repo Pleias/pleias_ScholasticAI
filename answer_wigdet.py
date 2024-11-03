@@ -2,6 +2,7 @@ import sys
 
 from PySide6.QtWidgets import QFrame, QLabel, QVBoxLayout, QApplication
 from PySide6.QtCore import Qt
+from reference_widget import ReferenceWidget
 
 
 class ResponseFrame(QFrame):
@@ -19,10 +20,8 @@ class ResponseFrame(QFrame):
         self.layout().addWidget(response_label)
 
         # References list below the main response
-        references_label = QLabel()
-        references_label.setText(self.generate_references_list())
-        references_label.setWordWrap(True)
-        self.layout().addWidget(references_label)
+        reference_widget = ReferenceWidget()
+        self.layout().addWidget(reference_widget)
 
     def generate_response_text(self):
         # Main response text with inline reference numbers
