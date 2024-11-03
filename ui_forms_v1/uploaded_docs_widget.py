@@ -83,8 +83,6 @@ class Ui_Frame(object):
         self.verticalSpacer_2 = QSpacerItem(20, 121, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
 
         self.gridLayout.addItem(self.verticalSpacer_2, 5, 0, 1, 1)
-
-
         self.retranslateUi(Frame)
 
         QMetaObject.connectSlotsByName(Frame)

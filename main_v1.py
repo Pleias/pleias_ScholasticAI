@@ -199,6 +199,9 @@ class MainWindow(QMainWindow):
         self.show_conversation_frame()
 
     def show_reference_list(self, document_list: List[str]):
+        """
+        This function displays uploaded docs title on right sigh widget
+        """
         # Create QStandardItemModel for show chat title list
         model = QStandardItemModel()
         self.ui.uploaded_docs_list.setModel(model)
@@ -206,9 +209,7 @@ class MainWindow(QMainWindow):
         for document in document_list:
             item = QStandardItem()
             model.appendRow(item)
-
             index = item.index()
-
             widget = ReferenceWidget(document)
             self.ui.uploaded_docs_list.setIndexWidget(index, widget)
 
