@@ -381,7 +381,7 @@ class Ui_MainWindow(object):
         self.open_alex_btn = QPushButton(self.frame_8)
         self.open_alex_btn.setObjectName(u"open_alex_btn")
         icon1 = QIcon()
-        icon1.addFile(u":/icons/icons/logo_openalex.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+        icon1.addFile(u"static/icons/logo_openalex.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
         self.open_alex_btn.setIcon(icon1)
 
         self.gridLayout_4.addWidget(self.open_alex_btn, 4, 0, 1, 1)
