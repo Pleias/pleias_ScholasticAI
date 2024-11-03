@@ -286,7 +286,7 @@ class Ui_MainWindow(object):
 "	background: #ececf1;\n"
 "}")
         icon = QIcon()
-        icon.addFile(u":/icons/icons/icon_arrow_up_white.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+        icon.addFile(u"static/icons/icon_arrow_up_white.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
         self.msg_send_btn.setIcon(icon)
         self.msg_send_btn.setIconSize(QSize(20, 20))
         self.msg_send_btn.setCheckable(False)
@@ -376,6 +376,7 @@ class Ui_MainWindow(object):
         self.archive_btn = QPushButton(self.frame_8)
         self.archive_btn.setObjectName(u"archive_btn")
 
+
         self.gridLayout_4.addWidget(self.archive_btn, 5, 0, 1, 1)
 
         self.open_alex_btn = QPushButton(self.frame_8)
@@ -391,7 +392,7 @@ class Ui_MainWindow(object):
         sizePolicy2.setHeightForWidth(self.upload_pdf_btn.sizePolicy().hasHeightForWidth())
         self.upload_pdf_btn.setSizePolicy(sizePolicy2)
         icon2 = QIcon()
-        icon2.addFile(u":/icons/icons/icon_add.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+        icon2.addFile(u"static/icons/icon_add.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
         self.upload_pdf_btn.setIcon(icon2)
         self.upload_pdf_btn.setIconSize(QSize(16, 16))
 
