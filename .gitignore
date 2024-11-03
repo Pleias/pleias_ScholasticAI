@@ -2,3 +2,10 @@
 **/.DS_Store
 *.db
 __pycache__/
+/app_storage
+/data
+/models
+notebooks/processed
+notebooks/app_storage
+output
+processed

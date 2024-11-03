@@ -69,6 +69,38 @@ class MainWindow(QMainWindow):
         self.ui.main_sroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.show_conversation_frame()
 
+        # OPEN ALEX BTN
+        self.ui.open_alex_btn.setCheckable(True)
+        self.ui.open_alex_btn.setStyleSheet("""
+            QPushButton {
+                background-color: none;
+            }
+            QPushButton:checked {
+                background-color: grey;
+            }
+        """)
+
+        # ARCHIVE BTN
+        self.ui.archive_btn.setCheckable(True)
+        self.ui.archive_btn.setStyleSheet("""
+            QPushButton {
+                background-color: none;
+            }
+            QPushButton:checked {
+                background-color: grey;
+            }
+        """)
+
+    def archive_btn_clicked(self):
+        pass
+
+    def open_alex_btn(self):
+        if self.ui.open_alex_btn.isChecked():
+            print("if this btn is clicked we have to find 3 the most similar text chunks??"
+                  "add them to our prompt")
+        else:
+            print("Button is not pressed.")
+
     def on_msg_input_text_edit(self):
         document = self.msg_input_text_edit.document()
         self.msg_input_text_edit.setFixedHeight(int(document.size().height()))
@@ -217,8 +249,6 @@ class MainWindow(QMainWindow):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-
     main_window = MainWindow()
     main_window.show()
-
     sys.exit(app.exec())
