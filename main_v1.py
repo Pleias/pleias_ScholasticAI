@@ -10,14 +10,13 @@ from PySide6.QtWidgets import QApplication, QMainWindow, QGridLayout, QLabel, QL
     QVBoxLayout, QListWidget
 from PySide6.QtGui import QStandardItem, QStandardItemModel
 from dialog_display import ChatDialog
-from ui_forms_v1.ui_chat_window2 import Ui_MainWindow as ChatWindow
-from ui_forms_v1.uploaded_docs_widget import Ui_Frame as DocsWidget
+from ui_forms_v1.ui_chat_window import Ui_MainWindow as ChatWindow
+from ui_forms_v1.ui_uploaded_docs_widget import Ui_user_prompts as DocsWidget
 from ui_forms_v1.reference_ui import Ui_Form as ReferenceForm
 from connect_db import ConnectDB
 
 from PySide6.QtWidgets import QWidget, QHBoxLayout, QPushButton, QLineEdit
 from PySide6.QtGui import QIcon
-
 from PyPDF2 import PdfReader
 from get_answer_from_api import get_response
 
@@ -58,17 +57,27 @@ class MainWindow(QMainWindow):
         # self.ui.conversation_btn.clicked.connect(self.show_lower_frame)
         # self.show_conversation_frame()
 
+        # Resize input frame and textEdit
+        self.ui.msg_input_frame.setFixedHeight(50)
+        self.ui.msg_input_text_edit.setFixedHeight(50)
+
+        # Adjust input height by text height
         # Upload button clicked
         self.ui.upload_pdf_btn.clicked.connect(self.upload_files)
         # Process button clicked
-        self.ui.process_btn.clicked.connect(self.process_files)
+        # self.ui.process_btn.clicked.connect(self.process_files)
         # Send msg clicked
         self.ui.msg_send_btn.clicked.connect(self.get_response)
 
         # Hide scrollbar of scroll area
         self.ui.main_sroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.show_conversation_frame()
-    
+
+    def on_msg_input_text_edit(self):
+        document = self.msg_input_text_edit.document()
+        self.msg_input_text_edit.setFixedHeight(int(document.size().height()))
+        self.msg_input_frame.setFixedHeight(int(document.size().height()))
+
     def process_files(self):
         """Handle processing of uploaded PDFs through the complete pipeline"""
         try:
@@ -76,32 +85,32 @@ class MainWindow(QMainWindow):
             pdf_storage_dir = 'app_storage/pdfs'
             output_base_dir = 'app_storage/processed'
             os.makedirs(output_base_dir, exist_ok=True)
-            
+
             # Step 1: Initial PDF Processing
             print("Step 1: Initial PDF processing...")
             pdf_processor = PDFProcessor(pdf_storage_dir, output_base_dir)
             pdf_processor.process_directory()
-            
+
             # Step 2: Image Processing with YOLO
             print("\nStep 2: Processing images with YOLO...")
             model_path = 'models/yolo.pt'  # You'll need to provide the path to your YOLO model
             image_processor = ImageProcessor(model_path)
             image_processor.process_directory(output_base_dir)
-            
+
             # Step 3: Text Extraction
             print("\nStep 3: Extracting text...")
             text_extractor = TextExtractor(output_base_dir, pdf_storage_dir)
             text_extractor.process_directory_for_text_extraction()
-            
+
             # Step 4: Final TSV to JSON conversion
             print("\nStep 4: Converting to final JSON format...")
             tsv_processor = TSVJSON(output_base_dir)
             final_json_path = os.path.join(output_base_dir, 'final_output.json')
             results = tsv_processor.process(final_json_path)
-            
+
             print("\nProcessing completed successfully!")
             print(f"Results saved to: {output_base_dir}")
-            
+
         except Exception as e:
             print(f"Error during processing: {str(e)}")
 
@@ -160,6 +169,7 @@ class MainWindow(QMainWindow):
             3. User have started the conversation
 
         """
+        # self.sources_is_empty = False
         if self.dialog_is_empty and not self.sources_is_empty:
             state_widget = UploadedDocs()
             grid_layout = self.ui.main_sroll_area
@@ -182,44 +192,11 @@ class MainWindow(QMainWindow):
         )
         file_paths, _ = response
         for file_path in file_paths:
-            self.store_and_save_metadata(file_path)
+            self.db.store_and_save_metadata(file_path)
             print(f"Sucessfully uploaded file at path: {file_path}")
 
         self.show_reference_list(file_paths)
         self.show_conversation_frame()
-
-    def store_and_save_metadata(self, file_path):
-        """Store the PDF file in the local storage directory and save its metadata to the database.
-        The metadata is extracted using the extract_metadata method."""
-        # Define storage directory
-        save_directory = 'app_storage/pdfs'
-        os.makedirs(save_directory, exist_ok=True)
-        file_name = os.path.basename(file_path)
-        target_path = os.path.join(save_directory, file_name)
-
-        # Copy the file to the local storage directory
-        if not os.path.exists(target_path):
-            shutil.copy(file_path, target_path)
-
-        # Extract metadata ====> TO REPLACE WITH CARLOS FUNCTION
-        metadata = self.extract_metadata(file_path)
-
-        # Save metadata to database
-        self.db.insert_pdf_metadata(file_name, target_path, metadata)
-
-    def extract_metadata(self, file_path):
-        """Extract metadata from a PDF file using the PyPDF2 library.
-        TO REPLACE WITH CARLOS FUNCTION"""
-        with open(file_path, 'rb') as file:
-            pdf_reader = PdfReader(file)
-            info = pdf_reader.metadata
-            metadata = {
-                'title': info.title if info.title else "Untitled",
-                'author': info.author if info.author else "Unknown",
-                'creation_date': info['/CreationDate'] if '/CreationDate' in info else "N/A",
-                'subject': info.subject if info.subject else "N/A"
-            }
-        return metadata
 
     def show_reference_list(self, document_list: List[str]):
         # Create QStandardItemModel for show chat title list
