@@ -1,24 +1,20 @@
-import json
+import os
 import os
 import sys
-import shutil
-from pdf_processing_lib import PDFProcessor, ImageProcessor, TextExtractor, TSVJSON
-from typing import List, Optional
+from typing import List
 
-from PySide6.QtCore import Qt, Slot
-from PySide6.QtWidgets import QApplication, QMainWindow, QGridLayout, QLabel, QListView, QFileDialog, QWidget, \
-    QVBoxLayout, QListWidget
+from PySide6.QtCore import Qt
 from PySide6.QtGui import QStandardItem, QStandardItemModel
+from PySide6.QtWidgets import QApplication, QMainWindow, QFileDialog
+from PySide6.QtWidgets import QWidget
+from pdf_processing_lib import PDFProcessor, ImageProcessor, TextExtractor, TSVJSON
+
+from connect_db import ConnectDB
 from dialog_display import ChatDialog
+from get_answer_from_api import get_response
+from ui_forms_v1.reference_ui import Ui_Form as ReferenceForm
 from ui_forms_v1.ui_chat_window import Ui_MainWindow as ChatWindow
 from ui_forms_v1.ui_uploaded_docs_widget import Ui_user_prompts as DocsWidget
-from ui_forms_v1.reference_ui import Ui_Form as ReferenceForm
-from connect_db import ConnectDB
-
-from PySide6.QtWidgets import QWidget, QHBoxLayout, QPushButton, QLineEdit
-from PySide6.QtGui import QIcon
-from PyPDF2 import PdfReader
-from get_answer_from_api import get_response
 
 chat_data = [{"title": "Hi, how are you?",
               "chat_list": [{"input_str": "Hi, how are you?", "out_str": "16 This is model answer"},
