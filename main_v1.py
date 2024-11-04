@@ -54,8 +54,8 @@ class MainWindow(QMainWindow):
         # self.show_conversation_frame()
 
         # Resize input frame and textEdit
-        self.ui.msg_input_frame.setFixedHeight(50)
-        self.ui.msg_input_text_edit.setFixedHeight(50)
+        self.ui.msg_input_frame.setFixedHeight(45)
+        self.ui.msg_input_text_edit.setFixedHeight(45)
 
         # Adjust input height by text height
         # Upload button clicked
