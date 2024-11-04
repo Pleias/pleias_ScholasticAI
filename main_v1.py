@@ -210,6 +210,8 @@ class MainWindow(QMainWindow):
             grid_layout = self.ui.main_sroll_area
             dialog = ChatDialog(chat_data)
             grid_layout.setWidget(dialog)
+            scroll_bar = self.ui.main_sroll_area.verticalScrollBar()
+            scroll_bar.setValue(scroll_bar.maximum())
 
     def upload_files(self):
         """Open a file dialog to select one or more PDF files for upload."""
