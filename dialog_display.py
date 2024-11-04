@@ -68,7 +68,7 @@ class ChatDialog(QScrollArea):
         else:
             # System output (aligned left) using ResponseFrame
             response_frame = ReferenceWidget()
-            response_frame.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Expanding)
+            response_frame.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Minimum)
             message_layout.addWidget(response_frame)
             message_layout.addStretch()  # Push the label to the left
 
