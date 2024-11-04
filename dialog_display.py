@@ -53,7 +53,7 @@ class ChatDialog(QScrollArea):
             message_label = QLabel(self)
             message_label.setText(message)
             message_label.setWordWrap(True)
-            message_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+            message_label.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Minimum)
 
             # User input (aligned right)
             message_label.setStyleSheet("""

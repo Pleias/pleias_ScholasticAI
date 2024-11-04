@@ -5,7 +5,7 @@ from typing import List
 
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QStandardItem, QStandardItemModel
-from PySide6.QtWidgets import QApplication, QMainWindow, QFileDialog
+from PySide6.QtWidgets import QApplication, QMainWindow, QFileDialog, QLabel
 from PySide6.QtWidgets import QWidget
 from pdf_processing_lib import PDFProcessor, ImageProcessor, TextExtractor, TSVJSON
 
@@ -34,6 +34,9 @@ class ReferenceWidget(QWidget):
 
 
 class UploadedDocs(QWidget):
+    """
+    This is a screen which user see after uploading documents.
+    """
     def __init__(self):
         super().__init__()
         self.ui = DocsWidget()

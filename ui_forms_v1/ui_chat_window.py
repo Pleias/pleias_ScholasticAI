@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'chat_windowuARmXX.ui'
+## Form generated from reading UI file 'chat_windowbBSUTy.ui'
 ##
 ## Created by: Qt User Interface Compiler version 6.8.0
 ##
@@ -198,8 +198,10 @@ class Ui_MainWindow(object):
         self.main_sroll_area.setObjectName(u"main_sroll_area")
         self.main_sroll_area.setMaximumSize(QSize(16777215, 16777215))
         self.main_sroll_area.setBaseSize(QSize(5, 0))
-        self.main_sroll_area.setStyleSheet(u"border: none;")
+        self.main_sroll_area.setStyleSheet(u"border: none;\n"
+"background-color: rgb(255, 255, 255);")
         self.main_sroll_area.setFrameShape(QFrame.Shape.NoFrame)
+        self.main_sroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.main_sroll_area.setWidgetResizable(True)
         self.main_sroll_area.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.scrollAreaWidgetContents_3 = QWidget()

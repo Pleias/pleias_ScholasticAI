@@ -24,27 +24,6 @@ class Ui_Form(object):
         self.horizontalLayout = QHBoxLayout(Form)
         self.horizontalLayout.setObjectName(u"horizontalLayout")
 
-        # Create QLabel for the circle
-        self.label_3 = QLabel(Form)
-        self.label_3.setObjectName(u"label_3")
-        self.label_3.setFixedSize(25, 25)  # Fixed size for circle
-        self.label_3.setStyleSheet("""
-            QLabel {
-        background-color: rgb(200, 200, 200);  /* Grey background */
-        border-radius: 12px;                    /* Circular shape */
-        width: 25px;                             /* Width of the label */
-        height: 25px;                            /* Height of the label */
-        color: white;                            /* Text color */
-        font-size: 14px;                         /* Font size */
-        text-align: center;                      /* Center text */
-        padding: 0px;                           /* No padding for perfect circle */
-    }
-        """)
-        self.label_3.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.label_3.setText("1")  # Example number to display
-
-        self.horizontalLayout.addWidget(self.label_3)
-
         self.label = QLabel(Form)
         self.label.setObjectName(u"label")
         self.label.setMinimumSize(QSize(20, 25))

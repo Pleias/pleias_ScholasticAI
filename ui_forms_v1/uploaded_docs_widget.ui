@@ -23,7 +23,8 @@
    <enum>Qt::LayoutDirection::LeftToRight</enum>
   </property>
   <property name="styleSheet">
-   <string notr="true">#user_prompts QPushButton {
+   <string notr="true">
+#user_prompts QPushButton {
                 height: 64px;
                 border-radius: 8px;
                 font-family: &quot;San Francisco&quot;, sans-serif;
@@ -42,19 +43,19 @@
                 font-weight: 400;
                 text-align: center;
                 }
-            </string>
+</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="0" rowspan="7">
     <widget class="QFrame" name="frame">
      <property name="styleSheet">
-      <string notr="true">border-color: rgba(255, 255, 255, 0);</string>
+      <string notr="true"/>
      </property>
      <property name="frameShape">
       <enum>QFrame::Shape::NoFrame</enum>
      </property>
      <property name="frameShadow">
-      <enum>QFrame::Shadow::Raised</enum>
+      <enum>QFrame::Shadow::Plain</enum>
      </property>
     </widget>
    </item>
@@ -77,7 +78,7 @@
       <enum>QFrame::Shape::NoFrame</enum>
      </property>
      <property name="frameShadow">
-      <enum>QFrame::Shadow::Raised</enum>
+      <enum>QFrame::Shadow::Plain</enum>
      </property>
     </widget>
    </item>

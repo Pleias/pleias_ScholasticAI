@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'uploaded_docs_widgetGrUkDp.ui'
+## Form generated from reading UI file 'uploaded_docs_widgetndnCMd.ui'
 ##
 ## Created by: Qt User Interface Compiler version 6.8.0
 ##
@@ -25,7 +25,8 @@ class Ui_user_prompts(object):
         user_prompts.resize(569, 400)
         user_prompts.setMaximumSize(QSize(650, 400))
         user_prompts.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
-        user_prompts.setStyleSheet(u"#user_prompts QPushButton {\n"
+        user_prompts.setStyleSheet(u"\n"
+"#user_prompts QPushButton {\n"
 "                height: 64px;\n"
 "                border-radius: 8px;\n"
 "                font-family: \"San Francisco\", sans-serif;\n"
@@ -44,14 +45,14 @@ class Ui_user_prompts(object):
 "                font-weight: 400;\n"
 "                text-align: center;\n"
 "                }\n"
-"            ")
+"")
         self.gridLayout = QGridLayout(user_prompts)
         self.gridLayout.setObjectName(u"gridLayout")
         self.frame = QFrame(user_prompts)
         self.frame.setObjectName(u"frame")
-        self.frame.setStyleSheet(u"border-color: rgba(255, 255, 255, 0);")
+        self.frame.setStyleSheet(u"")
         self.frame.setFrameShape(QFrame.Shape.NoFrame)
-        self.frame.setFrameShadow(QFrame.Shadow.Raised)
+        self.frame.setFrameShadow(QFrame.Shadow.Plain)
 
         self.gridLayout.addWidget(self.frame, 0, 0, 7, 1)
 
@@ -62,7 +63,7 @@ class Ui_user_prompts(object):
         self.frame_2 = QFrame(user_prompts)
         self.frame_2.setObjectName(u"frame_2")
         self.frame_2.setFrameShape(QFrame.Shape.NoFrame)
-        self.frame_2.setFrameShadow(QFrame.Shadow.Raised)
+        self.frame_2.setFrameShadow(QFrame.Shadow.Plain)
 
         self.gridLayout.addWidget(self.frame_2, 0, 2, 7, 1)
 
