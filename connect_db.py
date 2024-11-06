@@ -55,7 +55,7 @@ class ConnectDB:
             connection = sqlite3.connect(self.db_path)
             cursor = connection.cursor()
             # Metadata table
-            cursor.execute('''
+            cursor.execute("""
                 CREATE TABLE IF NOT EXISTS pdf_metadata (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     file_name TEXT,
@@ -65,7 +65,7 @@ class ConnectDB:
                     creation_date TEXT,
                     subject TEXT
                 )
-            ''')
+            """)
             # Chunks table: we can add fields
             cursor.execute(
                 """
