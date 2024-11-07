@@ -22,7 +22,3 @@
   * [Embeddings](backend-development/local-rag/embeddings.md)
   * [Current YOLOv8 RAG pipeline](backend-development/local-rag/current-yolov8-rag-pipeline.md)
   * [Llama Index - Script](backend-development/local-rag/llama-index-script.md)
-
-## Data
-
-* [Dataset](data/dataset.md)
