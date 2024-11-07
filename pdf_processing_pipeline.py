@@ -17,6 +17,9 @@ import hashlib
 import random
 import re
 
+import tempfile
+import shutil
+
 _yolo_model = None
 
 def format_time(seconds):
@@ -97,7 +100,7 @@ def process_single_pdf(pdf_path, output_directory):
             traceback.print_exc(file=log_file)
         return 0
 
-def process_pdf_directory(input_path, output_directory):
+def process_pdf_directory(input_path, output_directory, pdf_chunk_size=25):
     """Process all PDFs in the input directory"""
     start_time = time.time()
     
@@ -109,9 +112,8 @@ def process_pdf_directory(input_path, output_directory):
     total_jpg_count = 0
     
     # Process PDFs in chunks to manage memory
-    chunk_size = 25
-    for start_idx in range(0, len(pdf_paths), chunk_size):
-        end_idx = start_idx + chunk_size
+    for start_idx in range(0, len(pdf_paths), pdf_chunk_size):
+        end_idx = start_idx + pdf_chunk_size
         pdf_chunk = pdf_paths[start_idx:end_idx]
         
         # Process chunk in parallel
@@ -173,7 +175,7 @@ def process_image_batch(image_batch, output_folder, model_path):
     del results
     gc.collect()
 
-def process_images_in_output_folder(output_folder, model_path):
+def process_images_in_output_folder(output_folder, model_path, batch_size=10):
     """Process all images in a specific output folder"""
     image_folder = os.path.join(output_folder, f"{os.path.basename(output_folder[:-7])}_images")
     if not os.path.exists(image_folder):
@@ -185,7 +187,7 @@ def process_images_in_output_folder(output_folder, model_path):
                   if os.path.isfile(os.path.join(image_folder, f)) and f.lower().endswith('.jpg')]
     
     start_time = time.time()
-    batch_size = 10  # Adjusted for CPU processing
+    # batch_size = 10  # Adjusted for CPU processing
 
     for i in range(0, len(image_files), batch_size):
         batch = image_files[i:i+batch_size]
@@ -197,7 +199,7 @@ def process_images_in_output_folder(output_folder, model_path):
     end_time = time.time()
     return len(image_files), end_time - start_time
 
-def process_images_directory(output_directory, model_path):
+def process_images_directory(output_directory, model_path, batch_size=10):
     """Process all images in all output directories"""
     total_images_processed = 0
     total_time_spent = 0.0
@@ -205,7 +207,7 @@ def process_images_directory(output_directory, model_path):
     for entry in os.listdir(output_directory):
         path = os.path.join(output_directory, entry)
         if os.path.isdir(path) and path.endswith('_output'):
-            images_processed, time_spent = process_images_in_output_folder(path, model_path)
+            images_processed, time_spent = process_images_in_output_folder(path, model_path, batch_size=batch_size)
             total_images_processed += images_processed
             total_time_spent += time_spent
             
@@ -578,61 +580,131 @@ def merge_json_files(json_files, output_file):
     except Exception as e:
         print(f"Error saving merged JSON: {str(e)}")
         return None, 0
+    
+    
+# Metadata extractor
+
+from datetime import datetime
+
+def format_pdf_date(date_str):
+    """Format PDF date string to 'YYYY-MM-DD'"""
+    date_str = date_str.lstrip('D:').rstrip('Z')
+    
+    # Parse the string to a datetime object
+    try:
+        date_obj = datetime.strptime(date_str, "%Y%m%d%H%M%S")
+    except ValueError:
+        date_obj = datetime.strptime(date_str, "%Y%m%d")
+    
+    # Format to 'YYYY-MM-DD'
+    return date_obj.strftime("%Y-%m-%d")
+
+def extract_pdf_metadata(pdf_path):
+    """Extract metadata from a PDF file.""" 
+    # Note: often metadata is not complete or missing, we should take care of that
+    # Maybe we can extract it from openalex anyway
+    with fitz.open(pdf_path) as doc:
+        metadata = doc.metadata
+    return {
+        "title": metadata.get("title"),
+        "author": metadata.get("author"),
+        "subject": metadata.get("subject"),
+        "keywords": metadata.get("keywords"),
+        "creation_date": format_pdf_date(metadata.get("creationDate")),
+    }
+
+# Final wrapper function
+def process_pdfs_in_folder(pdf_folder="app_storage/pdfs", 
+                           yolo_model_path="models/yolo.pt", 
+                           output_folder=None, 
+                           pdf_chunk_size=25, 
+                           batch_size=10):
+    """
+    Process PDFs in a folder, extracting tables, converting pages to images, processing with YOLO, 
+    and extracting text to return structured data for each PDF document.
+    
+    Args:
+        pdf_folder (str): Path to the folder containing PDF files.
+        yolo_model_path (str): Path to the YOLO model file.
+        output_folder (str, optional): Directory to store intermediate outputs (images, TSVs).
+        pdf_chunk_size (int, optional): Number of PDFs processed in each chunk (for memory management).
+        batch_size (int, optional): Number of images processed in each YOLO batch.
+    
+    Returns:
+        list: A list of dictionaries containing extracted information for each PDF document.
+    """
+    # Set up output directories
+    if output_folder is None:
+        temp_dir = tempfile.mkdtemp()
+        output_directory = temp_dir
+    else:
+        output_directory = output_folder
+        os.makedirs(output_directory, exist_ok=True)
+
+    # Dictionary to store all extracted data
+    extracted_data = []
+
+    try:
+        # Step 1: Process PDFs to extract images and text
+        print("\nStep 1: Processing PDFs...")
+        total_pages, pdf_processing_time, avg_time = process_pdf_directory(pdf_folder, output_directory, pdf_chunk_size=pdf_chunk_size)
+        print("PDF processing completed.")
+
+        # Step 2: Process Images with YOLO model
+        print("\nStep 2: Processing Images...")
+        total_images, image_processing_time, avg_image_time = process_images_directory(output_directory, yolo_model_path, batch_size=batch_size)
+        print("Image processing completed.")
+
+        # Step 3: Extract Text from PDF regions
+        print("\nStep 3: Text Extraction...")
+        total_files, text_extraction_time, _ = process_directory_for_text_extraction(output_directory, pdf_folder)
+        print("Text extraction completed.")
+
+        # Step 4: TSV to structured data processing
+        print("\nStep 4: TSV to JSON Processing...")
+        final_directories = []
+        for subdir, _, _ in os.walk(output_directory):
+            if subdir.endswith("final") and "_output" in subdir:
+                final_directories.append(subdir)
+        
+        for directory in final_directories:
+            document_data = []
+            json_file_path, tsv_count = parse_tsvs_to_json(directory)
+
+            if json_file_path:
+                with open(json_file_path, 'r', encoding='utf-8') as json_file:
+                    document_data = json.load(json_file)
+                    
+                    document_name = os.path.basename(os.path.dirname(directory)).replace('_output', '')
+                    
+                    # Extract metadata from the original PDF file
+                    pdf_path = os.path.join(pdf_folder, f"{document_name}.pdf")
+                    metadata = extract_pdf_metadata(pdf_path)
+
+                    # Append document data with metadata
+                    extracted_data.append({
+                        'document_name': document_name,
+                        'metadata': metadata,      # Insert metadata here
+                        'sections': document_data
+                    })
+
+                
+        print("\nAll processing completed successfully!")
+        return extracted_data
+
+    finally:
+        # Clean up temporary directory if used
+        if output_folder is None:
+            shutil.rmtree(temp_dir)
+
 
 if __name__ == "__main__":
-    input_directory = "/Users/rosas/mozilla/rag_irene"
-    output_directory = "/Users/rosas/mozilla/rag_irene_res"
-    yolo_model_path = "/Users/rosas/YoloV8-Detect.pt"
 
-    os.makedirs(output_directory, exist_ok=True)
-
-    # Dictionary to store timing results
-    timing_results = {}
-
-    # Step 1: Process PDFs
-    print("\nStep 1: Processing PDFs...")
-    start_time = time.time()
-    total_pages, pdf_processing_time, avg_time = process_pdf_directory(input_directory, output_directory)
-    timing_results['PDF Processing'] = time.time() - start_time
-    print("PDF processing completed.")
-
-    # Step 2: Process Images with YOLO
-    print("\nStep 2: Processing Images...")
-    start_time = time.time()
-    total_images, total_time, avg_time = process_images_directory(output_directory, yolo_model_path)
-    timing_results['Image Processing'] = time.time() - start_time
-    print("Image processing completed.")
-
-    # Step 3: Text Extraction
-    print("\nStep 3: Text Extraction...")
-    start_time = time.time()
-    total_files, text_time, cvat_xml_path = process_directory_for_text_extraction(output_directory, input_directory)
-    timing_results['Text Extraction'] = time.time() - start_time
-    print(f"Text extraction completed. CVAT XML saved at: {cvat_xml_path}")
-
-    # Step 4: TSV to JSON Processing
-    print("\nStep 4: TSV to JSON Processing...")
-    start_time = time.time()
-    tsv_results = process_tsv_directory(output_directory)
+    # Call the function
+    processed_data = process_pdfs_in_folder()
     
-    if tsv_results and tsv_results['json_files']:
-        merged_output_path = os.path.join(output_directory, 'merged_output.json')
-        final_json_path, total_entries = merge_json_files(tsv_results['json_files'], merged_output_path)
-        
-        timing_results['TSV to JSON Processing'] = time.time() - start_time
-        print(f"\nTSV to JSON parsing completed. Processed {tsv_results['files_processed']} files.")
-        print(f"Total processing time: {tsv_results['total_time']:.2f} seconds")
-        print(f"Average time per file: {tsv_results['avg_time']:.4f} seconds")
-        print(f"JSON merging completed. Total entries: {total_entries}")
-        print(f"Merged file saved at: {final_json_path}")
-
-    # Print timing summary
-    print("\nTiming Summary:")
-    print("-" * 40)
-    for operation, duration in timing_results.items():
-        print(f"{operation}: {format_time(duration)} seconds")
-    print("-" * 40)
-    total_time = sum(timing_results.values())
-    print(f"Total Script Time: {format_time(total_time)} seconds")
-
-    print("\nAll processing completed successfully!")
+    # Print the result to inspect
+    import json 
+    
+    with open("temp.json", 'w', encoding='utf-8') as f:
+        json.dump(processed_data, f, ensure_ascii=False, indent=4)

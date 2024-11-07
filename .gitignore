@@ -9,3 +9,5 @@ notebooks/processed
 notebooks/app_storage
 output
 processed
+
+temp.json

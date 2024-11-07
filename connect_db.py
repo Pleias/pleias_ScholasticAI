@@ -165,9 +165,8 @@ class ConnectDB:
         connection.commit()
         connection.close()
 
-    def store_and_save_metadata(self, file_path):
-        """Store the PDF file in the local storage directory and save its metadata to the database.
-        The metadata is extracted using the extract_metadata method."""
+    def store_pdf(self, file_path):
+        """Store the PDF file in the local storage directory."""
         # Define storage directory
         save_directory = 'app_storage/pdfs'
         os.makedirs(save_directory, exist_ok=True)
@@ -176,24 +175,6 @@ class ConnectDB:
         # Copy the file to the local storage directory
         if not os.path.exists(target_path):
             shutil.copy(file_path, target_path)
-        # Extract metadata ====> TO REPLACE WITH CARLOS FUNCTION
-        metadata = self.extract_metadata(file_path)
-        # Save metadata to database
-        self.insert_pdf_metadata(file_name, target_path, metadata)
-
-    def extract_metadata(self, file_path):
-        """Extract metadata from a PDF file using the PyPDF2 library.
-        TO REPLACE WITH CARLOS FUNCTION"""
-        with open(file_path, 'rb') as file:
-            pdf_reader = PdfReader(file)
-            info = pdf_reader.metadata
-            metadata = {
-                'title': info.title if info.title else "Untitled",
-                'author': info.author if info.author else "Unknown",
-                'creation_date': info['/CreationDate'] if '/CreationDate' in info else "N/A",
-                'subject': info.subject if info.subject else "N/A"
-            }
-        return metadata
 
     def close(self):
         # Placeholder close method to prevent errors; add actual cleanup if needed
