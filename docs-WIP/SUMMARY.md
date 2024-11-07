@@ -13,6 +13,7 @@
 ## 💻 Backend development
 
 * [Database](backend-development/database.md)
+* [Dataset for fine-tuning](backend-development/dataset-for-fine-tuning.md)
 * [Model & Framework](backend-development/model-and-framework/README.md)
   * [Llama files compared with MLX inference](backend-development/model-and-framework/llama-files-compared-with-mlx-inference.md)
 * [Local RAG](backend-development/local-rag/README.md)
