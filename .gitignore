@@ -2,12 +2,12 @@
 **/.DS_Store
 *.db
 __pycache__/
-/app_storage
+# /app_storage
 /data
 /models
 notebooks/processed
 notebooks/app_storage
 output
-processed
+# app_storage/pdfs/processed/*
 
 temp.json

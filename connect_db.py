@@ -242,8 +242,14 @@ class ConnectDB:
     def move_pdf(self, old_path, new_path):
         """Move a PDF file from one location to another."""
         for item in os.listdir(old_path):
-            item_new_path = os.path.join(old_path, item)
-            shutil.move(item_new_path, new_path)
+            item_old_path = os.path.join(old_path, item)
+            item_new_path = os.path.join(new_path, item)
+            
+            # # Remove it already exists
+            if os.path.exists(item_new_path):
+                os.remove(item_new_path)
+                
+            shutil.move(item_old_path, new_path)
 
     def close(self):
         """Close the persistent database connection."""
