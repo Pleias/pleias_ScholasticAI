@@ -94,6 +94,12 @@ class MainWindow(QMainWindow):
             }
         """)
 
+    def closeEvent(self, event):
+        """Overide closing method to make sure the database connection is closed"""
+        self.db.close()  # Close the database connection
+        event.accept()  # Accept the close event
+
+
     def archive_btn_clicked(self):
         pass
 
@@ -109,41 +115,41 @@ class MainWindow(QMainWindow):
         self.msg_input_text_edit.setFixedHeight(int(document.size().height()))
         self.msg_input_frame.setFixedHeight(int(document.size().height()))
 
-    def process_files(self):
-        """Handle processing of uploaded PDFs through the complete pipeline"""
-        try:
-            # Get the storage directory path
-            pdf_storage_dir = 'app_storage/pdfs'
-            output_base_dir = 'app_storage/processed'
-            os.makedirs(output_base_dir, exist_ok=True)
+    # def process_files(self):
+    #     """Handle processing of uploaded PDFs through the complete pipeline"""
+    #     try:
+    #         # Get the storage directory path
+    #         pdf_storage_dir = 'app_storage/pdfs'
+    #         output_base_dir = 'app_storage/processed'
+    #         os.makedirs(output_base_dir, exist_ok=True)
 
-            # Step 1: Initial PDF Processing
-            print("Step 1: Initial PDF processing...")
-            pdf_processor = PDFProcessor(pdf_storage_dir, output_base_dir)
-            pdf_processor.process_directory()
+    #         # Step 1: Initial PDF Processing
+    #         print("Step 1: Initial PDF processing...")
+    #         pdf_processor = PDFProcessor(pdf_storage_dir, output_base_dir)
+    #         pdf_processor.process_directory()
 
-            # Step 2: Image Processing with YOLO
-            print("\nStep 2: Processing images with YOLO...")
-            model_path = 'models/yolo.pt'  # You'll need to provide the path to your YOLO model
-            image_processor = ImageProcessor(model_path)
-            image_processor.process_directory(output_base_dir)
+    #         # Step 2: Image Processing with YOLO
+    #         print("\nStep 2: Processing images with YOLO...")
+    #         model_path = 'models/yolo.pt'  # You'll need to provide the path to your YOLO model
+    #         image_processor = ImageProcessor(model_path)
+    #         image_processor.process_directory(output_base_dir)
 
-            # Step 3: Text Extraction
-            print("\nStep 3: Extracting text...")
-            text_extractor = TextExtractor(output_base_dir, pdf_storage_dir)
-            text_extractor.process_directory_for_text_extraction()
+    #         # Step 3: Text Extraction
+    #         print("\nStep 3: Extracting text...")
+    #         text_extractor = TextExtractor(output_base_dir, pdf_storage_dir)
+    #         text_extractor.process_directory_for_text_extraction()
 
-            # Step 4: Final TSV to JSON conversion
-            print("\nStep 4: Converting to final JSON format...")
-            tsv_processor = TSVJSON(output_base_dir)
-            final_json_path = os.path.join(output_base_dir, 'final_output.json')
-            results = tsv_processor.process(final_json_path)
+    #         # Step 4: Final TSV to JSON conversion
+    #         print("\nStep 4: Converting to final JSON format...")
+    #         tsv_processor = TSVJSON(output_base_dir)
+    #         final_json_path = os.path.join(output_base_dir, 'final_output.json')
+    #         results = tsv_processor.process(final_json_path)
 
-            print("\nProcessing completed successfully!")
-            print(f"Results saved to: {output_base_dir}")
+    #         print("\nProcessing completed successfully!")
+    #         print(f"Results saved to: {output_base_dir}")
 
-        except Exception as e:
-            print(f"Error during processing: {str(e)}")
+    #     except Exception as e:
+    #         print(f"Error during processing: {str(e)}")
 
     def get_response(self):
         message_input = self.ui.msg_input_text_edit.toPlainText().strip()
@@ -224,9 +230,16 @@ class MainWindow(QMainWindow):
             filter=file_filter
         )
         file_paths, _ = response
+        
+        # Save copy of files
         for file_path in file_paths:
-            self.db.store_and_save_metadata(file_path)
+            self.db.store_pdf(file_path)
             print(f"Sucessfully uploaded file at path: {file_path}")
+            
+        self.db.parse_pdf_to_db()
+        self.db.move_pdf(old_path="app_storage/pdfs/to_process", 
+                         new_path="app_storage/pdfs/processed")
+        
 
         self.show_reference_list(file_paths)
         self.show_conversation_frame()
