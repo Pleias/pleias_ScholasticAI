@@ -26,91 +26,84 @@ def retrieve_augmented_generation(connection, embedded_query, query, documents, 
     """
     cursor = connection.cursor()
     
-    # Create temporary table for FTS search
+    # We need to first extract the list of possible chunks from the documents
+    cursor.execute("DROP TABLE IF EXISTS temp_list_of_possible_chunks;")
+    placeholders = ', '.join('?' for _ in documents)
+    create_temp_table_query = f"""
+        CREATE TEMP TABLE temp_list_of_possible_chunks AS
+        WITH list_of_possible_chunks AS (
+            SELECT chunk_id, document_id 
+            FROM chunks
+            WHERE document_id IN ({placeholders})
+        )
+        SELECT * FROM list_of_possible_chunks;
+    """
+    cursor.execute(create_temp_table_query, documents)
     
-    cursor.execute("drop table if exists fts_chunks")
-    cursor.execute("""
-            create virtual table fts_chunks using fts5(
-                text,
-                content='chunks', content_rowid='chunk_id'
-                )
-            """
-            )
-    cursor.execute("""
-            insert into fts_chunks(rowid, text)
-            select chunk_id, text
-            from chunks
-            """)
-    cursor.execute("insert into fts_chunks(fts_chunks) values('optimize')")
+    
                     
-    query = f"""
-        -- extract list of possible chunks from documents
-        with list_of_possible_chunks as (
-            select chunk_id, 
-                document_id 
-            from chunks
-            where document_id in (:documents)
+    main_rag_query = """
+        -- SQLite-vector KNN vector search results
+        WITH vec_matches AS (
+            SELECT
+                chunk_id,
+                ROW_NUMBER() OVER (ORDER BY distance) AS rank_number,
+                distance
+            FROM chunk_embeddings
+            WHERE
+                embedding MATCH :embedded_query
+                AND chunk_id IN (SELECT chunk_id FROM temp_list_of_possible_chunks)
+                AND k = :k
         ),
-        
-        -- the sqlite-vec KNN vector search results
-        vec_matches as (
-        select
-            chunk_id,
-            row_number() over (order by distance) as rank_number,
-            distance
-        from chunk_embeddings
-        where
-            embedding match :embedded_query
-            and chunk_id in (select chunk_id from list_of_possible_chunks)
-            and k = :k
+
+        -- FTS5 search results
+        fts_matches AS (
+            SELECT
+                rowid,
+                ROW_NUMBER() OVER (ORDER BY rank) AS rank_number,
+                rank AS score
+            FROM fts_chunks
+            WHERE 
+                text MATCH :query
+                AND rowid IN (SELECT chunk_id FROM temp_list_of_possible_chunks)
+            LIMIT :k
         ),
-        
-        -- the FTS5 search results
-        fts_matches as (
-        select
-            rowid,
-            row_number() over (order by rank) as rank_number,
-            rank as score
-        from fts_chunks
-        where 
-            text match :query
-            and rowid in (select chunk_id from list_of_possible_chunks)
-        limit :k
-        ),
-        
-        -- combine FTS5 + vector search results with RRF
-        final as (
-        select
-            chunks.chunk_id,
-            chunks.text,
-            vec_matches.rank_number as vec_rank,
-            fts_matches.rank_number as fts_rank,
-            -- RRF algorithm
-            (
-            coalesce(1.0 / (:rrf_k + fts_matches.rank_number), 0.0) * :weight_fts +
-            coalesce(1.0 / (:rrf_k + vec_matches.rank_number), 0.0) * :weight_vec
-            ) as combined_rank,
-            vec_matches.distance as vec_distance,
-            fts_matches.score as fts_score
-        from fts_matches
-        full outer join vec_matches on vec_matches.chunk_id = fts_matches.rowid
-        join chunks on chunks.chunk_id = coalesce(fts_matches.rowid, vec_matches.chunk_id)
-        order by combined_rank desc
+
+        -- Combine FTS5 and vector search results with RRF
+        ranking_query AS (
+            SELECT
+                chunks.chunk_id,
+                chunks.document_id,
+                pdf_metadata.title,
+                pdf_metadata.author,
+                pdf_metadata.creation_date,
+                chunks.text,
+                vec_matches.rank_number AS vec_rank,
+                fts_matches.rank_number AS fts_rank,
+                -- RRF algorithm
+                (
+                    COALESCE(1.0 / (:rrf_k + fts_matches.rank_number), 0.0) * :weight_fts +
+                    COALESCE(1.0 / (:rrf_k + vec_matches.rank_number), 0.0) * :weight_vec
+                ) AS combined_rank,
+                vec_matches.distance AS vec_distance,
+                fts_matches.score AS fts_score
+            FROM fts_matches
+            FULL OUTER JOIN vec_matches ON vec_matches.chunk_id = fts_matches.rowid
+            JOIN chunks ON chunks.chunk_id = COALESCE(fts_matches.rowid, vec_matches.chunk_id)
+            LEFT JOIN pdf_metadata ON pdf_metadata.id = chunks.document_id
+            ORDER BY combined_rank DESC
         )
         
-        select * from final
-    """
-    document_string = ', '.join(str(element) for element in documents)
+        SELECT * FROM ranking_query"""
     
-    cursor.execute(query, 
+    cursor.execute(main_rag_query, 
                         {
-                        'documents': document_string,
-                        'embedded_query': serialize_f32(embedded_query),
-                        'query': query,
-                        'k': k,
-                        'rrf_k': rrf_k,
-                        'weight_fts': weight_fts,
-                        'weight_vec': weight_vec
+                            'embedded_query': serialize_f32(embedded_query),
+                            'query': query,
+                            'k': k,
+                            'rrf_k': rrf_k,
+                            'weight_fts': weight_fts,
+                            'weight_vec': weight_vec
                         }
                      )
     
@@ -125,7 +118,7 @@ if __name__ == "__main__":
         from connect_db import ConnectDB
         connection = ConnectDB().connection
         embedded_query = [0.1, 0.0, 0.1, 0.4]
-        query ="test"
+        query ="transformer"
         documents = [1, 2, 3]
         results = retrieve_augmented_generation(connection, embedded_query, query, documents)
         print(results)

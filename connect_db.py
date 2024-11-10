@@ -20,13 +20,14 @@ class ConnectDB:
         # Database to database
         self.db_path = db_path
         
+        self.init_database()
+        
         # Persistent connection
         self.connection = sqlite3.connect(self.db_path)  
         self.connection.enable_load_extension(True)
         sqlite_vec.load(self.connection)
         self.connection.enable_load_extension(False)
         
-        self.init_database()
 
     def get_chat_data(self):
         with open(self.chat_db_path, "r") as f:
@@ -62,10 +63,17 @@ class ConnectDB:
 
     def init_database(self):
         """Creates the SQLite database if it doesn’t already exist.
-        Creates the 3 tables: pdf_metadata, chunks, and chunk_embeddings.""" 
+        Creates the 4 tables: pdf_metadata, chunks, chunks for FTS, and chunk_embeddings.""" 
 
         if not os.path.exists(self.db_path):
+            
+            self.connection = sqlite3.connect(self.db_path)  
+            self.connection.enable_load_extension(True)
+            sqlite_vec.load(self.connection)
+            self.connection.enable_load_extension(False)
             cursor = self.connection.cursor()
+            
+            print("Creating database and tables...")
 
             # Metadata table
             cursor.execute("""
@@ -79,7 +87,7 @@ class ConnectDB:
                     creation_date TEXT
                 )
             """)
-            # Chunks table: we can add fields
+            # Chunks table
             cursor.execute(
                 """
                     CREATE TABLE IF NOT EXISTS chunks (
@@ -92,6 +100,15 @@ class ConnectDB:
                     )
                 """
             )
+            # Chunks table for FTS
+            cursor.execute("""
+            CREATE VIRTUAL TABLE fts_chunks USING fts5(
+                text,
+                content='chunks', content_rowid='chunk_id'
+                )
+            """
+            )
+            
             # Embeddings table
             cursor.execute("""
                     CREATE VIRTUAL TABLE IF NOT EXISTS chunk_embeddings USING vec0(
@@ -133,7 +150,12 @@ class ConnectDB:
                 INSERT INTO chunks (section, text, pages, word_count, document_id)
                 VALUES (?, ?, ?, ?, ?)
             """, (chunk["section"], chunk["text"], str(chunk["pages"]), chunk["word_count"], document_id))
-            new_ids.append(cursor.lastrowid)
+            last_id = cursor.lastrowid
+            cursor.execute("""
+                INSERT INTO fts_chunks(rowid, text)
+                VALUES (?, ?)
+            """, (last_id, chunk["text"]))
+            new_ids.append(last_id)
         if verbose:
             print(f"Inserted {len(chunks)} chunks for document {document_id}")
         self.connection.commit()
@@ -164,9 +186,11 @@ class ConnectDB:
                 INSERT INTO chunk_embeddings (chunk_id, embedding)
                 VALUES (?, ?)
             """, (chunk_id, embedding))
-            
+        cursor.execute("INSERT INTO fts_chunks(fts_chunks) VALUES('optimize')")
+        
         if verbose:
             print(f"Inserted embeddings")
+            
         self.connection.commit()
         
         
