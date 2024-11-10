@@ -34,12 +34,13 @@ class ChatDialog(QScrollArea):
         chat_list = self.chats_data.get("chat_list")
         for chat in chat_list:
             input_str = chat.get("input_str")
-            self.addMessage(input_str, user=True)
+            self.addMessage(input_str, user=True, reference_info=None)
 
             out_str = chat.get("out_str")
-            self.addMessage(out_str, user=False)
+            reference_info = chat.get("references_info")
+            self.addMessage(out_str, user=False, reference_info=reference_info)
 
-    def addMessage(self, message, user):
+    def addMessage(self, message, user, reference_info):
         """
         Add a message to the chat.
         - If `user` is True, it aligns the message to the right (user input).
@@ -67,7 +68,7 @@ class ChatDialog(QScrollArea):
             message_layout.addWidget(message_label)
         else:
             # System output (aligned left) using ResponseFrame
-            response_frame = ReferenceWidget()
+            response_frame = ReferenceWidget(message, reference_info)
             response_frame.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Minimum)
             message_layout.addWidget(response_frame)
             message_layout.addStretch()  # Push the label to the left
@@ -77,23 +78,11 @@ class ChatDialog(QScrollArea):
 
 
 if __name__ == "__main__":
-    import sys
+    pass
 
-    chat_data = [{"title": "Hi, how are you?",
-                  "chat_list": [{"input_str": "Hi, how are you?", "out_str": "16 This is model answer"},
-                                {"input_str": "Good and you?", "out_str": "13 This is model answer"}, {
-                                    "input_str": "Dark is a dark appearance that doesn\u2019t change. Dark Mode darkens the colour scheme so the content you\u2019re working on stands out, while windows and controls seem to recede into the background. It\u2019s effective for viewing documents, presentations, photos, films, web pages and more.",
-                                    "out_str": "278 This is model answer"}]}]
-
-    chat_data = [
-        {"title": "Hi, how are you?",
-         "chat_list": [
-             {"input_str": "Hi, how are you?", "out_str": "16 This is model answer"},
-             {"input_str": "Good and you?", "out_str": "13 This is model answer"}]
-         }
-    ]
-
-    app = QApplication(sys.argv)
-    window = ChatDialog(chat_data[0])
-    window.show()
-    sys.exit(app.exec())
+    # import sys
+    #
+    # app = QApplication(sys.argv)
+    # window = ChatDialog(chat_data[0])
+    # window.show()
+    # sys.exit(app.exec())

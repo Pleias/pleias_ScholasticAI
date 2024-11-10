@@ -3,18 +3,21 @@ import sqlite_vec
 from typing import List
 import struct
 
+
 def embed_query(query, model):
     # to fill with actual embedding query
     return [0.1, 0.0, 0.1, 0.4]
-### NOTE: in the end, this should be the same embedding function as in connect_db.py
 
+
+### NOTE: in the end, this should be the same embedding function as in connect_db.py
 
 
 def serialize_f32(vector: List[float]) -> bytes:
     """serializes a list of floats into a compact "raw bytes" format"""
     return struct.pack("%sf" % len(vector), *vector)
 
-def retrieve_augmented_generation(connection, embedded_query, query, documents, k=10, rrf_k=60, weight_fts=1.0, weight_vec=1.0):
+
+def retrieve(connection, embedded_query, query, documents, k=1, rrf_k=60, weight_fts=1.0, weight_vec=1.0):
     """
     Retrieve using hybrid search with RRF.
     Example usage:
@@ -25,7 +28,7 @@ def retrieve_augmented_generation(connection, embedded_query, query, documents, 
         results = retrieve_augmented_generation(connection, embedded_query, documents)
     """
     cursor = connection.cursor()
-    
+
     # We need to first extract the list of possible chunks from the documents
     cursor.execute("DROP TABLE IF EXISTS temp_list_of_possible_chunks;")
     placeholders = ', '.join('?' for _ in documents)
@@ -39,9 +42,7 @@ def retrieve_augmented_generation(connection, embedded_query, query, documents, 
         SELECT * FROM list_of_possible_chunks;
     """
     cursor.execute(create_temp_table_query, documents)
-    
-    
-                    
+
     main_rag_query = """
         -- SQLite-vector KNN vector search results
         WITH vec_matches AS (
@@ -95,30 +96,32 @@ def retrieve_augmented_generation(connection, embedded_query, query, documents, 
         )
         
         SELECT * FROM ranking_query"""
-    
-    cursor.execute(main_rag_query, 
-                        {
-                            'embedded_query': serialize_f32(embedded_query),
-                            'query': query,
-                            'k': k,
-                            'rrf_k': rrf_k,
-                            'weight_fts': weight_fts,
-                            'weight_vec': weight_vec
-                        }
-                     )
-    
+
+    cursor.execute(main_rag_query,
+                   {
+                       'embedded_query': serialize_f32(embedded_query),
+                       'query': query,
+                       'k': k,
+                       'rrf_k': rrf_k,
+                       'weight_fts': weight_fts,
+                       'weight_vec': weight_vec
+                   }
+                   )
+
     # Fetch and return results
     results = cursor.fetchall()
     columns = [description[0] for description in cursor.description]
     return [dict(zip(columns, row)) for row in results]
 
 
-
 if __name__ == "__main__":
-        from connect_db import ConnectDB
-        connection = ConnectDB().connection
-        embedded_query = [0.1, 0.0, 0.1, 0.4]
-        query ="transformer"
-        documents = [1, 2, 3]
-        results = retrieve_augmented_generation(connection, embedded_query, query, documents)
-        print(results)
+    from connect_db import ConnectDB
+
+    connection = ConnectDB().connection
+    embedded_query = [0.1, 0.0, 0.1, 0.4]
+    query = "transformer"
+    documents = [1, 2, 3]
+    results = retrieve(connection, embedded_query, query, documents)
+    print(len(results))
+    print(results[0].keys())
+    print(results[1].keys())

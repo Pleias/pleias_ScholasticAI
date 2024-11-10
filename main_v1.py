@@ -11,16 +11,10 @@ from pdf_processing_lib import PDFProcessor, ImageProcessor, TextExtractor, TSVJ
 
 from connect_db import ConnectDB
 from dialog_display import ChatDialog
-from get_answer_from_api import get_response
+from get_answer_from_api import get_response_and_metadata
 from ui_forms_v1.reference_ui import Ui_Form as ReferenceForm
 from ui_forms_v1.ui_chat_window import Ui_MainWindow as ChatWindow
 from ui_forms_v1.ui_uploaded_docs_widget import Ui_user_prompts as DocsWidget
-
-chat_data = [{"title": "Hi, how are you?",
-              "chat_list": [{"input_str": "Hi, how are you?", "out_str": "16 This is model answer"},
-                            {"input_str": "Good and you?", "out_str": "13 This is model answer"}, {
-                                "input_str": "Dark is a dark appearance that doesn\u2019t change. Dark Mode darkens the colour scheme so the content you\u2019re working on stands out, while windows and controls seem to recede into the background. It\u2019s effective for viewing documents, presentations, photos, films, web pages and more.",
-                                "out_str": "278 This is model answer"}]}][0]
 
 
 class ReferenceWidget(QWidget):
@@ -37,6 +31,7 @@ class UploadedDocs(QWidget):
     """
     This is a screen which user see after uploading documents.
     """
+
     def __init__(self):
         super().__init__()
         self.ui = DocsWidget()
@@ -99,7 +94,6 @@ class MainWindow(QMainWindow):
         self.db.close()  # Close the database connection
         event.accept()  # Accept the close event
 
-
     def archive_btn_clicked(self):
         pass
 
@@ -115,52 +109,20 @@ class MainWindow(QMainWindow):
         self.msg_input_text_edit.setFixedHeight(int(document.size().height()))
         self.msg_input_frame.setFixedHeight(int(document.size().height()))
 
-    # def process_files(self):
-    #     """Handle processing of uploaded PDFs through the complete pipeline"""
-    #     try:
-    #         # Get the storage directory path
-    #         pdf_storage_dir = 'app_storage/pdfs'
-    #         output_base_dir = 'app_storage/processed'
-    #         os.makedirs(output_base_dir, exist_ok=True)
-
-    #         # Step 1: Initial PDF Processing
-    #         print("Step 1: Initial PDF processing...")
-    #         pdf_processor = PDFProcessor(pdf_storage_dir, output_base_dir)
-    #         pdf_processor.process_directory()
-
-    #         # Step 2: Image Processing with YOLO
-    #         print("\nStep 2: Processing images with YOLO...")
-    #         model_path = 'models/yolo.pt'  # You'll need to provide the path to your YOLO model
-    #         image_processor = ImageProcessor(model_path)
-    #         image_processor.process_directory(output_base_dir)
-
-    #         # Step 3: Text Extraction
-    #         print("\nStep 3: Extracting text...")
-    #         text_extractor = TextExtractor(output_base_dir, pdf_storage_dir)
-    #         text_extractor.process_directory_for_text_extraction()
-
-    #         # Step 4: Final TSV to JSON conversion
-    #         print("\nStep 4: Converting to final JSON format...")
-    #         tsv_processor = TSVJSON(output_base_dir)
-    #         final_json_path = os.path.join(output_base_dir, 'final_output.json')
-    #         results = tsv_processor.process(final_json_path)
-
-    #         print("\nProcessing completed successfully!")
-    #         print(f"Results saved to: {output_base_dir}")
-
-    #     except Exception as e:
-    #         print(f"Error during processing: {str(e)}")
-
     def get_response(self):
         message_input = self.ui.msg_input_text_edit.toPlainText().strip()
         chat_db = self.db.get_chat_data()
         if message_input:
-            source_documents, response_str = get_response(message_input, debug=True)
+            references_info, html_output = get_response_and_metadata(message_input)
             if not self.dialog_is_empty:
                 # Get current selected chat index
                 select_row = 0  # In the future it must be project id
 
-                chat_db[select_row]["chat_list"] += [{"input_str": message_input, "out_str": response_str}]
+                chat_db[select_row]["chat_list"] += [{
+                    "input_str": message_input,
+                    "out_str": html_output,
+                    "references_info": references_info
+                }]
                 chat_data = chat_db[select_row]
 
                 self.db.save_chat_data(chat_db)
@@ -172,19 +134,17 @@ class MainWindow(QMainWindow):
                 self.dialog_is_empty = False
                 chat_data = {
                     "title": message_input,
-                    "chat_list": [
-                        {
-                            "input_str": message_input,
-                            "out_str": response_str
-                        }
-                    ]
+                    "chat_list": [{
+                        "input_str": message_input,
+                        "out_str": html_output,
+                        "references_info": references_info
+                    }]
                 }
                 chat_db.insert(0, chat_data)
                 self.db.save_chat_data(chat_db)
 
                 # Reload window
                 self.show_conversation_frame(chat_data)
-                # self.show_reference_list(source_documents)
 
             ## Clear input after get response
             self.ui.msg_input_text_edit.clear()
@@ -206,7 +166,7 @@ class MainWindow(QMainWindow):
             3. User have started the conversation
 
         """
-        # self.sources_is_empty = False
+        self.sources_is_empty = False
         if self.dialog_is_empty and not self.sources_is_empty:
             state_widget = UploadedDocs()
             grid_layout = self.ui.main_sroll_area
@@ -230,16 +190,15 @@ class MainWindow(QMainWindow):
             filter=file_filter
         )
         file_paths, _ = response
-        
+
         # Save copy of files
         for file_path in file_paths:
             self.db.store_pdf(file_path)
             print(f"Sucessfully uploaded file at path: {file_path}")
-            
+
         self.db.parse_pdf_to_db()
-        self.db.move_pdf(old_path="app_storage/pdfs/to_process", 
+        self.db.move_pdf(old_path="app_storage/pdfs/to_process",
                          new_path="app_storage/pdfs/processed")
-        
 
         self.show_reference_list(file_paths)
         self.show_conversation_frame()
