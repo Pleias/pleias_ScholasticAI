@@ -5,6 +5,7 @@ import json
 import os
 import struct
 from typing import List
+import numpy as np
 
 from PyPDF2 import PdfReader
 
@@ -140,7 +141,7 @@ class ConnectDB:
     
     def embed(self, text):
         # Placeholder function to generate embeddings
-        return [0.1, 0.2, 0.3, 0.4] # Placeholder embedding
+        return [np.random.rand() for i in range(4)] # Placeholder embedding
     
     def serialize_f32(self, vector: List[float]) -> bytes:
         """serializes a list of floats into a compact "raw bytes" format"""
