@@ -701,7 +701,7 @@ def process_pdfs_in_folder(pdf_folder="app_storage/pdfs",
 if __name__ == "__main__":
 
     # Call the function
-    processed_data = process_pdfs_in_folder()
+    processed_data = process_pdfs_in_folder(output_folder="temp/")
     
     # Print the result to inspect
     import json 

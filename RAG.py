@@ -2,22 +2,10 @@ import sqlite3
 import sqlite_vec
 from typing import List
 import struct
+from embedding import embed_query, serialize_f32
 
 
-def embed_query(query, model):
-    # to fill with actual embedding query
-    return [0.1, 0.0, 0.1, 0.4]
-
-
-### NOTE: in the end, this should be the same embedding function as in connect_db.py
-
-
-def serialize_f32(vector: List[float]) -> bytes:
-    """serializes a list of floats into a compact "raw bytes" format"""
-    return struct.pack("%sf" % len(vector), *vector)
-
-
-def retrieve(connection, embedded_query, query, documents, k=1, rrf_k=60, weight_fts=1.0, weight_vec=1.0):
+def retrieve(connection, query, documents, k=2, rrf_k=10, weight_fts=1.0, weight_vec=1.0):
     """
     Retrieve using hybrid search with RRF.
     Example usage:
@@ -41,6 +29,8 @@ def retrieve(connection, embedded_query, query, documents, k=1, rrf_k=60, weight
         )
         SELECT * FROM list_of_possible_chunks;
     """
+
+    embedded_query = embed_query(query)
     cursor.execute(create_temp_table_query, documents)
 
     main_rag_query = """
@@ -118,10 +108,8 @@ if __name__ == "__main__":
     from connect_db import ConnectDB
 
     connection = ConnectDB().connection
-    embedded_query = [0.1, 0.0, 0.1, 0.4]
-    query = "transformer"
+    query = "single task training on single domain datasets is a major contributor to the lack of generalization "
     documents = [1, 2, 3]
-    results = retrieve(connection, embedded_query, query, documents)
-    print(len(results))
-    print(results[0].keys())
-    print(results[1].keys())
+    results = retrieve(connection, query, documents)
+    print(results)
+    connection.close()

@@ -10,6 +10,7 @@ import numpy as np
 from PyPDF2 import PdfReader
 
 from pdf_processing_pipeline import process_pdfs_in_folder
+from embedding import embed_query, serialize_f32
 
 class ConnectDB:
     def __init__(self, 
@@ -113,7 +114,7 @@ class ConnectDB:
             cursor.execute("""
                     CREATE VIRTUAL TABLE IF NOT EXISTS chunk_embeddings USING vec0(
                     chunk_id INTEGER PRIMARY KEY,
-                    embedding float[4])
+                    embedding float[1024])
                 """
             ) # replace 4 with the actual size of the embedding
 
@@ -161,32 +162,29 @@ class ConnectDB:
         self.connection.commit()
         return new_ids
     
-    def embed(self, text):
-        # Placeholder function to generate embeddings
-        return [np.random.rand() for i in range(4)] # Placeholder embedding
-    
-    def serialize_f32(self, vector: List[float]) -> bytes:
-        """serializes a list of floats into a compact "raw bytes" format"""
-        return struct.pack("%sf" % len(vector), *vector)
-    
-    def insert_embeddings(self, new_chunk_ids, verbose=True):
+    def insert_embeddings(self, new_chunk_ids:List[int], verbose=True):
         """Accepts a list of chunk ids. Inserts the embeddings into the database."""
 
         cursor = self.connection.cursor()
-        for chunk_id in new_chunk_ids:
-            # Extract text from the chunk
-            cursor.execute("""
-                SELECT text FROM chunks WHERE chunk_id = ?
-            """, (chunk_id,))
-            text = cursor.fetchone()[0]
-            
+        placeholders = ', '.join('?' for _ in new_chunk_ids)
+        cursor.execute(f"""
+            SELECT text FROM chunks WHERE chunk_id IN ({placeholders})
+        """, new_chunk_ids)
+        chunks = cursor.fetchall()
+        chunks = [chunk[0] for chunk in chunks]
+        
+        if verbose:
+            print("Embedding chunks")
+        embeddings = embed_query(chunks) 
+        
+        if verbose:
+            print("Inserting embeddings")
+        for chunk_id, embedding in zip(new_chunk_ids, embeddings):
             # Embed text and store it
-            embedding = self.serialize_f32(self.embed(text)) #### NOTE: we have to create an embedding function
             cursor.execute("""
                 INSERT INTO chunk_embeddings (chunk_id, embedding)
                 VALUES (?, ?)
-            """, (chunk_id, embedding))
-        cursor.execute("INSERT INTO fts_chunks(fts_chunks) VALUES('optimize')")
+            """, (chunk_id, serialize_f32(embedding)))
         
         if verbose:
             print(f"Inserted embeddings")
@@ -281,3 +279,9 @@ class ConnectDB:
         if self.connection:
             self.connection.close()
             print("Database connection closed.")
+            
+            
+if __name__ == "__main__":
+    db = ConnectDB()
+    db.parse_pdf_to_db()
+    db.close()

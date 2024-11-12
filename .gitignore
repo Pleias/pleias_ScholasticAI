@@ -10,4 +10,5 @@ notebooks/app_storage
 output
 # app_storage/pdfs/processed/*
 
-temp.json
+temp
+models/*
