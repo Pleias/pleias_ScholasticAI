@@ -17,8 +17,6 @@ class ConnectDB:
                  chat_db_path="app_storage/chat_data/data.json", 
                  db_path="app_storage/metadata/sqlite-poc.db"):
         self.chat_db_path = chat_db_path
-
-        # Database to database
         self.db_path = db_path
         
         self.init_database()
@@ -28,12 +26,10 @@ class ConnectDB:
         self.connection.enable_load_extension(True)
         sqlite_vec.load(self.connection)
         self.connection.enable_load_extension(False)
-        
 
     def get_chat_data(self):
         with open(self.chat_db_path, "r") as f:
             chat_db = json.load(f)
-
         return chat_db
 
     def get_chat_title_list(self):
@@ -57,23 +53,27 @@ class ConnectDB:
         with open(self.chat_db_path, "r") as f:
             chat_db = json.load(f)
         chat_db.pop(index)
-
         self.save_chat_data(chat_db)
 
-    ### PDF Metadata Storage Methods ###
-
     def init_database(self):
-        """Creates the SQLite database if it doesn’t already exist.
+        """Creates the SQLite database if it doesn't already exist.
         Creates the 4 tables: pdf_metadata, chunks, chunks for FTS, and chunk_embeddings.""" 
-
-        if not os.path.exists(self.db_path):
-            
-            self.connection = sqlite3.connect(self.db_path)  
-            self.connection.enable_load_extension(True)
-            sqlite_vec.load(self.connection)
-            self.connection.enable_load_extension(False)
-            cursor = self.connection.cursor()
-            
+        
+        # Make a connection without checking if file exists first
+        self.connection = sqlite3.connect(self.db_path)  
+        self.connection.enable_load_extension(True)
+        sqlite_vec.load(self.connection)
+        self.connection.enable_load_extension(False)
+        cursor = self.connection.cursor()
+        
+        # Check if tables exist
+        cursor.execute("""
+            SELECT name FROM sqlite_master 
+            WHERE type='table' AND name='pdf_metadata'
+        """)
+        table_exists = cursor.fetchone() is not None
+        
+        if not table_exists:  # Create tables only if they don't exist
             print("Creating database and tables...")
 
             # Metadata table
@@ -103,7 +103,7 @@ class ConnectDB:
             )
             # Chunks table for FTS
             cursor.execute("""
-            CREATE VIRTUAL TABLE fts_chunks USING fts5(
+            CREATE VIRTUAL TABLE IF NOT EXISTS fts_chunks USING fts5(
                 text,
                 content='chunks', content_rowid='chunk_id'
                 )
@@ -116,10 +116,11 @@ class ConnectDB:
                     chunk_id INTEGER PRIMARY KEY,
                     embedding float[1024])
                 """
-            ) # replace 4 with the actual size of the embedding
+            )
 
             self.connection.commit()
-            
+            print("Database tables created successfully")
+
     def insert_pdf_metadata(self, file_name, metadata, verbose=True):
         """Inserts metadata for a PDF into the database.
         Accepts file_name, and a dictionary of metadata fields."""
@@ -164,7 +165,6 @@ class ConnectDB:
     
     def insert_embeddings(self, new_chunk_ids:List[int], verbose=True):
         """Accepts a list of chunk ids. Inserts the embeddings into the database."""
-
         cursor = self.connection.cursor()
         placeholders = ', '.join('?' for _ in new_chunk_ids)
         cursor.execute(f"""
@@ -190,7 +190,6 @@ class ConnectDB:
             print(f"Inserted embeddings")
             
         self.connection.commit()
-        
         
     def parse_pdf_to_db(self, 
                          parsed_pdf_list=None,
@@ -233,8 +232,6 @@ class ConnectDB:
             
         if verbose:
             print("All PDFs parsed successfully.")
-            
-        
 
     def get_all_pdf_metadata(self):
         """Retrieves all entries in the pdf_metadata table, 
@@ -268,7 +265,7 @@ class ConnectDB:
             item_old_path = os.path.join(old_path, item)
             item_new_path = os.path.join(new_path, item)
             
-            # # Remove it already exists
+            # Remove if it already exists
             if os.path.exists(item_new_path):
                 os.remove(item_new_path)
                 
@@ -279,7 +276,6 @@ class ConnectDB:
         if self.connection:
             self.connection.close()
             print("Database connection closed.")
-            
             
 if __name__ == "__main__":
     db = ConnectDB()
