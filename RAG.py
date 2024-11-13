@@ -5,7 +5,7 @@ import struct
 from embedding import embed_query, serialize_f32
 
 
-def retrieve(connection, query, documents, k=2, rrf_k=10, weight_fts=1.0, weight_vec=1.0):
+def retrieve(connection, query, documents, k=3, rrf_k=10, weight_fts=1.0, weight_vec=1.0):
     """
     Retrieve using hybrid search with RRF.
     Example usage:
@@ -109,7 +109,7 @@ if __name__ == "__main__":
 
     connection = ConnectDB().connection
     query = "single task training on single domain datasets is a major contributor to the lack of generalization "
-    documents = [1, 2, 3]
+    documents = [1]
     results = retrieve(connection, query, documents)
     print(results)
     connection.close()

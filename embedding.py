@@ -4,11 +4,6 @@ import struct
 
 embedding_model: Optional[BGEM3FlagModel] = None
 
-embedding_model = BGEM3FlagModel('BAAI/bge-m3', 
-                       use_fp16=True, 
-                       device="cpu", 
-                       cache_dir="C:/Users/User/Documents/Models") #### NEED TO EDIT LOCALLY
-
 def embed_query(query: List[str]) -> List[List[float]]:
     global embedding_model
     # Initialize the model only once when the function is called for the first time
@@ -24,7 +19,8 @@ def embed_query(query: List[str]) -> List[List[float]]:
     return embedding_model.encode(query,
                         return_dense=True,
                         return_colbert_vecs=False,
-                        return_sparse=False)['dense_vecs']
+                        return_sparse=False,
+                        batch_size=10)['dense_vecs']
     
 def serialize_f32(vector: List[float]) -> bytes:
     """serializes a list of floats into a compact "raw bytes" format"""

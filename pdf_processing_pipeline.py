@@ -139,10 +139,18 @@ def process_pdf_directory(input_path, output_directory, pdf_chunk_size=25):
 # Image Processing Functions
 def load_yolo_model(model_path):
     """Load YOLO model if not already loaded"""
+    print("Loading YOLO model...")
     global _yolo_model
     if _yolo_model is None:
         _yolo_model = YOLO(model_path)
     return _yolo_model
+
+def unload_yolo_model():
+    """Unload YOLO model from memory."""
+    print("Unloading YOLO model...")
+    global _yolo_model
+    _yolo_model = None
+    gc.collect()  # Force garbage collection to free up memory
 
 def process_image_batch(image_batch, output_folder, model_path):
     """Process a batch of images using YOLO model"""
@@ -693,6 +701,8 @@ def process_pdfs_in_folder(pdf_folder="app_storage/pdfs",
         return extracted_data
 
     finally:
+        unload_yolo_model()
+        
         # Clean up temporary directory if used
         if output_folder is None:
             shutil.rmtree(temp_dir)
