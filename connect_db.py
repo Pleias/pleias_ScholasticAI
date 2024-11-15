@@ -4,7 +4,7 @@ import sqlite_vec
 import json
 import os
 import struct
-from typing import List, Dict
+from typing import List, Dict, Optional, Sequence
 import numpy as np
 
 from PyPDF2 import PdfReader
@@ -14,8 +14,8 @@ from embedding import embed_query, serialize_f32
 
 class ConnectDB:
     def __init__(self, 
-                 chat_db_path="app_storage/chat_data/data.json" :str , 
-                 db_path="app_storage/metadata/sqlite-poc.db": str ):
+                 chat_db_path: str ="app_storage/chat_data/data.json", 
+                 db_path: str = "app_storage/metadata/sqlite-poc.db"):
         self.chat_db_path = chat_db_path
 
         # Database to database
@@ -44,7 +44,7 @@ class ConnectDB:
             chat_list.append(title)
         return chat_list
 
-    def save_chat_data(self, new_chat_data : Dict[str]):
+    def save_chat_data(self, new_chat_data: Dict[str]):
         with open(self.chat_db_path, "w") as f:
             f.write(json.dumps(new_chat_data))
 
@@ -120,7 +120,7 @@ class ConnectDB:
 
             self.connection.commit()
             
-    def insert_pdf_metadata(self, file_name :str , metadata : Dict[str], verbose : bool =True):
+    def insert_pdf_metadata(self, file_name:str , metadata: Dict[str], verbose: bool =True):
         """Inserts metadata for a PDF into the database.
         Accepts file_name, and a dictionary of metadata fields."""
         cursor = self.connection.cursor()
@@ -141,7 +141,7 @@ class ConnectDB:
         self.connection.commit()
         return id
         
-    def insert_chunks(self, chunks : List[str], document_id : int, verbose : bool =True):
+    def insert_chunks(self, chunks: Sequence[str], document_id: int, verbose: bool =True):
         """"Accepts a list of chunks. The document_id is the id of the document in the metadata table.
         Returns a list of the new chunk ids, which is useful to embed these new chunks afterwards."""
         cursor = self.connection.cursor()
@@ -162,7 +162,7 @@ class ConnectDB:
         self.connection.commit()
         return new_ids
     
-    def insert_embeddings(self, new_chunk_ids:List[int], verbose : bool =True):
+    def insert_embeddings(self, new_chunk_ids: Sequence[int], verbose: bool = True):
         """Accepts a list of chunk ids. Inserts the embeddings into the database."""
 
         cursor = self.connection.cursor()
@@ -192,14 +192,16 @@ class ConnectDB:
         self.connection.commit()
         
         
-    def parse_pdf_to_db(self, 
-                         parsed_pdf_list : List[dict] =None,
-                         verbose : bool =True,
-                         pdf_folder : str ="app_storage/pdfs/to_process", 
-                         yolo_model_path : str ="models/yolo.pt", 
-                         intermediate_store_folder : str =None, 
-                         pdf_chunk_size : int =25, 
-                         batch_size : int =10):
+    def parse_pdf_to_db(
+        self, 
+        parsed_pdf_list: Optional[Sequence[dict]] = None,
+        verbose: bool = True,
+        pdf_folder: str = "app_storage/pdfs/to_process", 
+        yolo_model_path: str = "models/yolo.pt", 
+        intermediate_store_folder: Optional[str] = None, 
+        pdf_chunk_size: int = 25, 
+        batch_size: int = 10
+    ):
         # to combine the functions earlier in a single function
         # combine with pdf parsing function
         if parsed_pdf_list is None:
@@ -244,14 +246,14 @@ class ConnectDB:
         pdf_metadata = cursor.fetchall()
         return pdf_metadata
 
-    def delete_pdf_metadata(self, pdf_id : int):
+    def delete_pdf_metadata(self, pdf_id: int):
         """Deletes a specific entry in the pdf_metadata table based on the id (primary key), 
         allowing you remove a record if necessary."""
         cursor = self.connection.cursor()
         cursor.execute('DELETE FROM pdf_metadata WHERE id = ?', (pdf_id,))
         self.connection.commit()
 
-    def store_pdf(self, file_path : str):
+    def store_pdf(self, file_path: str):
         """Store the PDF file in the local storage directory."""
         # Define storage directory
         save_directory = 'app_storage/pdfs/to_process'
@@ -262,7 +264,7 @@ class ConnectDB:
         if not os.path.exists(target_path):
             shutil.copy(file_path, target_path)
 
-    def move_pdf(self, old_path : str, new_path : str):
+    def move_pdf(self, old_path: str, new_path: str):
         """Move a PDF file from one location to another."""
         for item in os.listdir(old_path):
             item_old_path = os.path.join(old_path, item)
