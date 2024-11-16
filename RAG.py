@@ -1,11 +1,9 @@
-import sqlite3
-import sqlite_vec
-from typing import List
-import struct
-from embedding import embed_query, serialize_f32
+from embedding import embed_query, format_for_vec_db
 
 
-def retrieve(connection, query, documents, k=3, rrf_k=10, weight_fts=1.0, weight_vec=1.0):
+def retrieve(
+    connection, query, documents, k=3, rrf_k=10, weight_fts=1.0, weight_vec=1.0
+):
     """
     Retrieve using hybrid search with RRF.
     Example usage:
@@ -19,7 +17,7 @@ def retrieve(connection, query, documents, k=3, rrf_k=10, weight_fts=1.0, weight
 
     # We need to first extract the list of possible chunks from the documents
     cursor.execute("DROP TABLE IF EXISTS temp_list_of_possible_chunks;")
-    placeholders = ', '.join('?' for _ in documents)
+    placeholders = ", ".join("?" for _ in documents)
     create_temp_table_query = f"""
         CREATE TEMP TABLE temp_list_of_possible_chunks AS
         WITH list_of_possible_chunks AS (
@@ -33,6 +31,7 @@ def retrieve(connection, query, documents, k=3, rrf_k=10, weight_fts=1.0, weight
     embedded_query = embed_query(query)
     cursor.execute(create_temp_table_query, documents)
 
+    # Note: we are using euclidean distance here, we could use another one https://alexgarcia.xyz/sqlite-vec/api-reference.html#distance
     main_rag_query = """
         -- SQLite-vector KNN vector search results
         WITH vec_matches AS (
@@ -87,16 +86,17 @@ def retrieve(connection, query, documents, k=3, rrf_k=10, weight_fts=1.0, weight
         
         SELECT * FROM ranking_query"""
 
-    cursor.execute(main_rag_query,
-                   {
-                       'embedded_query': serialize_f32(embedded_query),
-                       'query': query,
-                       'k': k,
-                       'rrf_k': rrf_k,
-                       'weight_fts': weight_fts,
-                       'weight_vec': weight_vec
-                   }
-                   )
+    cursor.execute(
+        main_rag_query,
+        {
+            "embedded_query": format_for_vec_db(embedded_query),
+            "query": query,
+            "k": k,
+            "rrf_k": rrf_k,
+            "weight_fts": weight_fts,
+            "weight_vec": weight_vec,
+        },
+    )
 
     # Fetch and return results
     results = cursor.fetchall()

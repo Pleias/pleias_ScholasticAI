@@ -12,3 +12,4 @@ output
 
 temp
 models/*
+.ruff*
