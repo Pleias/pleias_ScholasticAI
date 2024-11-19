@@ -124,7 +124,7 @@ def get_response_and_metadata(user_message):
     connection = ConnectDB().connection
     embedded_query = [0.1, 0.0, 0.1, 0.4]
     documents = [1, 2, 3]
-    results = retrieve(connection, embedded_query, user_message, documents)
+    results = retrieve(connection, embedded_query, documents)
     prompt = construct_prompt(results, user_message)
     raw_response = generate_with_llamafile_api(prompt)
     html_output = convert_input_msg_to_html(raw_response)
