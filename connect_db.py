@@ -3,32 +3,29 @@ import sqlite3
 import sqlite_vec
 import json
 import os
-import struct
-from typing import List, Dict
-import numpy as np
+from typing import Dict, Optional, Sequence, Any
 
-from PyPDF2 import PdfReader
 
 from pdf_processing_pipeline import process_pdfs_in_folder
-from embedding import embed_query, serialize_f32
+from embedding import embed_query, format_for_vec_db
+
 
 class ConnectDB:
     def __init__(self, 
-                 chat_db_path : str ="app_storage/chat_data/data.json", 
-                 db_path : str ="app_storage/metadata/sqlite-poc.db"):
+                 chat_db_path="app_storage/chat_data/data.json" :str , 
+                 db_path="app_storage/metadata/sqlite-poc.db": str ):
         self.chat_db_path = chat_db_path
 
         # Database to database
         self.db_path = db_path
-        
+
         self.init_database()
-        
+
         # Persistent connection
-        self.connection = sqlite3.connect(self.db_path)  
+        self.connection = sqlite3.connect(self.db_path)
         self.connection.enable_load_extension(True)
         sqlite_vec.load(self.connection)
         self.connection.enable_load_extension(False)
-        
 
     def get_chat_data(self):
         with open(self.chat_db_path, "r") as f:
@@ -44,7 +41,7 @@ class ConnectDB:
             chat_list.append(title)
         return chat_list
 
-    def save_chat_data(self, new_chat_data):
+    def save_chat_data(self, new_chat_data : Dict[str]):
         with open(self.chat_db_path, "w") as f:
             f.write(json.dumps(new_chat_data))
 
@@ -64,16 +61,15 @@ class ConnectDB:
 
     def init_database(self):
         """Creates the SQLite database if it doesn’t already exist.
-        Creates the 4 tables: pdf_metadata, chunks, chunks for FTS, and chunk_embeddings.""" 
+        Creates the 4 tables: pdf_metadata, chunks, chunks for FTS, and chunk_embeddings."""
 
         if not os.path.exists(self.db_path):
-            
-            self.connection = sqlite3.connect(self.db_path)  
+            self.connection = sqlite3.connect(self.db_path)
             self.connection.enable_load_extension(True)
             sqlite_vec.load(self.connection)
             self.connection.enable_load_extension(False)
             cursor = self.connection.cursor()
-            
+
             print("Creating database and tables...")
 
             # Metadata table
@@ -103,92 +99,115 @@ class ConnectDB:
             )
             # Chunks table for FTS
             cursor.execute("""
-            CREATE VIRTUAL TABLE fts_chunks USING fts5(
+            CREATE VIRTUAL TABLE chunks_fts USING fts5(
                 text,
                 content='chunks', content_rowid='chunk_id'
                 )
-            """
-            )
-            
+            """)
+
             # Embeddings table
             cursor.execute("""
                     CREATE VIRTUAL TABLE IF NOT EXISTS chunk_embeddings USING vec0(
                     chunk_id INTEGER PRIMARY KEY,
                     embedding float[1024])
-                """
-            ) # replace 4 with the actual size of the embedding
+                """)  # replace 4 with the actual size of the embedding
 
             self.connection.commit()
             
-    def insert_pdf_metadata(self, file_name :str , metadata, verbose : bool =True):
+    def insert_pdf_metadata(self, file_name :str , metadata : Dict[str], verbose : bool =True):
         """Inserts metadata for a PDF into the database.
         Accepts file_name, and a dictionary of metadata fields."""
         cursor = self.connection.cursor()
-        cursor.execute('''
+        cursor.execute(
+            """
             INSERT INTO pdf_metadata (
                 file_name, title, author, subject, keywords, creation_date
                 )
             VALUES (?, ?, ?, ?, ?, ?)
-        ''', (file_name, 
-              metadata.get('title'), 
-              metadata.get('author'),
-              metadata.get('subject'),
-              metadata.get('keywords'),
-              metadata.get('creation_date')))
+        """,
+            (
+                file_name,
+                metadata.get("title"),
+                metadata.get("author"),
+                metadata.get("subject"),
+                metadata.get("keywords"),
+                metadata.get("creation_date"),
+            ),
+        )
         if verbose:
             print(f"Inserted metadata for {file_name}")
         id = cursor.lastrowid
         self.connection.commit()
         return id
-        
-    def insert_chunks(self, chunks : List[str], document_id : int, verbose : bool =True):
-        """"Accepts a list of chunks. The document_id is the id of the document in the metadata table.
+
+    def insert_chunks(
+        self, chunks: Sequence[str], document_id: int, verbose: bool = True
+    ):
+        """ "Accepts a list of chunks. The document_id is the id of the document in the metadata table.
         Returns a list of the new chunk ids, which is useful to embed these new chunks afterwards."""
         cursor = self.connection.cursor()
         new_ids = []
         for chunk in chunks:
-            cursor.execute("""
+            cursor.execute(
+                """
                 INSERT INTO chunks (section, text, pages, word_count, document_id)
                 VALUES (?, ?, ?, ?, ?)
-            """, (chunk["section"], chunk["text"], str(chunk["pages"]), chunk["word_count"], document_id))
+            """,
+                (
+                    chunk["section"],
+                    chunk["text"],
+                    str(chunk["pages"]),
+                    chunk["word_count"],
+                    document_id,
+                ),
+            )
             last_id = cursor.lastrowid
-            cursor.execute("""
-                INSERT INTO fts_chunks(rowid, text)
+            cursor.execute(
+                """
+                INSERT INTO chunks_fts(rowid, text)
                 VALUES (?, ?)
-            """, (last_id, chunk["text"]))
+            """,
+                (last_id, chunk["text"]),
+            )
             new_ids.append(last_id)
         if verbose:
             print(f"Inserted {len(chunks)} chunks for document {document_id}")
         self.connection.commit()
         return new_ids
-    
-    def insert_embeddings(self, new_chunk_ids:List[int], verbose : bool =True):
+
+    def insert_embeddings(self, new_chunk_ids: Sequence[int], verbose: bool = True):
         """Accepts a list of chunk ids. Inserts the embeddings into the database."""
 
         cursor = self.connection.cursor()
-        placeholders = ', '.join('?' for _ in new_chunk_ids)
-        cursor.execute(f"""
+        placeholders = ", ".join("?" for _ in new_chunk_ids)
+        cursor.execute(
+            f"""
             SELECT text FROM chunks WHERE chunk_id IN ({placeholders})
-        """, new_chunk_ids)
+        """,
+            new_chunk_ids,
+        )
         chunks = cursor.fetchall()
         chunks = [chunk[0] for chunk in chunks]
-        
+
         if verbose:
             print("Embedding chunks")
-        embeddings = embed_query(chunks) 
-        
+        embeddings = embed_query(chunks)
+
         if verbose:
             print("Inserting embeddings")
         for chunk_id, embedding in zip(new_chunk_ids, embeddings):
             # Embed text and store it
-            cursor.execute("""
+            cursor.execute(
+                """
                 INSERT INTO chunk_embeddings (chunk_id, embedding)
                 VALUES (?, ?)
-            """, (chunk_id, serialize_f32(embedding)))
-        
+            """,
+                (chunk_id, format_for_vec_db(embedding)),
+            )
+
         if verbose:
-            print(f"Inserted embeddings")
-            
+            print("Inserted embeddings")
+
         self.connection.commit()
         
         
@@ -197,64 +216,63 @@ class ConnectDB:
                          verbose : bool =True,
                          pdf_folder : str ="app_storage/pdfs/to_process", 
                          yolo_model_path : str ="models/yolo.pt", 
-                         intermediate_store_folder : str =  "temp/intermediate_folders", 
+                         intermediate_store_folder : str =None, 
                          pdf_chunk_size : int =25, 
                          batch_size : int =10):
         # to combine the functions earlier in a single function
         # combine with pdf parsing function
         if parsed_pdf_list is None:
-            parsed_pdf_list = process_pdfs_in_folder(pdf_folder=pdf_folder, 
-                            yolo_model_path=yolo_model_path, 
-                            output_folder=intermediate_store_folder, 
-                            pdf_chunk_size=pdf_chunk_size, 
-                            batch_size=batch_size)
-        
+            parsed_pdf_list = process_pdfs_in_folder(
+                pdf_folder=pdf_folder,
+                yolo_model_path=yolo_model_path,
+                output_folder=intermediate_store_folder,
+                pdf_chunk_size=pdf_chunk_size,
+                batch_size=batch_size,
+            )
+
         for parsed_pdf in parsed_pdf_list:
             file_name = parsed_pdf.get("document_name")
             metadata = parsed_pdf.get("metadata")
-            
+
             # Insert metadata
-            document_id = self.insert_pdf_metadata(file_name=file_name, 
-                                                   metadata=metadata, 
-                                                   verbose=verbose)
-            
+            document_id = self.insert_pdf_metadata(
+                file_name=file_name, metadata=metadata, verbose=verbose
+            )
+
             # Insert chunks
             chunks = parsed_pdf.get("sections")
-            new_chunk_ids = self.insert_chunks(chunks=chunks, 
-                                               document_id=document_id, 
-                                               verbose=verbose)
-            
+            new_chunk_ids = self.insert_chunks(
+                chunks=chunks, document_id=document_id, verbose=verbose
+            )
+
             # Insert embeddings
-            self.insert_embeddings(new_chunk_ids=new_chunk_ids, 
-                                   verbose=verbose)
-            
+            self.insert_embeddings(new_chunk_ids=new_chunk_ids, verbose=verbose)
+
             if verbose:
                 print(f"Stored metadata, chunks, and embeddings for {file_name}")
-            
+
         if verbose:
             print("All PDFs parsed successfully.")
-            
-        
 
     def get_all_pdf_metadata(self):
-        """Retrieves all entries in the pdf_metadata table, 
+        """Retrieves all entries in the pdf_metadata table,
         useful for loading and displaying metadata if needed in the app."""
         cursor = self.connection.cursor()
-        cursor.execute('SELECT * FROM pdf_metadata')
+        cursor.execute("SELECT * FROM pdf_metadata")
         pdf_metadata = cursor.fetchall()
         return pdf_metadata
 
-    def delete_pdf_metadata(self, pdf_id : int):
-        """Deletes a specific entry in the pdf_metadata table based on the id (primary key), 
+    def delete_pdf_metadata(self, pdf_id: int):
+        """Deletes a specific entry in the pdf_metadata table based on the id (primary key),
         allowing you remove a record if necessary."""
         cursor = self.connection.cursor()
-        cursor.execute('DELETE FROM pdf_metadata WHERE id = ?', (pdf_id,))
+        cursor.execute("DELETE FROM pdf_metadata WHERE id = ?", (pdf_id,))
         self.connection.commit()
 
-    def store_pdf(self, file_path : str):
+    def store_pdf(self, file_path: str):
         """Store the PDF file in the local storage directory."""
         # Define storage directory
-        save_directory = 'app_storage/pdfs/to_process'
+        save_directory = "app_storage/pdfs/to_process"
         os.makedirs(save_directory, exist_ok=True)
         file_name = os.path.basename(file_path)
         target_path = os.path.join(save_directory, file_name)
@@ -262,16 +280,16 @@ class ConnectDB:
         if not os.path.exists(target_path):
             shutil.copy(file_path, target_path)
 
-    def move_pdf(self, old_path : str, new_path : str):
+    def move_pdf(self, old_path: str, new_path: str):
         """Move a PDF file from one location to another."""
         for item in os.listdir(old_path):
             item_old_path = os.path.join(old_path, item)
             item_new_path = os.path.join(new_path, item)
-            
+
             # # Remove it already exists
             if os.path.exists(item_new_path):
                 os.remove(item_new_path)
-                
+
             shutil.move(item_old_path, new_path)
 
     def close(self):
@@ -279,8 +297,8 @@ class ConnectDB:
         if self.connection:
             self.connection.close()
             print("Database connection closed.")
-            
-            
+
+
 if __name__ == "__main__":
     db = ConnectDB()
     db.parse_pdf_to_db(intermediate_store_folder="temp/intermediate_folders")
