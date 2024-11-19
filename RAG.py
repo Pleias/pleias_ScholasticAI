@@ -1,8 +1,9 @@
 from embedding import embed_query, format_for_vec_db
+from typing import List, Optional
 
 
 def retrieve(
-    connection, query, documents, k=3, rrf_k=10, weight_fts=1.0, weight_vec=1.0
+    connection, query, documents: Optional[List] = None, k=3, rrf_k=10, weight_fts=1.0, weight_vec=1.0
 ):
     """
     Retrieve using hybrid search with RRF.
@@ -17,19 +18,31 @@ def retrieve(
 
     # We need to first extract the list of possible chunks from the documents
     cursor.execute("DROP TABLE IF EXISTS temp_list_of_possible_chunks;")
-    placeholders = ", ".join("?" for _ in documents)
-    create_temp_table_query = f"""
-        CREATE TEMP TABLE temp_list_of_possible_chunks AS
-        WITH list_of_possible_chunks AS (
-            SELECT chunk_id, document_id 
-            FROM chunks
-            WHERE document_id IN ({placeholders})
-        )
-        SELECT * FROM list_of_possible_chunks;
-    """
+    
+    if documents is not None:
+        placeholders = ", ".join("?" for _ in documents)
+        create_temp_table_query = f"""
+            CREATE TEMP TABLE temp_list_of_possible_chunks AS
+            WITH list_of_possible_chunks AS (
+                SELECT chunk_id, document_id 
+                FROM chunks
+                WHERE document_id IN ({placeholders})
+            )
+            SELECT * FROM list_of_possible_chunks;
+        """
+        cursor.execute(create_temp_table_query, documents)
+    else:
+        create_temp_table_query = """
+            CREATE TEMP TABLE temp_list_of_possible_chunks AS
+            WITH list_of_possible_chunks AS (
+                SELECT chunk_id, document_id 
+                FROM chunks
+            )
+            SELECT * FROM list_of_possible_chunks;
+        """
+        cursor.execute(create_temp_table_query)
 
     embedded_query = embed_query(query)
-    cursor.execute(create_temp_table_query, documents)
 
     # Note: we are using euclidean distance here, we could use another one https://alexgarcia.xyz/sqlite-vec/api-reference.html#distance
     main_rag_query = """
@@ -52,7 +65,7 @@ def retrieve(
                 rowid,
                 ROW_NUMBER() OVER (ORDER BY rank) AS rank_number,
                 rank AS score
-            FROM fts_chunks
+            FROM chunks_fts
             WHERE 
                 text MATCH :query
                 AND rowid IN (SELECT chunk_id FROM temp_list_of_possible_chunks)
@@ -109,7 +122,7 @@ if __name__ == "__main__":
 
     connection = ConnectDB().connection
     query = "single task training on single domain datasets is a major contributor to the lack of generalization "
-    documents = [1]
-    results = retrieve(connection, query, documents)
+    results = retrieve(connection, query)
+    print(len(results))
     print(results)
     connection.close()

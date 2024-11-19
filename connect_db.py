@@ -3,7 +3,7 @@ import sqlite3
 import sqlite_vec
 import json
 import os
-from typing import Dict, Optional, Sequence
+from typing import Dict, Optional, Sequence, Any
 
 
 from pdf_processing_pipeline import process_pdfs_in_folder
@@ -43,7 +43,7 @@ class ConnectDB:
             chat_list.append(title)
         return chat_list
 
-    def save_chat_data(self, new_chat_data: Dict[str]):
+    def save_chat_data(self, new_chat_data: Dict[str, str]):
         with open(self.chat_db_path, "w") as f:
             f.write(json.dumps(new_chat_data))
 
@@ -101,7 +101,7 @@ class ConnectDB:
             )
             # Chunks table for FTS
             cursor.execute("""
-            CREATE VIRTUAL TABLE fts_chunks USING fts5(
+            CREATE VIRTUAL TABLE chunks_fts USING fts5(
                 text,
                 content='chunks', content_rowid='chunk_id'
                 )
@@ -117,7 +117,7 @@ class ConnectDB:
             self.connection.commit()
 
     def insert_pdf_metadata(
-        self, file_name: str, metadata: Dict[str], verbose: bool = True
+        self, file_name: str, metadata: Dict[str, Any], verbose: bool = True
     ):
         """Inserts metadata for a PDF into the database.
         Accepts file_name, and a dictionary of metadata fields."""
@@ -168,7 +168,7 @@ class ConnectDB:
             last_id = cursor.lastrowid
             cursor.execute(
                 """
-                INSERT INTO fts_chunks(rowid, text)
+                INSERT INTO chunks_fts(rowid, text)
                 VALUES (?, ?)
             """,
                 (last_id, chunk["text"]),
