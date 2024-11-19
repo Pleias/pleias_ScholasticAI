@@ -472,6 +472,7 @@ def parse_tsvs_to_json(directory):
                 df['Category'] = df['class_name'].apply(classify_class_name)
                 df['text'] = df['text'].astype(str)
                 
+                
                 for _, row in df.iterrows():
                     category = row['Category']
                     text = row['text'].strip()
@@ -483,6 +484,7 @@ def parse_tsvs_to_json(directory):
                             "pages": [page_number],
                             "document": document_name,
                             "word_count": len(text.split()),
+                            "coordinates":(row["x1"],row["y1"],row["x2"],row["y2"]),
                             "hash": generate_hash()
                         })
                     elif category == "Special":
@@ -494,6 +496,7 @@ def parse_tsvs_to_json(directory):
                                     "pages": current_chunk_pages,
                                     "document": document_name,
                                     "word_count": len(chunk.split()),
+                                    "coordinates":(row["x1"],row["y1"],row["x2"],row["y2"]),
                                     "hash": generate_hash()
                                 })
                         current_section = text

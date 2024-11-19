@@ -14,8 +14,8 @@ from embedding import embed_query, serialize_f32
 
 class ConnectDB:
     def __init__(self, 
-                 chat_db_path="app_storage/chat_data/data.json" :str , 
-                 db_path="app_storage/metadata/sqlite-poc.db": str ):
+                 chat_db_path : str ="app_storage/chat_data/data.json", 
+                 db_path : str ="app_storage/metadata/sqlite-poc.db"):
         self.chat_db_path = chat_db_path
 
         # Database to database
@@ -44,7 +44,7 @@ class ConnectDB:
             chat_list.append(title)
         return chat_list
 
-    def save_chat_data(self, new_chat_data : Dict[str]):
+    def save_chat_data(self, new_chat_data):
         with open(self.chat_db_path, "w") as f:
             f.write(json.dumps(new_chat_data))
 
@@ -120,7 +120,7 @@ class ConnectDB:
 
             self.connection.commit()
             
-    def insert_pdf_metadata(self, file_name :str , metadata : Dict[str], verbose : bool =True):
+    def insert_pdf_metadata(self, file_name :str , metadata, verbose : bool =True):
         """Inserts metadata for a PDF into the database.
         Accepts file_name, and a dictionary of metadata fields."""
         cursor = self.connection.cursor()
@@ -197,7 +197,7 @@ class ConnectDB:
                          verbose : bool =True,
                          pdf_folder : str ="app_storage/pdfs/to_process", 
                          yolo_model_path : str ="models/yolo.pt", 
-                         intermediate_store_folder : str =None, 
+                         intermediate_store_folder : str =  "temp/intermediate_folders", 
                          pdf_chunk_size : int =25, 
                          batch_size : int =10):
         # to combine the functions earlier in a single function
@@ -283,5 +283,5 @@ class ConnectDB:
             
 if __name__ == "__main__":
     db = ConnectDB()
-    db.parse_pdf_to_db()
+    db.parse_pdf_to_db(intermediate_store_folder="temp/intermediate_folders")
     db.close()
