@@ -2,8 +2,6 @@ from PySide6.QtGui import QPixmap, Qt
 from PySide6.QtWidgets import QApplication, QWidget, QFrame, QVBoxLayout, QLabel
 import sys
 from ui_one_reference_frame import Ui_one_reference
-
-
 class OneReferenceFrame(QFrame):
     def __init__(self,
                  new_ref_numer: int = 1,
@@ -50,7 +48,75 @@ class OneReferenceFrame(QFrame):
         if event.button() == Qt.LeftButton:
             self.setStyleSheet("background-color: lightgray;")
             print("Frame clicked!")  # Handle frame click here
+             # Specify the image and TSV file paths
+            image_path = "path/to/image.jpg"  # Replace with your image path
+            tsv_path = "path/to/coordinates.tsv"  # Replace with your TSV path
+
+            # Open the QScrollArea with the image and rectangle
+            self.show_image_with_highlight(image_path, tsv_path)
+
         super().mousePressEvent(event)
+
+    def show_image_with_highlight(self, image_path, tsv_path):
+        # Read the coordinates from the TSV file
+        coordinates = self.read_coordinates_from_tsv(tsv_path)
+        if not coordinates:
+            print("Invalid coordinates file.")
+            return
+
+        # Create a scroll area
+        scroll_area = QScrollArea()
+        scroll_area.setWindowTitle("Image Viewer")
+        scroll_area.resize(800, 600)
+
+        # Create a widget to display the image
+        image_label = QLabel()
+        pixmap = QPixmap(image_path)
+        if pixmap.isNull():
+            print(f"Failed to load image: {image_path}")
+            return
+
+        # Add the image to the label
+        image_label.setPixmap(pixmap)
+
+        # Create a custom widget to overlay the rectangle
+        overlay_widget = QLabel()
+        overlay_widget.setPixmap(self.add_highlight_to_pixmap(pixmap, coordinates))
+        overlay_widget.setAlignment(Qt.AlignTop | Qt.AlignLeft)
+
+        # Set up the scroll area
+        container_widget = QWidget()
+        layout = QVBoxLayout(container_widget)
+        layout.addWidget(overlay_widget)
+        scroll_area.setWidget(container_widget)
+
+        # Show the scroll area
+        scroll_area.show()
+
+    def read_coordinates_from_tsv(self, tsv_path):
+        """Reads coordinates from a TSV file. Assumes format: x1\ty1\tx2\ty2"""
+        try:
+            with open(tsv_path, "r") as file:
+                line = file.readline().strip()
+                x1, y1, x2, y2 = map(int, line.split("\t"))
+                return x1, y1, x2, y2
+        except Exception as e:
+            print(f"Error reading TSV file: {e}")
+            return None
+
+    def add_highlight_to_pixmap(self, pixmap, coordinates):
+        """Draws a rectangle over the pixmap based on coordinates."""
+        x1, y1, x2, y2 = coordinates
+
+        # Create a painter to draw on the pixmap
+        highlighted_pixmap = pixmap.copy()
+        painter = QPainter(highlighted_pixmap)
+        painter.setPen(QColor(255, 0, 0, 200))  # Red color with transparency
+        painter.setBrush(QColor(255, 0, 0, 50))  # Transparent red fill
+        painter.drawRect(x1, y1, x2 - x1, y2 - y1)
+        painter.end()
+
+        return highlighted_pixmap
 
     # def mouseReleaseEvent(self, event):
     #     if event.button() == Qt.LeftButton:
