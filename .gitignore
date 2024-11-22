@@ -8,7 +8,7 @@ __pycache__/
 notebooks/processed
 notebooks/app_storage
 output
-# app_storage/pdfs/processed/*
+app_storage/pdfs/processed/*
 
 temp
 models/*

@@ -171,7 +171,7 @@ class ConnectDB:
             )
             new_ids.append(last_id)
         if verbose:
-            print(f"Inserted {len(chunks)} chunks for document {document_id}")
+            print(f"Inserted {len(chunks)} chunks for document n°{document_id}")
         self.connection.commit()
         return new_ids
 
@@ -250,6 +250,7 @@ class ConnectDB:
 
             if verbose:
                 print(f"Stored metadata, chunks, and embeddings for {file_name}")
+                print("-------------------")
 
         if verbose:
             print("All PDFs parsed successfully.")

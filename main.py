@@ -99,8 +99,10 @@ class MainWindow(QMainWindow):
 
     def open_alex_btn(self):
         if self.ui.open_alex_btn.isChecked():
-            print("if this btn is clicked we have to find 3 the most similar text chunks??"
-                  "add them to our prompt")
+            print(
+                "if this btn is clicked we have to find 3 the most similar text chunks??"
+                "add them to our prompt"
+            )
         else:
             print("Button is not pressed.")
 
@@ -119,11 +121,13 @@ class MainWindow(QMainWindow):
                 # Get current selected chat index
                 select_row = 0  # In the future it must be project id
 
-                chat_db[select_row]["chat_list"] += [{
-                    "input_str": message_input,
-                    "out_str": html_output,
-                    "references_info": references_info
-                }]
+                chat_db[select_row]["chat_list"] += [
+                    {
+                        "input_str": message_input,
+                        "out_str": html_output,
+                        "references_info": references_info,
+                    }
+                ]
                 chat_data = chat_db[select_row]
 
                 self.db.save_chat_data(chat_db)
@@ -135,11 +139,13 @@ class MainWindow(QMainWindow):
                 self.dialog_is_empty = False
                 chat_data = {
                     "title": message_input,
-                    "chat_list": [{
-                        "input_str": message_input,
-                        "out_str": html_output,
-                        "references_info": references_info
-                    }]
+                    "chat_list": [
+                        {
+                            "input_str": message_input,
+                            "out_str": html_output,
+                            "references_info": references_info,
+                        }
+                    ],
                 }
                 chat_db.insert(0, chat_data)
                 self.db.save_chat_data(chat_db)
@@ -182,12 +188,9 @@ class MainWindow(QMainWindow):
     def upload_files(self):
         """Open a file dialog to select one or more PDF files for upload."""
         self.sources_is_empty = False
-        file_filter = 'Data File (*.pdf);;'
+        file_filter = "Data File (*.pdf);;"
         response = QFileDialog.getOpenFileNames(
-            parent=self,
-            caption='Select file(s)',
-            dir=os.getcwd(),
-            filter=file_filter
+            parent=self, caption="Select file(s)", dir=os.getcwd(), filter=file_filter
         )
         file_paths, _ = response
 
@@ -197,8 +200,10 @@ class MainWindow(QMainWindow):
             print(f"Sucessfully uploaded file at path: {file_path}")
 
         self.db.parse_pdf_to_db()
-        self.db.move_pdf(old_path="app_storage/pdfs/to_process",
-                         new_path="app_storage/pdfs/processed")
+        self.db.move_pdf(
+            old_path="app_storage/pdfs/to_process",
+            new_path="app_storage/pdfs/processed",
+        )
 
         self.show_reference_list(file_paths)
         self.show_conversation_frame()

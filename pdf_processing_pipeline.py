@@ -168,9 +168,9 @@ def process_pdf_directory(input_path, output_directory, pdf_chunk_size=25):
 # Image Processing Functions
 def load_yolo_model(model_path):
     """Load YOLO model if not already loaded"""
-    print("Loading YOLO model...")
     global _yolo_model
     if _yolo_model is None:
+        print("Loading YOLO model...")
         _yolo_model = YOLO(model_path)
     return _yolo_model
 
