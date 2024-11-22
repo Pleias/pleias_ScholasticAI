@@ -5,6 +5,7 @@ To run the code you need llamafile running on the background, or get response ke
 ./Llama-3.2-1B-Instruct.Q6_K.llamafile --server --nobrowser -n 20
 python main.py
 ```
+You can download the model [there](https://huggingface.co/Mozilla/Llama-3.2-1B-Instruct-llamafile/blob/main/Llama-3.2-1B-Instruct.Q6_K.llamafile)
 
 [//]: # (Usful links for implemetation )
 [//]: # (https://thepythoncode.com/article/make-pdf-viewer-with-tktinter-in-python)

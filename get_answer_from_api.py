@@ -7,12 +7,12 @@ from RAG import retrieve
 
 
 def construct_prompt(results, user_message):
-    hash_ids = ['**7b3a9c2d4e8f5g1h**', '**9d4e2f7c8b5a3h1i**']
+    # hash_ids = ['**7b3a9c2d4e8f5g1h**', '**9d4e2f7c8b5a3h1i**']
     text_chunks = [res['text'] for res in results]
     titles = [res['title'] for res in results]
     sources = ''
     for i in range(len(text_chunks)):
-        source = "\n".join([hash_ids[i], titles[i], text_chunks[i]])
+        source = "\n".join([titles[i], text_chunks[i]]) #hash_ids[i],
         sources += source
 
     prompt = f"""### Query ###\n{user_message}\n\n### Source ###\n{sources}\n\n### Analysis ###\n"""
@@ -122,9 +122,8 @@ def convert_input_msg_to_html(answer):
 
 def get_response_and_metadata(user_message):
     connection = ConnectDB().connection
-    embedded_query = [0.1, 0.0, 0.1, 0.4]
-    documents = [1, 2, 3]
-    results = retrieve(connection, embedded_query, user_message, documents)
+    # documents = [1, 2, 3]
+    results = retrieve(connection, user_message) # documents
     prompt = construct_prompt(results, user_message)
     raw_response = generate_with_llamafile_api(prompt)
     html_output = convert_input_msg_to_html(raw_response)

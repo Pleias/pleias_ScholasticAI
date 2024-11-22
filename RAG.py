@@ -3,22 +3,32 @@ from typing import List, Optional
 
 
 def retrieve(
-    connection, query, documents: Optional[List] = None, k=3, rrf_k=10, weight_fts=1.0, weight_vec=1.0
+    connection,
+    query: str,
+    documents: Optional[List] = None,
+    k: int = 3,
+    rrf_k: float = 10,
+    weight_fts: float = 1.0,
+    weight_vec: float = 1.0,
 ):
     """
-    Retrieve using hybrid search with RRF.
-    Example usage:
-        from connect_db import ConnectDB
-        connection = ConnectDB().connection
-        embedded_query = [0.1, 0.2, 0.3, 0.4]
-        documents = [1, 2, 3]
-        results = retrieve_augmented_generation(connection, embedded_query, documents)
+    Retrieve relevant document chunks based on a query using hybrid search (combination of vector search and full-text search (FTS)).
+    Arguments:
+        connection: The database connection object.
+        query (str): The search query string.
+        documents (Optional[List]): A list of document IDs to restrict the search to specific documents. Defaults to None for search in all documents.
+        k (int): The number of top results to return from each search method (vector search and FTS). Defaults to 3.
+        rrf_k (float): The rank fusion parameter for Reciprocal Rank Fusion (RRF). Defaults to 10.
+        weight_fts (float): The weight for the FTS ranking in the combined rank. Defaults to 1.0.
+        weight_vec (float): The weight for the vector search ranking in the combined rank. Defaults to 1.0.
+    Returns:
+        List[Dict]: A list of dictionaries containing the combined search results, with each dictionary representing a document chunk and its metadata.
     """
     cursor = connection.cursor()
 
     # We need to first extract the list of possible chunks from the documents
     cursor.execute("DROP TABLE IF EXISTS temp_list_of_possible_chunks;")
-    
+
     if documents is not None:
         placeholders = ", ".join("?" for _ in documents)
         create_temp_table_query = f"""
