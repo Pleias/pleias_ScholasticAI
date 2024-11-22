@@ -114,6 +114,7 @@ class MainWindow(QMainWindow):
         chat_db = self.db.get_chat_data()
         if message_input:
             references_info, html_output = get_response_and_metadata(message_input)
+            print("REFERENCES INFO : ",references_info)
             if not self.dialog_is_empty:
                 # Get current selected chat index
                 select_row = 0  # In the future it must be project id
@@ -166,7 +167,6 @@ class MainWindow(QMainWindow):
             3. User have started the conversation
 
         """
-        self.sources_is_empty = False
         if self.dialog_is_empty and not self.sources_is_empty:
             state_widget = UploadedDocs()
             grid_layout = self.ui.main_sroll_area

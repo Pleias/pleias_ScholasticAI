@@ -15,7 +15,7 @@ def embed_query(query: List[str]) -> List[List[float]]:
             "BAAI/bge-m3",
             use_fp16=True,
             device="cpu",
-            cache_dir="C:/Users/User/Documents/Models",
+            cache_dir="Models",
         )
 
     return embedding_model.encode(
