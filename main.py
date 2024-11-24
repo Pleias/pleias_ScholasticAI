@@ -7,8 +7,6 @@ from PySide6.QtCore import Qt
 from PySide6.QtGui import QStandardItem, QStandardItemModel
 from PySide6.QtWidgets import QApplication, QMainWindow, QFileDialog, QLabel
 from PySide6.QtWidgets import QWidget
-from pdf_processing_lib import PDFProcessor, ImageProcessor, TextExtractor, TSVJSON
-
 from connect_db import ConnectDB
 from dialog_display import ChatDialog
 from get_answer_from_api import get_response_and_metadata

@@ -40,7 +40,7 @@ class OneReferenceFrame(QFrame):
             self.ui.ref_last_icon.clear()
             self.ui.ref_text.setText("")
         elif source_database == "open_alex":
-            "Do nothing as OpenAlex is used as a default icon"
+            self.ui.ref_last_icon.setPixmap(QPixmap(u"static/icons/logo_openalex.png"))
             pass
         elif source_database == "archive":
             self.ui.ref_last_icon.setPixmap(QPixmap(u"static/icons/archive.svg"))
@@ -96,15 +96,15 @@ if __name__ == "__main__":
         'author': 'Authors info found on archive',
         'source_database': 'archive',
     }
-    text = """
+    html_response = """
     The primary feature of the Transformers architecture is the self-attention mechanism <span style="border: 1px solid #007bff; padding: 2px; border-radius: 3px; background-color: #e7f3ff; color: #007bff; font-size: 12px;">1</span>.
     This allows the model to weigh the importance of different words dynamically, capturing long-range dependencies efficiently
     <span style="border: 1px solid #6c757d; padding: 2px; border-radius: 3px; background-color: #f1f1f1; color: #6c757d; font-size: 12px;">2</span>.
     Transformers also use an encoder-decoder architecture that avoids sequential operations
      <span style="border: 1px solid #6c757d; padding: 2px; border-radius: 3px; background-color: #f1f1f1; color: #6c757d; font-size: 12px;">2</span> <span style="border: 1px solid #ffc107; padding: 2px; border-radius: 3px; background-color: #fff3cd; color: #856404; font-size: 12px;">3</span>.
     """
-
+    references_info = [example_local, example_archive, example_open_alex]
     app = QApplication(sys.argv)
-    window = ReferenceWidget()
+    window = ReferenceWidget(html_response, references_info)
     window.show()
     sys.exit(app.exec())

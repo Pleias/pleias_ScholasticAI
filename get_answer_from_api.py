@@ -4,6 +4,7 @@ import json
 import re
 from connect_db import ConnectDB
 from RAG import retrieve
+from open_alex_retrieval import OpenAlexReader
 
 
 def construct_prompt(results, user_message):
@@ -120,13 +121,28 @@ def convert_input_msg_to_html(answer):
     return updated_text
 
 
-def retrive_from_open_alex(user_message):
-    return []
+def retrieve_from_open_alex(user_message, debug=False):
+    if debug:
+        return [
+            {"text": "put your text",
+             'title': "Short story about Anna", 'author': "Kamu", 'source_database': 'open_alex',
+             "creation_date": "01/12/12"},
+            {"text": "put your text",
+             'title': "Short story about Anna", 'author': "CHUK", 'source_database': 'open_alex',
+             "creation_date": "01/12/12"},
+            {"text": "put your text",
+             'title': "Short story about Anna", 'author': "LION", 'source_database': 'open_alex',
+             "creation_date": "01/12/12"},
+        ]
+    else:
+        r = OpenAlexReader()
+        results = r.retrieve_from_open_alex(user_query=user_message, max_results=3)
+        return results
 
 
 def get_response_and_metadata(user_message, open_alex):
     if open_alex:
-        results = retrive_from_open_alex(user_message)
+        results = retrieve_from_open_alex(user_message)
     else:
         connection = ConnectDB().connection
         results = retrieve(connection, user_message)
@@ -141,7 +157,7 @@ def get_response_and_metadata(user_message, open_alex):
             "title": reference["title"],
             "author": reference["author"],
             "creation_date": reference["creation_date"],
-            "source_database": reference["source_database"],
+            "source_database": reference.get('source_database', 'local'),
         }
         references_info.append(reference_info)
     return references_info, html_output
