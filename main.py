@@ -107,15 +107,16 @@ class MainWindow(QMainWindow):
             print("Button is not pressed.")
 
     def on_msg_input_text_edit(self):
-        document = self.msg_input_text_edit.document()
-        self.msg_input_text_edit.setFixedHeight(int(document.size().height()))
-        self.msg_input_frame.setFixedHeight(int(document.size().height()))
+        document = self.ui.msg_input_text_edit.document()
+        self.ui.msg_input_text_edit.setFixedHeight(int(document.size().height()))
+        self.ui.msg_input_frame.setFixedHeight(int(document.size().height()))
 
     def get_response(self):
         message_input = self.ui.msg_input_text_edit.toPlainText().strip()
         chat_db = self.db.get_chat_data()
         if message_input:
-            references_info, html_output = get_response_and_metadata(message_input)
+            open_alex = self.ui.open_alex_btn.isChecked()
+            references_info, html_output = get_response_and_metadata(message_input, open_alex)
             if not self.dialog_is_empty:
                 # Get current selected chat index
                 select_row = 0  # In the future it must be project id

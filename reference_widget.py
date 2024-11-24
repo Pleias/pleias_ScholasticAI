@@ -77,23 +77,23 @@ if __name__ == "__main__":
     example_local = {
         'new_ref_numer': '1',
         'source_icon_local': True,
-        'source_title': 'Paper Title found on Local database',
-        'source_authors': 'Authors info found on Local database',
+        'title': 'Paper Title found on Local database',
+        'author': 'Authors info found on Local database',
         'source_database': 'local',
     }
 
     example_open_alex = {
         'new_ref_numer': '2',
         'source_icon_local': False,
-        'source_title': 'Paper Title found on Open Alex',
-        'source_authors': 'Authors info found on Open Alex',
+        'title': 'Paper Title found on Open Alex',
+        'author': 'Authors info found on Open Alex',
         'source_database': 'open_alex',
     }
     example_archive = {
         'new_ref_numer': '3',
         'source_icon_local': False,
-        'source_title': 'Paper Title found on archive',
-        'source_authors': 'Authors info found on archive',
+        'title': 'Paper Title found on archive',
+        'author': 'Authors info found on archive',
         'source_database': 'archive',
     }
     text = """

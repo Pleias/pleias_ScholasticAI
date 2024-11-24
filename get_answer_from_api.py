@@ -12,7 +12,7 @@ def construct_prompt(results, user_message):
     titles = [res['title'] for res in results]
     sources = ''
     for i in range(len(text_chunks)):
-        source = "\n".join([titles[i], text_chunks[i]]) #hash_ids[i],
+        source = "\n".join([titles[i], text_chunks[i]])  # hash_ids[i],
         sources += source
 
     prompt = f"""### Query ###\n{user_message}\n\n### Source ###\n{sources}\n\n### Analysis ###\n"""
@@ -120,10 +120,17 @@ def convert_input_msg_to_html(answer):
     return updated_text
 
 
-def get_response_and_metadata(user_message):
-    connection = ConnectDB().connection
-    # documents = [1, 2, 3]
-    results = retrieve(connection, user_message) # documents
+def retrive_from_open_alex(user_message):
+    return []
+
+
+def get_response_and_metadata(user_message, open_alex):
+    if open_alex:
+        results = retrive_from_open_alex(user_message)
+    else:
+        connection = ConnectDB().connection
+        results = retrieve(connection, user_message)
+
     prompt = construct_prompt(results, user_message)
     raw_response = generate_with_llamafile_api(prompt)
     html_output = convert_input_msg_to_html(raw_response)
@@ -134,10 +141,7 @@ def get_response_and_metadata(user_message):
             "title": reference["title"],
             "author": reference["author"],
             "creation_date": reference["creation_date"],
+            "source_database": reference["source_database"],
         }
         references_info.append(reference_info)
-
     return references_info, html_output
-
-
-
