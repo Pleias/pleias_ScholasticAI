@@ -306,7 +306,7 @@ class Ui_MainWindow(object):
 "	background: #ececf1;\n"
 "}")
         icon = QIcon()
-        icon.addFile(u":/icons/icons/icon_arrow_up_white.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+        icon.addFile(u"static/icons/icon_arrow_up_white.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
         self.msg_send_btn.setIcon(icon)
         self.msg_send_btn.setIconSize(QSize(20, 20))
         self.msg_send_btn.setCheckable(False)
@@ -423,7 +423,7 @@ class Ui_MainWindow(object):
         self.open_alex_btn = QPushButton(self.frame_8)
         self.open_alex_btn.setObjectName(u"open_alex_btn")
         icon1 = QIcon()
-        icon1.addFile(u":/icons/icons/logo_openalex.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+        icon1.addFile(u"static/icons/logo_openalex.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
         self.open_alex_btn.setIcon(icon1)
 
         self.gridLayout_4.addWidget(self.open_alex_btn, 4, 0, 1, 1)
@@ -433,7 +433,7 @@ class Ui_MainWindow(object):
         sizePolicy1.setHeightForWidth(self.upload_pdf_btn.sizePolicy().hasHeightForWidth())
         self.upload_pdf_btn.setSizePolicy(sizePolicy1)
         icon2 = QIcon()
-        icon2.addFile(u":/icons/icons/icon_add.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+        icon2.addFile(u"static/icons/icon_add.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
         self.upload_pdf_btn.setIcon(icon2)
         self.upload_pdf_btn.setIconSize(QSize(16, 16))
 
@@ -469,7 +469,7 @@ class Ui_MainWindow(object):
         self.main_sroll_area.setProperty(u"class", QCoreApplication.translate("MainWindow", u"subheader", None))
         self.label_5.setText(QCoreApplication.translate("MainWindow", u"Select the sources for your search and start new conversation", None))
         self.label_5.setProperty(u"class", QCoreApplication.translate("MainWindow", u"placeholder", None))
-        self.msg_input_text_edit.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Type a message kvcmkfdsmvksdf kfvsdkfnv dlfkvmdkfmvlksdv dlfvkmdfkmvlkdfmvkm dflkvmdfkmvkfdmvkmdfskv dflvkmdfkvmkfdmvdmslv", None))
+        self.msg_input_text_edit.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Type a message", None))
         self.msg_send_btn.setText("")
         self.save_notes_btn.setText(QCoreApplication.translate("MainWindow", u"Save to notes", None))
         self.label.setText(QCoreApplication.translate("MainWindow", u"Local sources", None))

@@ -4,6 +4,7 @@ import json
 import re
 from connect_db import ConnectDB
 from RAG import retrieve
+from open_alex_retrieval import OpenAlexReader
 
 
 def construct_prompt(results, user_message):
@@ -107,9 +108,9 @@ def return_span(number=1):
 
 
 def convert_input_msg_to_html(answer):
-    pattern = r'###\s*Answer\s*###'
+    pattern = r'###\s*Analysis\s*###'
     match = re.search(pattern, answer)
-    start_answer = match.end()
+    start_answer = match.end() if match is not None else 0
     end_answer = answer.find("#END#") if answer.find("###") == -1 else len(answer)
     answer = answer[start_answer:end_answer]
     references = re.findall(r'<ref name="[^"]+">', answer)
@@ -123,18 +124,36 @@ def convert_input_msg_to_html(answer):
     return updated_text
 
 
-def get_response_and_metadata(user_message):
-    connection = ConnectDB().connection
+def retrieve_from_open_alex(user_message, debug=False):
+    if debug:
+        return [
+            {"text": "put your text",
+             'title': "Short story about Anna", 'author': "Kamu", 'source_database': 'open_alex',
+             "creation_date": "01/12/12"},
+            {"text": "put your text",
+             'title': "Short story about Anna", 'author': "CHUK", 'source_database': 'open_alex',
+             "creation_date": "01/12/12"},
+            {"text": "put your text",
+             'title': "Short story about Anna", 'author': "LION", 'source_database': 'open_alex',
+             "creation_date": "01/12/12"},
+        ]
+    else:
+        r = OpenAlexReader()
+        results = r.retrieve_from_open_alex(user_query=user_message, max_results=3)
+        return results
 
-    #documents = [1, 2, 3]
-    #results = retrieve(connection, user_message, documents)
 
-    results = retrieve(connection, user_message) # documents
+def get_response_and_metadata(user_message, open_alex):
+    if open_alex:
+        results = retrieve_from_open_alex(user_message)
+    else:
+        connection = ConnectDB().connection
+        results = retrieve(connection, user_message)
 
-    #prompt = construct_prompt(results, user_message)
-    #raw_response = generate_with_llamafile_api(prompt)
-    #html_output = convert_input_msg_to_html(raw_response)
-    html_output = "temp solution"
+    prompt = construct_prompt(results, user_message)
+    raw_response = generate_with_llamafile_api(prompt)
+    print(raw_response)
+    html_output = convert_input_msg_to_html(raw_response)
 
     references_info = []
     for reference in results:
@@ -142,13 +161,9 @@ def get_response_and_metadata(user_message):
             "title": reference["title"],
             "author": reference["author"],
             "creation_date": reference["creation_date"],
-            "chunk_id": reference["chunk_id"],
-            "document_id":reference["document_id"],
-            "text":reference["text"]
+            "source_database": reference.get('source_database', 'local'),
+            "document_id" : reference["document_id"],
+            "chunk_id" : reference["chunk_id"]
         }
         references_info.append(reference_info)
-
     return references_info, html_output
-
-
-

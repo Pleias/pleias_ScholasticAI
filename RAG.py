@@ -113,7 +113,7 @@ def retrieve(
         main_rag_query,
         {
             "embedded_query": format_for_vec_db(embedded_query),
-            "query": query,
+            "query": query.replace("?", ""), # Remove question marks as they are not supported in FTS
             "k": k,
             "rrf_k": rrf_k,
             "weight_fts": weight_fts,
