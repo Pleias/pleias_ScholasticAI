@@ -691,15 +691,23 @@ def merge_json_files(json_files, output_file):
 
 def format_pdf_date(date_str):
     """Format PDF date string to 'YYYY-MM-DD'"""
-    date_str = date_str.lstrip("D:").rstrip("Z")
-
-    # Parse the string to a datetime object
+    if not date_str:
+        return None
+        
+    # Remove D: prefix and timezone if present
+    date_str = date_str.replace('D:', '')
+    date_str = re.sub(r'[+-]\d{2}\'\d{2}\'.*$', '', date_str)
+    
     try:
+        # Try full format first (with time)
         date_obj = datetime.strptime(date_str, "%Y%m%d%H%M%S")
     except ValueError:
-        date_obj = datetime.strptime(date_str, "%Y%m%d")
-
-    # Format to 'YYYY-MM-DD'
+        try:
+            # Try date-only format
+            date_obj = datetime.strptime(date_str, "%Y%m%d")
+        except ValueError:
+            return None
+    
     return date_obj.strftime("%Y-%m-%d")
 
 
