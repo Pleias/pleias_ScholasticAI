@@ -1,5 +1,4 @@
 import os
-import os
 import sys
 from typing import List
 
@@ -13,6 +12,9 @@ from get_answer_from_api import get_response_and_metadata
 from ui_forms_v1.reference_ui import Ui_Form as ReferenceForm
 from ui_forms_v1.ui_chat_window import Ui_MainWindow as ChatWindow
 from ui_forms_v1.ui_uploaded_docs_widget import Ui_user_prompts as DocsWidget
+
+from watchdog.observers import Observer
+from watchdog.events import FileSystemEventHandler
 
 
 class ReferenceWidget(QWidget):
@@ -227,9 +229,43 @@ class MainWindow(QMainWindow):
         self.ui.uploaded_docs_list.setContentsMargins(5, 0, 5, 5)
         # self.ui.uploaded_docs_list.setViewMode(QListView.IconMode)
 
+# Reload the app when a Python file changes
+class ReloadHandler(FileSystemEventHandler):
+    def __init__(self, app_restart_callback):
+        super().__init__()
+        self.app_restart_callback = app_restart_callback
+
+    def on_modified(self, event):
+        if event.src_path.endswith(".py"):  # Only watch Python files
+            print(f"Detected change in {event.src_path}, restarting app...")
+            self.app_restart_callback()
+
+def restart_app():
+    # Kill the current process and restart it
+    python = sys.executable
+    os.execl(python, python, *sys.argv)
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     main_window = MainWindow()
     main_window.show()
     sys.exit(app.exec())
+
+## Uncomment this code to enable auto-reloading
+# if __name__ == "__main__":
+#     observer = Observer()
+#     handler = ReloadHandler(restart_app)
+#     observer.schedule(handler, path=".", recursive=True)
+#     observer.start()
+
+#     try:
+#         app = QApplication(sys.argv)
+#         main_window = MainWindow()
+#         main_window.show()
+#         sys.exit(app.exec())
+#     except KeyboardInterrupt:
+#         print("Stopping watcher...")
+#         observer.stop()
+#     finally:
+#         observer.join()

@@ -9,6 +9,7 @@ notebooks/processed
 notebooks/app_storage
 output
 app_storage/pdfs/processed/*
+app_storage/chat_data*
 
 temp
 models/*

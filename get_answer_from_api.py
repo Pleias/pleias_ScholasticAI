@@ -105,9 +105,9 @@ def return_span(number=1):
 
 
 def convert_input_msg_to_html(answer):
-    pattern = r'###\s*Answer\s*###'
+    pattern = r'###\s*Analysis\s*###'
     match = re.search(pattern, answer)
-    start_answer = match.end()
+    start_answer = match.end() if match is not None else 0
     end_answer = answer.find("#END#") if answer.find("###") == -1 else len(answer)
     answer = answer[start_answer:end_answer]
     references = re.findall(r'<ref name="[^"]+">', answer)
@@ -149,6 +149,7 @@ def get_response_and_metadata(user_message, open_alex):
 
     prompt = construct_prompt(results, user_message)
     raw_response = generate_with_llamafile_api(prompt)
+    print(raw_response)
     html_output = convert_input_msg_to_html(raw_response)
 
     references_info = []
