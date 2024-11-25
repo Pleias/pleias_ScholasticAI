@@ -126,22 +126,15 @@ def convert_input_msg_to_html(answer):
 def get_response_and_metadata(user_message):
     connection = ConnectDB().connection
 
-    documents = [1, 2, 3]
-    results = retrieve(connection, user_message, documents)
-    print("results")
-    for r in results:
-        print("chunk_id : ",r["chunk_id"])
-        print("document_id : ",r["document_id"])
-        print("title : ",r["title"])
-        print("text : ",r["text"][:20])
+    #documents = [1, 2, 3]
+    #results = retrieve(connection, user_message, documents)
 
     results = retrieve(connection, user_message) # documents
 
-    prompt = construct_prompt(results, user_message)
-    print("prompt : ",prompt)
-    raw_response = generate_with_llamafile_api(prompt)
-    print("raw response : ", raw_response)
-    html_output = convert_input_msg_to_html(raw_response)
+    #prompt = construct_prompt(results, user_message)
+    #raw_response = generate_with_llamafile_api(prompt)
+    #html_output = convert_input_msg_to_html(raw_response)
+    html_output = "temp solution"
 
     references_info = []
     for reference in results:
@@ -149,6 +142,9 @@ def get_response_and_metadata(user_message):
             "title": reference["title"],
             "author": reference["author"],
             "creation_date": reference["creation_date"],
+            "chunk_id": reference["chunk_id"],
+            "document_id":reference["document_id"],
+            "text":reference["text"]
         }
         references_info.append(reference_info)
 
