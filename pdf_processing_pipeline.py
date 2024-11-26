@@ -500,7 +500,7 @@ def classify_class_name(class_name):
     return "Regular"
 
 
-def split_text(text, max_words=400):
+def split_text(text, max_words=250):
     """Split text into chunks by sentences, respecting max word limit"""
     sentences = re.split(r"(?<=[.!?])\s+", text)
     chunks = []

@@ -6,10 +6,11 @@ def retrieve(
     connection,
     query: str,
     documents: Optional[List] = None,
-    k: int = 3,
+    k: int = 2,  # Changed to 2 to get top 2 from each method
     rrf_k: float = 10,
     weight_fts: float = 1.0,
     weight_vec: float = 1.0,
+    final_k: int = 3,  # New parameter to specify final number of results
 ):
     """
     Retrieve relevant document chunks based on a query using hybrid search (combination of vector search and full-text search (FTS)).
@@ -17,12 +18,13 @@ def retrieve(
         connection: The database connection object.
         query (str): The search query string.
         documents (Optional[List]): A list of document IDs to restrict the search to specific documents. Defaults to None for search in all documents.
-        k (int): The number of top results to return from each search method (vector search and FTS). Defaults to 3.
+        k (int): The number of top results to return from each search method (vector search and FTS). Defaults to 2.
         rrf_k (float): The rank fusion parameter for Reciprocal Rank Fusion (RRF). Defaults to 10.
         weight_fts (float): The weight for the FTS ranking in the combined rank. Defaults to 1.0.
         weight_vec (float): The weight for the vector search ranking in the combined rank. Defaults to 1.0.
+        final_k (int): The final number of top results to return after combining both methods. Defaults to 3.
     Returns:
-        List[Dict]: A list of dictionaries containing the combined search results, with each dictionary representing a document chunk and its metadata.
+        List[Dict]: A list of dictionaries containing the top 3 combined search results.
     """
     cursor = connection.cursor()
 
@@ -54,7 +56,6 @@ def retrieve(
 
     embedded_query = embed_query(query)
 
-    # Note: we are using euclidean distance here, we could use another one https://alexgarcia.xyz/sqlite-vec/api-reference.html#distance
     main_rag_query = """
         -- SQLite-vector KNN vector search results
         WITH vec_matches AS (
@@ -104,20 +105,22 @@ def retrieve(
             FULL OUTER JOIN vec_matches ON vec_matches.chunk_id = fts_matches.rowid
             JOIN chunks ON chunks.chunk_id = COALESCE(fts_matches.rowid, vec_matches.chunk_id)
             LEFT JOIN pdf_metadata ON pdf_metadata.id = chunks.document_id
-            ORDER BY combined_rank DESC
         )
         
-        SELECT * FROM ranking_query"""
+        SELECT * FROM ranking_query
+        ORDER BY combined_rank DESC
+        LIMIT :final_k"""  # Added LIMIT clause for final top 3
 
     cursor.execute(
         main_rag_query,
         {
             "embedded_query": format_for_vec_db(embedded_query),
-            "query": query.replace("?", ""), # Remove question marks as they are not supported in FTS
+            "query": query.replace("?", ""),  # Remove question marks as they are not supported in FTS
             "k": k,
             "rrf_k": rrf_k,
             "weight_fts": weight_fts,
             "weight_vec": weight_vec,
+            "final_k": final_k,  # Added final_k parameter
         },
     )
 
@@ -132,7 +135,7 @@ if __name__ == "__main__":
 
     connection = ConnectDB().connection
     query = "single task training on single domain datasets is a major contributor to the lack of generalization "
-    results = retrieve(connection, query)
+    results = retrieve(connection, query)  # Will now return top 3 results
     print(len(results))
     print(results)
     connection.close()
