@@ -1,3 +1,8 @@
+### latest models
+
+pleias3b_q4 https://drive.google.com/file/d/1JGmJZVkZKIfH-yYWo7K4xgLX9LFL-IPu/view?usp=drive_link
+pleias350M https://drive.google.com/file/d/1PgFKgLmSdRGKNcX8EhqlThbrbo4gO_G8/view?usp=sharing
+
 ### Run the code
 
 To run the code you need llamafile running on the background, or get response key changed to debug mode. It is on debug mode by defailt now
