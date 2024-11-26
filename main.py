@@ -18,14 +18,76 @@ from watchdog.events import FileSystemEventHandler
 
 
 class ReferenceWidget(QWidget):
-    def __init__(self, text):
+    def __init__(self, message, reference_info):
         super().__init__()
+        self.reference_info = reference_info
+        
+        # Create label for message
+        self.label = QLabel()
+        self.label.setTextFormat(Qt.RichText)
+        self.label.setOpenExternalLinks(False)
+        self.label.setWordWrap(True)
+        
+        # Style the label - important for link rendering
+        self.label.setStyleSheet("""
+            QLabel {
+                background-color: white;
+                border: 1px solid #ccc;
+                padding: 10px;
+                border-radius: 10px;
+            }
+            QLabel a {
+                color: #007bff;
+                text-decoration: none;
+                background-color: #e7f3ff;
+                padding: 2px 6px;
+                border-radius: 3px;
+                border: 1px solid #007bff;
+            }
+        """)
+        
+        # Enable mouse tracking
+        self.label.setMouseTracking(True)
+        self.label.installEventFilter(self)
+        
+        # Set the text after styling is set up
+        self.label.setText(message)
+        
+        # Layout
+        layout = QVBoxLayout(self)
+        layout.addWidget(self.label)
+        layout.setContentsMargins(0, 0, 0, 0)
 
-        # Initialize of the main window
-        self.ui = ReferenceForm()
-        self.ui.setupUi(self)
-        self.ui.label_2.setText(text)
-
+    def eventFilter(self, obj, event):
+        if obj == self.label:
+            if event.type() == QEvent.MouseButtonPress:
+                pos = event.pos()
+                cursor = self.label.cursorForPosition(pos)
+                char_format = cursor.charFormat()
+                
+                if char_format.isAnchor():
+                    href = char_format.anchorHref()
+                    if ':' in href:
+                        ref_id, ref_content = href.split(':', 1)
+                        tooltip_text = f"{ref_id} : {ref_content}"
+                        
+                        QToolTip.showText(
+                            self.mapToGlobal(pos),
+                            tooltip_text,
+                            self,
+                            timeout=5000
+                        )
+                        return True
+            
+            elif event.type() == QEvent.MouseMove:
+                pos = event.pos()
+                cursor = self.label.cursorForPosition(pos)
+                if cursor.charFormat().isAnchor():
+                    self.setCursor(Qt.PointingHandCursor)
+                else:
+                    self.setCursor(Qt.ArrowCursor)
+        
+        return super().eventFilter(obj, event)
 
 class UploadedDocs(QWidget):
     """
