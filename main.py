@@ -116,8 +116,10 @@ class MainWindow(QMainWindow):
         chat_db = self.db.get_chat_data()
         if message_input:
             open_alex = self.ui.open_alex_btn.isChecked()
+            #print("IN MAIN, CALLING GET_RESPONSE_AND_METADATA")
             references_info, html_output = get_response_and_metadata(message_input, open_alex)
             if not self.dialog_is_empty:
+                #print("IN MAIN, DIALOG IS NOT EMPTY")
                 # Get current selected chat index
                 select_row = 0  # In the future it must be project id
 
@@ -129,12 +131,15 @@ class MainWindow(QMainWindow):
                     }
                 ]
                 chat_data = chat_db[select_row]
-
+                #print("chat_db : ",chat_db)
+                #print("chat_data : ",chat_data)
                 self.db.save_chat_data(chat_db)
+                #print("calling show_conversation_frame")
                 self.show_conversation_frame(chat_data)
                 # self.show_reference_list(source_documents)
 
             else:
+                #print("IN MAIN, DIALOG IS EMPTY")
                 # Create new chat and save it into database
                 self.dialog_is_empty = False
                 chat_data = {
@@ -148,8 +153,11 @@ class MainWindow(QMainWindow):
                     ],
                 }
                 chat_db.insert(0, chat_data)
+                #print("chat_db : ",chat_db)
+                #print("chat_data : ",chat_data)
                 self.db.save_chat_data(chat_db)
 
+                #print("calling show_conversation_frame")
                 # Reload window
                 self.show_conversation_frame(chat_data)
 
@@ -173,12 +181,19 @@ class MainWindow(QMainWindow):
             3. User have started the conversation
 
         """
+        ###DEBUG
+        print("#####################DEBUG MODE###########################\n\n\n")
+        self.sources_is_empty = False
+        #print("dialog_is_empty : ",self.dialog_is_empty)
+        #print("sources_is_empty", self.sources_is_empty)
         if self.dialog_is_empty and not self.sources_is_empty:
+            #print("dialog empty but sources are not")
             state_widget = UploadedDocs()
             grid_layout = self.ui.main_sroll_area
             grid_layout.setWidget(state_widget)
 
         if not self.dialog_is_empty and not self.sources_is_empty:
+            #print("dialog not empty, source not empty")
             grid_layout = self.ui.main_sroll_area
             dialog = ChatDialog(chat_data)
             grid_layout.setWidget(dialog)

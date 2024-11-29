@@ -9,13 +9,14 @@ from open_alex_retrieval import OpenAlexReader
 
 def construct_prompt(results, user_message):
 
-    doc_ids =  [res["document_id"] for res in results]
+    #doc_ids =  [res["document_id"] for res in results]
 
     text_chunks = [res['text'] for res in results]
     titles = [res['title'] for res in results]
     sources = ''
     for i in range(len(text_chunks)):
-        source = "\n".join([str(doc_ids[i]), titles[i], text_chunks[i]])
+        #☻source = "\n".join([str(doc_ids[i]), titles[i], text_chunks[i]])
+        source = "\n".join([titles[i], text_chunks[i]])
 
         sources += source
 
@@ -124,18 +125,24 @@ def convert_input_msg_to_html(answer):
     return updated_text
 
 
-def retrieve_from_open_alex(user_message, debug=False):
+def retrieve_from_open_alex(user_message, debug=True):
     if debug:
         return [
             {"text": "put your text",
              'title': "Short story about Anna", 'author': "Kamu", 'source_database': 'open_alex',
-             "creation_date": "01/12/12"},
+             "creation_date": "01/12/12",
+             "document_id" : 1,
+             "chunk_id":1},
             {"text": "put your text",
              'title': "Short story about Anna", 'author': "CHUK", 'source_database': 'open_alex',
-             "creation_date": "01/12/12"},
+             "creation_date": "01/12/12",
+             "document_id" : 2,
+             "chunk_id":2},
             {"text": "put your text",
              'title': "Short story about Anna", 'author': "LION", 'source_database': 'open_alex',
-             "creation_date": "01/12/12"},
+             "creation_date": "01/12/12",
+             "doucment_id" : 3,
+             "chunk_id":3},
         ]
     else:
         r = OpenAlexReader()
@@ -144,19 +151,24 @@ def retrieve_from_open_alex(user_message, debug=False):
 
 
 def get_response_and_metadata(user_message, open_alex):
+    #print("In get_response_and_metadata")
     if open_alex:
+        #print("retrieving from open alex")
         results = retrieve_from_open_alex(user_message)
     else:
+        #print("retrieving from local db")
         connection = ConnectDB().connection
         results = retrieve(connection, user_message)
 
+    #print("RESULTS : ",results) 
     prompt = construct_prompt(results, user_message)
     raw_response = generate_with_llamafile_api(prompt)
-    print(raw_response)
     html_output = convert_input_msg_to_html(raw_response)
 
     references_info = []
     for reference in results:
+        #print("reference ", reference)
+        #print("clés : ",reference.keys())
         reference_info = {
             "title": reference["title"],
             "author": reference["author"],
@@ -166,4 +178,7 @@ def get_response_and_metadata(user_message, open_alex):
             "chunk_id" : reference["chunk_id"]
         }
         references_info.append(reference_info)
+    #print("REFERENCES INFO : ",references_info)
+    #print("HTML OUTPUT : ", html_output)
+    
     return references_info, html_output
