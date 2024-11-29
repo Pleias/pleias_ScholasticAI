@@ -93,7 +93,8 @@ class ConnectDB:
                     text TEXT,
                     pages TEXT,
                     word_count INTEGER,
-                    document_id INTEGER
+                    document_id INTEGER,
+                    hash TEXT
                     )
                 """
             )
@@ -150,8 +151,8 @@ class ConnectDB:
         for chunk in chunks:
             cursor.execute(
                 """
-                INSERT INTO chunks (section, text, pages, word_count, document_id)
-                VALUES (?, ?, ?, ?, ?)
+                INSERT INTO chunks (section, text, pages, word_count, document_id, hash)
+                VALUES (?, ?, ?, ?, ?, ?)
             """,
                 (
                     chunk["section"],
@@ -159,6 +160,8 @@ class ConnectDB:
                     str(chunk["pages"]),
                     chunk["word_count"],
                     document_id,
+                    chunk["hash"],
+
                 ),
             )
             last_id = cursor.lastrowid

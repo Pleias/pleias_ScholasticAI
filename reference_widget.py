@@ -194,23 +194,22 @@ class OneReferenceFrame(QFrame):
             # Specify the image and TSV file paths
             doc_filename = self.doc_metadata["file_name"]
             page_number = ast.literal_eval(self.chunk_metadata["pages"])[0] #☻Retrieving the first page if there are more than one
-            #image_path = f"temp/intermediate_folders/{doc_filename}_output/{doc_filename}_images/{doc_filename}_page{page_number}.jpg"  
-            image_path = f"temp/intermediate_folders/{doc_filename}_output/{doc_filename}_images/{doc_filename}_page9.jpg"  
-            tsv_path = "path/to/coordinates.tsv"  # Replace with your TSV path
+            image_path = f"temp/intermediate_folders/{doc_filename}_output/{doc_filename}_images/{doc_filename}_page{page_number}.jpg"  
+           
+            json_path = f"temp/intermediate_folders/{doc_filename}_output/final/{doc_filename}.json"
 
             # Open the QScrollArea with the image and rectangle
-            self.show_image_with_highlight(image_path, tsv_path)
+            self.show_image_with_highlight(image_path, json_path)
 
             
 
         super().mousePressEvent(event)
 
-    def show_image_with_highlight(self, image_path, tsv_path):
+    def show_image_with_highlight(self, image_path, json_path):
         # Read the coordinates from the TSV file
         coordinates = (0, 0, 100, 100)  # Example coordinates for testing
         #coordinates = (58.07,140.55700000000002,536.32,595.65)
-        #coordinates = (219.6362,181.22714,367.49118,224.307)
-        coordinates = (303.1138,132.75136,544.8269,221.06769)
+        #### COORDINATES FROM JSON PATH
         if not coordinates:
             print("Invalid coordinates file.")
             return
@@ -221,16 +220,7 @@ class OneReferenceFrame(QFrame):
 
 
     
-    def read_coordinates_from_tsv(self, tsv_path):
-        """Reads coordinates from a TSV file. Assumes format: x1\ty1\tx2\ty2"""
-        try:
-            with open(tsv_path, "r") as file:
-                line = file.readline().strip()
-                x1, y1, x2, y2 = map(int, line.split("\t"))
-                return x1, y1, x2, y2
-        except Exception as e:
-            print(f"Error reading TSV file: {e}")
-            return None
+
 
     # def mouseReleaseEvent(self, event):
     #     if event.button() == Qt.LeftButton:
