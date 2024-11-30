@@ -5,7 +5,52 @@ from PySide6.QtWebEngineWidgets import QWebEngineView
 from PySide6.QtWidgets import QApplication
 from PySide6.QtWidgets import QWidget, QFrame, QVBoxLayout, QLabel
 
-from ui_one_reference_frame import Ui_one_reference
+# from ui_one_reference_frame import Ui_one_reference
+from ui_one_ref_second import Ui_Frame as Ui_one_reference
+author_html = """
+<html>
+    <head>
+        <style>
+            .authors {
+                margin-left: 20px;
+                font-family: "SF Pro", sans-serif;
+                font-size: 12px;
+                font-weight: 400;
+                line-height: 14.32px;
+                text-align: left;
+                text-underline-position: from-font;
+                text-decoration-skip-ink: none;
+                color: #828282;
+            }
+        </style>
+    </head>
+    <body>
+        <span class="authors">Ashish Vaswani, Noam Shazeer et al.</span>
+    </body>
+</html>
+
+"""
+title_html = """
+<html>
+    <head>
+        <style>
+            .title {
+                font-family: "SF Pro", sans-serif;
+                font-size: 14px;
+                font-weight: 400;
+                line-height: 22px;
+                letter-spacing: -0.43px;
+                text-align: left;
+            }
+        </style>
+    </head>
+    <body>
+        <span class="title">Attention is All You Need</span>
+    </body>
+</html>
+"""
+
+
 html = """<!DOCTYPE html>
 <html lang="en">
   <head>
@@ -60,36 +105,6 @@ html = """<!DOCTYPE html>
   </body>
 </html>
 """
-square_html_yellow = """
-<div style="
-    display: inline-block;
-    width: 16px;
-    height: 18px;
-    background-color: #FFE289;
-    color: #B66400;
-    border-radius: 3px 0px 0px 0px;
-    font-size: 15px;
-    text-align: center;
-    font-weight: 200;
-    line-height: 16px;
-    opacity: 0px;
-">2</div>
-"""
-square_html = """
-<div style="
-    display: inline-block;
-    width: 16px;
-    height: 18px;
-    background-color: #BFEFFF;
-    color: #042FF4;
-    border-radius: 3px 0px 0px 0px;
-    font-size: 15px;
-    text-align: center;
-    font-weight: 200;
-    line-height: 16px;
-    opacity: 0px;
-">2</div>
-"""
 
 
 # app = QApplication([])
@@ -121,34 +136,25 @@ class OneReferenceFrame(QFrame):
         :param source_database: this field is empty if we don't use OpenAlex or Archive etc. Otherwise, database icon
         :return: None
         """
-        print(self.ui.ref_number)
+
         if source_icon_local:
-            self.ui.ref_start_icon.setPixmap(QPixmap(u"static/icons/icons8-document-ios-17-outlined-50.png"))
+            self.ui.doc_icon.setPixmap(QPixmap(u"static/icons/icons8-document-ios-17-outlined-50.png"))
+            pass
         else:
-            self.ui.ref_start_icon.setPixmap(QPixmap(u"static/icons/icon_web.svg"))
-            self.ui.ref_start_icon.setMaximumSize(QSize(15, 15))
+            pass
+            self.ui.doc_icon.setPixmap(QPixmap(u"static/icons/icon_web.svg"))
 
         title = title if len(title) else "No paper title identified"
         author = author if len(author) else "No paper author identified"
-        self.ui.ref_paper_title.setText(title)
-        self.ui.ref_authors.setText(author)
+        self.ui.titles.setText(title)
+        self.ui.authors.setText(author)
         if source_database == "local":
-            self.ui.ref_last_icon.clear()
-            self.ui.ref_text.setText("")
+            self.ui.label_2.clear()
         elif source_database == "open_alex":
-            self.ui.ref_last_icon.setPixmap(QPixmap(u"static/icons/logo_openalex.png"))
+            self.ui.label_2.setPixmap(QPixmap(u"static/icons/logo_openalex.png"))
             pass
         elif source_database == "archive":
-            self.ui.ref_last_icon.setPixmap(QPixmap(u"static/icons/archive.svg"))
-            self.ui.ref_text.setText("")
-
-        web_view = QWebEngineView()
-        web_view.setHtml(square_html)
-        web_view.setMaximumSize(50, 50)
-
-        self.ui.ref_number.setHtml(square_html_yellow)
-        self.ui.ref_number.setMaximumSize(50, 50)
-        self.ui.ref_number.setMinimumSize(50, 50)
+            self.ui.label_2.setPixmap(QPixmap(u"static/icons/archive.svg"))
 
     def mousePressEvent(self, event):
         if event.button() == Qt.LeftButton:
@@ -176,8 +182,6 @@ class ReferenceWidget(QWidget):
         label = QLabel()
         font_metrics = QFontMetrics(label.font())
         width = font_metrics.horizontalAdvance(text)
-        height = font_metrics.height()
-        print(f'Width: {width}, Height: {height}')
 
         self.layout = QVBoxLayout(self)
         web_view = QWebEngineView()
@@ -186,15 +190,25 @@ class ReferenceWidget(QWidget):
         height_content_based = width // 600 * 22
         web_view.setMaximumSize(width_content_based, height_content_based)
         response_label = web_view
+        # response_label = QLabel("some text")
         self.layout.addWidget(response_label)
-
+        widget_height = 0
         for i, reference_info in enumerate(references_info):
             reference_info['new_ref_numer'] = str(i + 1)
             reference = OneReferenceFrame(**reference_info)
+            widget_height += reference.ui.splitter.sizeHint().height()
+            reference.setMinimumHeight(40)
             self.layout.addWidget(reference)
-
+        print(widget_height)
         self.layout.setSpacing(0)
         self.layout.setContentsMargins(0, 0, 0, 0)
+        self.setLayout(self.layout)
+        # Check and print the size hint
+        print("Label size hint:", self.layout.sizeHint())  # QSize(width, height)
+        print("Widget size hint:", reference.ui.splitter.sizeHint())
+
+
+
 
 
 if __name__ == "__main__":
@@ -209,8 +223,8 @@ if __name__ == "__main__":
     example_open_alex = {
         'new_ref_numer': '2',
         'source_icon_local': False,
-        'title': 'Paper Title found on Open Alex',
-        'author': 'Authors info found on Open Alex',
+        'title': title_html,
+        'author': author_html,
         'source_database': 'open_alex',
     }
     example_archive = {
@@ -230,5 +244,6 @@ if __name__ == "__main__":
     references_info = [example_local, example_archive, example_open_alex]
     app = QApplication(sys.argv)
     window = ReferenceWidget(html_response, references_info)
+    # window = OneReferenceFrame(**example_open_alex)
     window.show()
     sys.exit(app.exec())
