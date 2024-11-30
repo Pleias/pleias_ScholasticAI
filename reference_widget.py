@@ -58,8 +58,6 @@ class ReferenceViewer(QDialog):
         return highlighted_pixmap
 
 
-
-
 class OneReferenceFrame(QFrame):
     def __init__(self,
                  new_ref_number: int = 1,
@@ -115,12 +113,19 @@ class OneReferenceFrame(QFrame):
             self.ui.ref_text.setText("")
         
          # Fetch metadata for this instance
-        self.doc_metadata, self.chunk_metadata = self.fetch_metadata()
+            self.doc_metadata, self.chunk_metadata = self.fetch_metadata()
+            if self.doc_metadata:
+                print(f"Fetched metadata for document_id {self.document_id}: {self.doc_metadata}")
+            if self.chunk_metadata:
+                print(f"Fetched metadata for chunk_id {self.chunk_id}: {self.chunk_metadata}")
 
-        if self.doc_metadata:
-            print(f"Fetched metadata for document_id {self.document_id}: {self.doc_metadata}")
-        if self.chunk_metadata:
-            print(f"Fetched metadata for chunk_id {self.chunk_id}: {self.chunk_metadata}")
+        elif source_database == "open_alex":
+            self.ui.ref_last_icon.setPixmap(QPixmap("static/icons/logo_openalex.png"))
+            pass
+            
+        elif source_database == "archive":
+            self.ui.ref_last_icon.setPixmap(QPixmap("static/icons/archive.svg"))
+            self.ui.ref_text.setText("")
 
     
     def fetch_metadata(self):
