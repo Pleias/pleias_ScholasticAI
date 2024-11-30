@@ -78,11 +78,40 @@ class ChatDialog(QScrollArea):
 
 
 if __name__ == "__main__":
-    pass
-
-    # import sys
-    #
-    # app = QApplication(sys.argv)
-    # window = ChatDialog(chat_data[0])
-    # window.show()
-    # sys.exit(app.exec())
+    import sys
+    chat_data = {
+    "title": "Hi",
+    "chat_list": [
+      {
+        "input_str": "Hi",
+        "out_str": "\n\nThe query pertains to technical work performed in the field of computer science, specifically focusing on research conducted while at Google Research. The reference **7b3a9c2d4e8f5g1h** provides a detailed description of this work. It states that the work was performed while the individual was affiliated with Google Research<span style=\"border: 1px solid #007bff; padding: 2px; border-radius: 3px; background-color: #e7f3ff; color: #007bff; font-size: 12px;\">1</span>.\n\nThe provided reference **DB-2023-001** does not offer additional context beyond the URL it contains. It does not provide any further relevant information for the query, focusing solely on the database entry itself<span style=\"border: 1px solid #007bff; padding: 2px; border-radius: 3px; background-color: #e7f3ff; color: #007bff; font-size: 12px;\">2</span>. Therefore, **DB-2023-001** can be excluded from the answer.\n\nIn conclusion, the most pertinent information for the query is found in **7b3a9c2d4e8f5g1h**, which directly addresses the work performed at Google Research.",
+        "references_info": [
+          {
+            "title": "",
+            "author": "",
+            "creation_date": "2024-04-10"
+          }
+        ]
+      },
+      {
+        "input_str": "transformers",
+        "out_str": "\n\nTransformers are advanced neural network models that have revolutionized natural language processing (NLP) and machine translation (MT). They are known for their ability to perform unsupervised multitask learning, which allows them to learn multiple tasks simultaneously, enhancing their overall performance in various NLP applications<span style=\"border: 1px solid #007bff; padding: 2px; border-radius: 3px; background-color: #e7f3ff; color: #007bff; font-size: 12px;\">1</span>.\n\nTransformers excel at character-level language modeling, which involves predicting the next character in a sequence of text. This capability is crucial for tasks such as generating coherent and meaningful text, as demonstrated by models like BERT and GPT-2<span style=\"border: 1px solid #007bff; padding: 2px; border-radius: 3px; background-color: #e7f3ff; color: #007bff; font-size: 12px;\">1</span>.\n\nIn the context of machine translation, transformers have shown significant improvements over traditional approaches. They can be trained on large amounts of parallel data, which is not always available for some languages, making them effective even in low-resource settings<span style=\"border: 1px solid #007bff; padding: 2px; border-radius: 3px; background-color: #e7f3ff; color: #007bff; font-size: 12px;\">1</span>. The ability of transformers to perform end-to-end translation without any need for alignment or segmentation makes them particularly efficient<span style=\"border: 1px solid #007bff; padding: 2px; border-radius: 3px; background-color: #e7f3ff; color: #007bff; font-size: 12px;\">2</span>.\n\nFurthermore, transformers have been applied to other NLP tasks such as image captioning, where they can generate natural language descriptions from visual inputs. This capability is crucial for applications in computer vision and natural language interaction<span style=\"border: 1px solid #007bff; padding: 2px; border-radius: 3px; background-color: #e7f3ff; color: #007bff; font-size: 12px;\">2</span>.\n\nThe robustness of transformers to various challenges has also been highlighted. They can handle strange poses in images, which can be a significant improvement over traditional methods that are easily fooled by such variations<span style=\"border: 1px solid #007bff; padding: 2px; border-radius: 3px; background-color: #e7f3ff; color: #007bff; font-size: 12px;\">2</span>. Additionally, transformers are pre-trained on large corpora to enhance their ability to understand and generate human language, making them a valuable tool for tasks like question answering and conversational agents<span style=\"border: 1px solid #007bff; padding: 2px; border-radius: 3px; background-color: #e7f3ff; color: #007bff; font-size: 12px;\">2</span>.\n\nIn summary, transformers are versatile models that excel in a wide range of NLP tasks due to their ability to perform unsupervised multitask learning, their effectiveness in character-level language modeling, and their application in high-precision machine translation and other complex NLP tasks.",
+        "references_info": [
+          {
+            "title": "Language Models are Unsupervised Multitask Learners",
+            "author": "Alec Radford*, Jeffrey Wu*, Rewon Child, David Luan, Dario Amodei**, Ilya Sutskever**",
+            "creation_date": "2019-02-14"
+          },
+          {
+            "title": "",
+            "author": "",
+            "creation_date": "2024-04-10"
+          }
+        ]
+      }
+    ]
+  }
+    app = QApplication(sys.argv)
+    window = ChatDialog(chat_data)
+    window.show()
+    sys.exit(app.exec())

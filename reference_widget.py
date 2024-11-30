@@ -1,10 +1,11 @@
-from PySide6.QtGui import QPixmap, Qt, QFontMetrics
-from PySide6.QtWidgets import QApplication, QWidget, QFrame, QVBoxLayout, QLabel, QSizePolicy, QTextBrowser
 import sys
-from ui_one_reference_frame import Ui_one_reference
-from PySide6.QtWidgets import QApplication
+from PySide6.QtCore import (QSize, Qt)
+from PySide6.QtGui import QPixmap, Qt, QFontMetrics
 from PySide6.QtWebEngineWidgets import QWebEngineView
+from PySide6.QtWidgets import QApplication
+from PySide6.QtWidgets import QWidget, QFrame, QVBoxLayout, QLabel
 
+from ui_one_reference_frame import Ui_one_reference
 html = """<!DOCTYPE html>
 <html lang="en">
   <head>
@@ -59,7 +60,6 @@ html = """<!DOCTYPE html>
   </body>
 </html>
 """
-
 square_html_yellow = """
 <div style="
     display: inline-block;
@@ -126,6 +126,7 @@ class OneReferenceFrame(QFrame):
             self.ui.ref_start_icon.setPixmap(QPixmap(u"static/icons/icons8-document-ios-17-outlined-50.png"))
         else:
             self.ui.ref_start_icon.setPixmap(QPixmap(u"static/icons/icon_web.svg"))
+            self.ui.ref_start_icon.setMaximumSize(QSize(15, 15))
 
         title = title if len(title) else "No paper title identified"
         author = author if len(author) else "No paper author identified"
@@ -147,6 +148,7 @@ class OneReferenceFrame(QFrame):
 
         self.ui.ref_number.setHtml(square_html_yellow)
         self.ui.ref_number.setMaximumSize(50, 50)
+        self.ui.ref_number.setMinimumSize(50, 50)
 
     def mousePressEvent(self, event):
         if event.button() == Qt.LeftButton:
@@ -190,6 +192,9 @@ class ReferenceWidget(QWidget):
             reference_info['new_ref_numer'] = str(i + 1)
             reference = OneReferenceFrame(**reference_info)
             self.layout.addWidget(reference)
+
+        self.layout.setSpacing(0)
+        self.layout.setContentsMargins(0, 0, 0, 0)
 
 
 if __name__ == "__main__":
