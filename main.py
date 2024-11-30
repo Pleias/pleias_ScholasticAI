@@ -245,17 +245,14 @@ class MainWindow(QMainWindow):
         """
         ###DEBUG
         print("#####################DEBUG MODE###########################\n\n\n")
+        print("setting self.sources_is_empty to False")
         self.sources_is_empty = False
-        #print("dialog_is_empty : ",self.dialog_is_empty)
-        #print("sources_is_empty", self.sources_is_empty)
         if self.dialog_is_empty and not self.sources_is_empty:
-            #print("dialog empty but sources are not")
             state_widget = UploadedDocs()
             grid_layout = self.ui.main_sroll_area
             grid_layout.setWidget(state_widget)
 
         if not self.dialog_is_empty and not self.sources_is_empty:
-            #print("dialog not empty, source not empty")
             grid_layout = self.ui.main_sroll_area
             dialog = ChatDialog(chat_data)
             grid_layout.setWidget(dialog)
