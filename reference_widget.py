@@ -5,13 +5,16 @@ from PySide6.QtWebEngineWidgets import QWebEngineView
 from PySide6.QtWidgets import QApplication
 from PySide6.QtWidgets import QWidget, QFrame, QVBoxLayout, QLabel
 
-# from ui_one_reference_frame import Ui_one_reference
+
 from ui_one_ref_second import Ui_Frame as Ui_one_reference
-author_html = """
+
+
+def get_author_html(author):
+    return f"""
 <html>
     <head>
         <style>
-            .authors {
+            .authors {{
                 margin-left: 20px;
                 font-family: "SF Pro", sans-serif;
                 font-size: 12px;
@@ -21,44 +24,54 @@ author_html = """
                 text-underline-position: from-font;
                 text-decoration-skip-ink: none;
                 color: #828282;
-            }
+            }}
         </style>
     </head>
     <body>
-        <span class="authors">Ashish Vaswani, Noam Shazeer et al.</span>
+        <span class="authors">{author}</span>
     </body>
 </html>
-
 """
-title_html = """
+
+
+author_html = get_author_html("Vasvani to se")
+
+
+def get_title_html(title):
+    return f"""
 <html>
     <head>
         <style>
-            .title {
+            .title {{
                 font-family: "SF Pro", sans-serif;
                 font-size: 14px;
                 font-weight: 400;
                 line-height: 22px;
                 letter-spacing: -0.43px;
                 text-align: left;
-            }
+            }}
         </style>
     </head>
     <body>
-        <span class="title">Attention is All You Need</span>
+        <span class="title">{title}</span>
     </body>
 </html>
 """
 
 
-html = """<!DOCTYPE html>
+title_html = get_title_html("Attention is All You Need ")
+
+
+def answer_html(answer):
+    return f"""
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Transformers Architecture</title>
     <style>
-      body {
+      body {{
         font-family: SF Pro;
         font-size: 16px;
         font-weight: 400;
@@ -67,16 +80,16 @@ html = """<!DOCTYPE html>
         text-align: left;
         text-underline-position: from-font;
         text-decoration-skip-ink: none;
-      }
-      .marker {
+      }}
+      .marker {{
         width: 16px;
         height: 18px;
         padding: 0px 2px;
         justify-content: center;
         align-items: center;
         border-radius: 3px;
-      }
-      .blue {
+      }}
+      .blue {{
         color: #042FF4;
         font-family: SF Pro;
         font-size: 12px;
@@ -84,8 +97,8 @@ html = """<!DOCTYPE html>
         font-weight: 200;
         line-height: normal;
         background: #BFEFFF;
-      }
-      .yellow {
+      }}
+      .yellow {{
         color: #B66400;
         font-family: SF Pro;
         font-size: 12px;
@@ -95,16 +108,22 @@ html = """<!DOCTYPE html>
         text-underline-position: from-font;
         text-decoration-skip-ink: none;
         background: #FFE289;
-      }
+      }}
     </style>
   </head>
   <body>
-    <p> The primary feature of the Transformers architecture is the self-attention mechanism <span class="marker blue">1</span>. This allows the model to weigh the importance of different words in a sentence dynamically and compute relationships between them, which helps in capturing long-range dependencies and contextual information efficiently <span class="marker blue">2</span>. Transformers also use an encoder-decoder architecture and avoid sequential operations, enabling them to be parallelised more effectively than traditional models like recurrent neural networks (RNNs) <span class="marker blue">1</span>
-      <span class="marker yellow">3</span>.
-    </p>
+    <p>{answer}</p>
   </body>
 </html>
 """
+
+
+answer = """The primary feature of the Transformers architecture is the self-attention mechanism <span class="marker blue">1</span>. 
+This allows the model to weigh the importance of different words in a sentence dynamically and compute relationships between them, 
+which helps in capturing long-range dependencies and contextual information efficiently <span class="marker blue">2</span>. 
+Transformers also use an encoder-decoder architecture and avoid sequential operations, enabling them to be parallelised 
+more effectively than traditional models like recurrent neural networks (RNNs) <span class="marker blue">1</span>
+<span class="marker yellow">3</span>."""
 
 
 # app = QApplication([])
@@ -190,25 +209,19 @@ class ReferenceWidget(QWidget):
         height_content_based = width // 600 * 22
         web_view.setMaximumSize(width_content_based, height_content_based)
         response_label = web_view
-        # response_label = QLabel("some text")
         self.layout.addWidget(response_label)
         widget_height = 0
         for i, reference_info in enumerate(references_info):
             reference_info['new_ref_numer'] = str(i + 1)
             reference = OneReferenceFrame(**reference_info)
-            widget_height += reference.ui.splitter.sizeHint().height()
-            reference.setMinimumHeight(40)
+            self.layout.setAlignment(Qt.AlignmentFlag.AlignLeft)
             self.layout.addWidget(reference)
-        print(widget_height)
+
         self.layout.setSpacing(0)
         self.layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(self.layout)
         # Check and print the size hint
         print("Label size hint:", self.layout.sizeHint())  # QSize(width, height)
-        print("Widget size hint:", reference.ui.splitter.sizeHint())
-
-
-
 
 
 if __name__ == "__main__":
@@ -230,7 +243,7 @@ if __name__ == "__main__":
     example_archive = {
         'new_ref_numer': '3',
         'source_icon_local': False,
-        'title': 'Paper Title found on archive',
+        'title': 'Paper Title found on archive' + 'Paper Title found on archive' + 'Paper Title found on archive' + 'Paper Title found on archive',
         'author': 'Authors info found on archive',
         'source_database': 'archive',
     }
@@ -241,7 +254,7 @@ if __name__ == "__main__":
     Transformers also use an encoder-decoder architecture that avoids sequential operations
      <span style="border: 1px solid #6c757d; padding: 2px; border-radius: 3px; background-color: #f1f1f1; color: #6c757d; font-size: 12px;">2</span> <span style="border: 1px solid #ffc107; padding: 2px; border-radius: 3px; background-color: #fff3cd; color: #856404; font-size: 12px;">3</span>.
     """
-    references_info = [example_local, example_archive, example_open_alex]
+    references_info = [example_open_alex, example_open_alex, example_archive]
     app = QApplication(sys.argv)
     window = ReferenceWidget(html_response, references_info)
     # window = OneReferenceFrame(**example_open_alex)
