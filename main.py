@@ -64,6 +64,7 @@ class MainWindow(QMainWindow):
 
         # Hide scrollbar of scroll area
         self.ui.main_sroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.ui.main_sroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.show_conversation_frame()
 
         # OPEN ALEX BTN
@@ -73,7 +74,7 @@ class MainWindow(QMainWindow):
                 background-color: none;
             }
             QPushButton:checked {
-                background-color: grey;
+                background-color: #BFEFFF;
             }
         """)
 
@@ -84,7 +85,7 @@ class MainWindow(QMainWindow):
                 background-color: none;
             }
             QPushButton:checked {
-                background-color: grey;
+                background-color: #FFE289;
             }
         """)
 
@@ -131,6 +132,7 @@ class MainWindow(QMainWindow):
                 ]
                 chat_data = chat_db[select_row]
                 #print("chat_db : ",chat_db)
+
                 #print("chat_data : ",chat_data)
                 self.db.save_chat_data(chat_db)
                 #print("calling show_conversation_frame")
@@ -204,6 +206,9 @@ class MainWindow(QMainWindow):
             grid_layout.setWidget(dialog)
             scroll_bar = self.ui.main_sroll_area.verticalScrollBar()
             scroll_bar.setValue(scroll_bar.maximum())
+            self.ui.main_sroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+            self.ui.main_sroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+
 
     def upload_files(self):
         """Open a file dialog to select one or more PDF files for upload."""

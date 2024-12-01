@@ -194,7 +194,7 @@ def get_html(answer):
         text-decoration-skip-ink: none;
         background: #FFE289;
      .green {{
-        color: #B66432;
+        color: #e0f8d6;
         font-family: SF Pro;
         font-size: 12px;
         font-weight: 200;
@@ -202,10 +202,10 @@ def get_html(answer):
         text-align: left;
         text-underline-position: from-font;
         text-decoration-skip-ink: none;
-        background: #FFE289;
+        background: #afed95;
       }}
      .pink {{
-        color: #B66100;
+        color: #9d6f7d;
         font-family: SF Pro;
         font-size: 12px;
         font-weight: 200;
@@ -213,7 +213,7 @@ def get_html(answer):
         text-align: left;
         text-underline-position: from-font;
         text-decoration-skip-ink: none;
-        background: #FFE289;
+        background: #d7c5cb;
       }}
     </style>
   </head>

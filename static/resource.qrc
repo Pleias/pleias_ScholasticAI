@@ -1,6 +1,7 @@
 <RCC>
   <qresource prefix="icons">
-
+    <file>icons/semantic.svg</file>
+    <file>icons/archive_2000.svg</file>
     <file>images/logo_openalex.png</file>
     <file>images/logo_scholastic.png</file>
     <file>images/logo_scholastic.svg</file>

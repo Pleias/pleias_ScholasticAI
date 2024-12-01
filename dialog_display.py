@@ -50,10 +50,10 @@ class ChatDialog(QScrollArea):
             message_label.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Minimum)
             message_label.setStyleSheet("""
                 QLabel {
-                    background-color: rgba(173, 216, 230, 180);
-                    border: 1px solid rgb(0, 120, 215);
-                    padding: 10px;
-                    border-radius: 10px;
+                    background-color: #F2F2F2;
+                    border: 1px solid #E0E0E0;
+                    padding: 8px;
+                    border-radius: 8px;
                 }
             """)
             message_label.setAlignment(Qt.AlignRight)

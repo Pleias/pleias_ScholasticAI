@@ -275,7 +275,7 @@ class ReferenceWidget(QWidget):
 
         web_view.setHtml(html)
         width_content_based = 600
-        height_content_based = width // 600 * 22 + 10
+        height_content_based = width // 600 * 22 + 5
         web_view.setMaximumSize(width_content_based, height_content_based)
         response_label = web_view
         self.layout.addWidget(response_label)
