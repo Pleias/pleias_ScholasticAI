@@ -1,11 +1,54 @@
-from PySide6.QtGui import QPixmap, Qt, QPainter, QColor
+from PySide6.QtGui import QPixmap, Qt, QPainter, QColor, QFontMetrics
+from PySide6.QtWebEngineWidgets import QWebEngineView
 from PySide6.QtWidgets import QApplication, QWidget, QFrame, QVBoxLayout, QLabel, QScrollArea, QDialog
 import sys
-from ui_one_reference_frame import Ui_one_reference
+
+from get_answer_from_api import get_html, get_title_html, get_author_html
+from ui_one_reference_frame import Ui_Frame as Ui_one_reference
 import sqlite3
-import sqlite_vec
 import ast
 
+
+def get_square(number=1):
+    return f"""
+    <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Centered Square</title>
+    <style>
+        /* Full viewport height and centering */
+        body, html {{
+            height: 100%;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: white; /* Changed background to white */
+        }}
+
+        /* Square with text inside */
+        .square {{
+            width: 16px; /* You can adjust this */
+            height: 18px; /* You can adjust this */
+            background-color: #BFEFFF;
+            color: #042FF4;
+            border-radius: 3px; /* Rounded corners */
+            font-size: 12px;
+            text-align: center;
+            font-weight: 590;
+            line-height: 18px; /* Centers the number vertically */
+        }}
+    </style>
+</head>
+<body>
+
+    <!-- Displaying the square with the number 2 inside -->
+    <div class="square">{number}</div>
+</body>
+</html> 
+    """
 
 class ReferenceViewer(QDialog):
     def __init__(self, image_path, coordinates, parent=None):
@@ -33,7 +76,7 @@ class ReferenceViewer(QDialog):
         container_widget = QWidget()
         layout = QVBoxLayout(container_widget)
         layout.addWidget(image_label)
-        layout.setAlignment(Qt.AlignCenter) 
+        layout.setAlignment(Qt.AlignCenter)
         layout.setContentsMargins(0, 0, 0, 0)  # Remove margins
         layout.setSpacing(0)  # Remove spacing between widgets
         scroll_area.setWidget(container_widget)
@@ -42,7 +85,6 @@ class ReferenceViewer(QDialog):
         main_layout = QVBoxLayout(self)
         main_layout.addWidget(scroll_area)
 
-
     def add_highlight_to_pixmap(self, pixmap, coordinates):
         """Draws a rectangle over the pixmap based on coordinates."""
         x1, y1, x2, y2 = coordinates
@@ -50,8 +92,8 @@ class ReferenceViewer(QDialog):
         # Create a painter to draw on the pixmap
         highlighted_pixmap = pixmap.copy()
         painter = QPainter(highlighted_pixmap)
-        painter.setPen(QColor(100,220,240,255))  # Red color with transparency
-        painter.setBrush(QColor(100,220,240,100))  # Transparent red fill
+        painter.setPen(QColor(100, 220, 240, 255))  # Red color with transparency
+        painter.setBrush(QColor(100, 220, 240, 100))  # Transparent red fill
         painter.drawRect(x1, y1, x2 - x1, y2 - y1)
         painter.end()
 
@@ -63,7 +105,7 @@ class OneReferenceFrame(QFrame):
                  new_ref_number: int = 1,
                  source_icon_local: bool = True,
                  document_id: int = None,
-                 chunk_id : int = None,
+                 chunk_id: int = None,
                  title: str = None,
                  author: list = None,
                  source_database: str = 'local',
@@ -91,28 +133,23 @@ class OneReferenceFrame(QFrame):
         :param source_database: this field is empty if we don't use OpenAlex or Archive etc. Otherwise, database icon
         :return: None
         """
-        self.ui.ref_number.setText(new_ref_number)
-
         if source_icon_local:
-            self.ui.ref_start_icon.setPixmap(QPixmap(u"static/icons/icons8-document-ios-17-outlined-50.png"))
+            self.ui.doc_icon.setPixmap(QPixmap(u"static/icons/icons8-document-ios-17-outlined-50.png"))
+            pass
         else:
-            self.ui.ref_start_icon.setPixmap(QPixmap(u"static/icons/icon_web.svg"))
-
+            pass
+            self.ui.doc_icon.setPixmap(QPixmap(u"static/icons/icon_web.svg"))
         title = title if len(title) else "No paper title identified"
         author = author if len(author) else "No paper author identified"
-        self.ui.ref_paper_title.setText(title)
-        self.ui.ref_authors.setText(author)
+
+        title = get_title_html(title)
+        author = get_author_html(author)
+        self.ui.titles.setText(title)
+        self.ui.authors.setText(author)
+        square = get_square(number=int(new_ref_number))
+        self.ui.webEngineView.setHtml(square)
         if source_database == "local":
-            self.ui.ref_last_icon.clear()
-            self.ui.ref_text.setText("")
-        elif source_database == "open_alex":
-            self.ui.ref_last_icon.setPixmap(QPixmap(u"static/icons/logo_openalex.png"))
-            pass
-        elif source_database == "archive":
-            self.ui.ref_last_icon.setPixmap(QPixmap(u"static/icons/archive.svg"))
-            self.ui.ref_text.setText("")
-        
-         # Fetch metadata for this instance
+            self.ui.label_2.clear()
             self.doc_metadata, self.chunk_metadata = self.fetch_metadata()
             if self.doc_metadata:
                 print(f"Fetched metadata for document_id {self.document_id}: {self.doc_metadata}")
@@ -120,14 +157,11 @@ class OneReferenceFrame(QFrame):
                 print(f"Fetched metadata for chunk_id {self.chunk_id}: {self.chunk_metadata}")
 
         elif source_database == "open_alex":
-            self.ui.ref_last_icon.setPixmap(QPixmap("static/icons/logo_openalex.png"))
+            self.ui.label_2.setPixmap(QPixmap(u"static/icons/logo_openalex.png"))
             pass
-            
         elif source_database == "archive":
-            self.ui.ref_last_icon.setPixmap(QPixmap("static/icons/archive.svg"))
-            self.ui.ref_text.setText("")
+            self.ui.label_2.setPixmap(QPixmap(u"static/icons/archive.svg"))
 
-    
     def fetch_metadata(self):
         """Fetch metadata for the current document_id from the database."""
         if self.document_id is None:
@@ -137,14 +171,14 @@ class OneReferenceFrame(QFrame):
         try:
             # Connect to the database
             connection = sqlite3.connect("app_storage/metadata/sqlite-poc.db")
-            
+
             # Query the pdf_metadata table for the row with id = self.document_id
             cursor = connection.cursor()
 
             ##### DOC METADATA
             query = "SELECT * FROM pdf_metadata WHERE id = ?"
             cursor.execute(query, (self.document_id,))
-            
+
             # Fetch the result
             row = cursor.fetchone()
             if row:
@@ -154,7 +188,6 @@ class OneReferenceFrame(QFrame):
             else:
                 print(f"No metadata found for document_id: {self.document_id}")
                 return None
-            
 
             ##### CHUNK METADATA
             query = "SELECT * FROM chunks WHERE document_id = ? AND chunk_id = ?"
@@ -169,8 +202,8 @@ class OneReferenceFrame(QFrame):
                 print(f"No chunk data found for document_id: {self.document_id} and chunk_id: {self.chunk_id}")
                 return None
             return doc_metadata, chunk_metadata
-            
-            
+
+
 
         except sqlite3.Error as e:
             print(f"Database error: {e}")
@@ -179,11 +212,8 @@ class OneReferenceFrame(QFrame):
         finally:
             connection.close()
 
-
-
     def mousePressEvent(self, event):
         if event.button() == Qt.LeftButton:
-
             self.setStyleSheet("background-color: lightgray;")
             """
             print(vars(self))
@@ -198,22 +228,21 @@ class OneReferenceFrame(QFrame):
             """
             # Specify the image and TSV file paths
             doc_filename = self.doc_metadata["file_name"]
-            page_number = ast.literal_eval(self.chunk_metadata["pages"])[0] #☻Retrieving the first page if there are more than one
-            image_path = f"temp/intermediate_folders/{doc_filename}_output/{doc_filename}_images/{doc_filename}_page{page_number}.jpg"  
-           
+            page_number = ast.literal_eval(self.chunk_metadata["pages"])[
+                0]  # ☻Retrieving the first page if there are more than one
+            image_path = f"temp/intermediate_folders/{doc_filename}_output/{doc_filename}_images/{doc_filename}_page{page_number}.jpg"
+
             json_path = f"temp/intermediate_folders/{doc_filename}_output/final/{doc_filename}.json"
 
             # Open the QScrollArea with the image and rectangle
             self.show_image_with_highlight(image_path, json_path)
-
-            
 
         super().mousePressEvent(event)
 
     def show_image_with_highlight(self, image_path, json_path):
         # Read the coordinates from the TSV file
         coordinates = (0, 0, 100, 100)  # Example coordinates for testing
-        #coordinates = (58.07,140.55700000000002,536.32,595.65)
+        # coordinates = (58.07,140.55700000000002,536.32,595.65)
         #### COORDINATES FROM JSON PATH
         if not coordinates:
             print("Invalid coordinates file.")
@@ -224,31 +253,49 @@ class OneReferenceFrame(QFrame):
         viewer.exec()  # Use exec() to display the dialog modally
 
 
-    
-
-
-    # def mouseReleaseEvent(self, event):
-    #     if event.button() == Qt.LeftButton:
-    #         self.setStyleSheet(f"background-color: (255, 255, 255);")  # Reset color on release
-    #     super().mouseReleaseEvent(event)
-
-
 class ReferenceWidget(QWidget):
     def __init__(self, html_response, references_info):
         super().__init__()
-        self.layout = QVBoxLayout(self)
-        response_label = QLabel()
-        response_label.setText(html_response)
-        response_label.setWordWrap(True)
-        self.layout.addWidget(response_label)
 
+        # text = """The primary feature of the Transformers architecture is the self-attention mechanism <span class="marker blue">1</span>.
+        # This allows the model to weigh the importance of different words in a sentence dynamically and compute relationships between them,
+        # which helps in capturing long-range dependencies and contextual information efficiently <span class="marker blue">2</span>.
+        # Transformers also use an encoder-decoder architecture and avoid sequential operations, enabling them to be parallelised
+        # more effectively than traditional models like recurrent neural networks (RNNs) <span class="marker blue">1</span>
+        # <span class="marker yellow">3</span>."""
+        label = QLabel()
+        font_metrics = QFontMetrics(label.font())
+        width = font_metrics.horizontalAdvance(html_response)
+        self.layout = QVBoxLayout(self)
+        web_view = QWebEngineView()
+        html = get_html(html_response)
+
+        with open("html_response.html", "w") as f:
+            f.write(html_response)
+
+        web_view.setHtml(html)
+        width_content_based = 600
+        height_content_based = width // 600 * 22 + 10
+        web_view.setMaximumSize(width_content_based, height_content_based)
+        response_label = web_view
+        self.layout.addWidget(response_label)
         for i, reference_info in enumerate(references_info):
             reference_info['new_ref_number'] = str(i + 1)
             reference = OneReferenceFrame(**reference_info)
+            self.layout.setAlignment(Qt.AlignmentFlag.AlignLeft)
             self.layout.addWidget(reference)
+
+        self.layout.setSpacing(0)
+        self.layout.setContentsMargins(0, 0, 0, 0)
+        self.setLayout(self.layout)
+        # Check and print the size hint
+        print("Label size hint:", self.layout.sizeHint())  # QSize(width, height)
 
 
 if __name__ == "__main__":
+    title_html = get_title_html("Attention is All You Need ")
+    author_html = get_author_html("Vasvani to se")
+
     example_local = {
         'new_ref_number': '1',
         'source_icon_local': True,
@@ -260,14 +307,14 @@ if __name__ == "__main__":
     example_open_alex = {
         'new_ref_number': '2',
         'source_icon_local': False,
-        'title': 'Paper Title found on Open Alex',
-        'author': 'Authors info found on Open Alex',
+        'title': title_html,
+        'author': author_html,
         'source_database': 'open_alex',
     }
     example_archive = {
         'new_ref_number': '3',
         'source_icon_local': False,
-        'title': 'Paper Title found on archive',
+        'title': 'Paper Title found on archive' + 'Paper Title found on archive' + 'Paper Title found on archive' + 'Paper Title found on archive',
         'author': 'Authors info found on archive',
         'source_database': 'archive',
     }
@@ -278,8 +325,9 @@ if __name__ == "__main__":
     Transformers also use an encoder-decoder architecture that avoids sequential operations
      <span style="border: 1px solid #6c757d; padding: 2px; border-radius: 3px; background-color: #f1f1f1; color: #6c757d; font-size: 12px;">2</span> <span style="border: 1px solid #ffc107; padding: 2px; border-radius: 3px; background-color: #fff3cd; color: #856404; font-size: 12px;">3</span>.
     """
-    references_info = [example_local, example_archive, example_open_alex]
+    references_info = [example_open_alex, example_open_alex, example_archive]
     app = QApplication(sys.argv)
     window = ReferenceWidget(html_response, references_info)
+    # window = OneReferenceFrame(**example_open_alex)
     window.show()
     sys.exit(app.exec())
