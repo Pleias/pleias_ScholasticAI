@@ -15,7 +15,7 @@ from ui_forms_v1.ui_uploaded_docs_widget import Ui_user_prompts as DocsWidget
 
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
-
+from pathlib import Path
 
 class ReferenceWidget(QWidget):
     def __init__(self, text):
@@ -24,7 +24,7 @@ class ReferenceWidget(QWidget):
         # Initialize of the main window
         self.ui = ReferenceForm()
         self.ui.setupUi(self)
-        self.ui.label_2.setText(text)
+        self.ui.label_2.setText(Path(text).stem)
 
 class UploadedDocs(QWidget):
     """
