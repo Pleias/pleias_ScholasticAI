@@ -42,7 +42,6 @@ class Ui_Frame(object):
         self.webEngineView.setStyleSheet(u"background-color: rgb(255, 255, 255);")
         self.webEngineView.setUrl(QUrl(u"static/square.html"))
         self.horizontalLayout.addWidget(self.webEngineView)
-
         self.gridLayout = QGridLayout()
         self.gridLayout.setObjectName(u"gridLayout")
         self.gridLayout.setSizeConstraint(QLayout.SizeConstraint.SetFixedSize)

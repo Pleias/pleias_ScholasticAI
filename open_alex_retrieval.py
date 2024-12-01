@@ -27,7 +27,7 @@ class OpenAlexReader:
         """
         papers = self._fetch_open_alex_results(user_query, max_results=max_results)
         results = []
-        fake_ids = ['**4e2d3c7a186d08a4**', '**9f6d52c01a14622d**', '**c27ee0fb7a2760dc**']
+        fake_ids = [1, 2, 3]
         for i, paper in enumerate(papers):
             try:
                 paper_metadata = {
