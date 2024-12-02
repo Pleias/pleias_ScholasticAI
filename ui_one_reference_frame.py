@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'one_reference_frameESBcdn.ui'
+## Form generated from reading UI file 'one_ref_secondfZfFzE.ui'
 ##
 ## Created by: Qt User Interface Compiler version 6.8.0
 ##
@@ -15,152 +15,139 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
+from PySide6.QtWebEngineWidgets import QWebEngineView
 from PySide6.QtWidgets import (QApplication, QFrame, QGridLayout, QHBoxLayout,
-    QLabel, QSizePolicy, QVBoxLayout, QWidget)
+    QLabel, QLayout, QSizePolicy, QSpacerItem,
+    QWidget)
 from static import resource_rc
 
+class Ui_Frame(object):
+    def setupUi(self, Frame):
+        if not Frame.objectName():
+            Frame.setObjectName(u"Frame")
+        Frame.resize(628, 76)
 
-class Ui_one_reference(object):
-    def setupUi(self, one_reference):
-        if not one_reference.objectName():
-            one_reference.setObjectName(u"one_reference")
-        one_reference.resize(527, 56)
-        self.horizontalLayout = QHBoxLayout(one_reference)
+        self.horizontalLayout = QHBoxLayout(Frame)
         self.horizontalLayout.setObjectName(u"horizontalLayout")
-        self.ref_number = QLabel(one_reference)
-        self.ref_number.setObjectName(u"ref_number")
+        self.webEngineView = QWebEngineView(Frame)
+        self.webEngineView.setObjectName(u"webEngineView")
+
         sizePolicy = QSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.ref_number.sizePolicy().hasHeightForWidth())
-        self.ref_number.setSizePolicy(sizePolicy)
-        self.ref_number.setMinimumSize(QSize(30, 30))
-        self.ref_number.setStyleSheet(u"background-color: rgb(160, 219, 255);\n"
-"border-radius:5px;\n"
-"color:rgb(108, 109, 109);\n"
-"font: 24pt \"Times New Roman\";")
-        self.ref_number.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        sizePolicy.setHeightForWidth(self.webEngineView.sizePolicy().hasHeightForWidth())
+        self.webEngineView.setSizePolicy(sizePolicy)
+        self.webEngineView.setMinimumSize(QSize(31, 31))
+        self.webEngineView.setMaximumSize(QSize(31, 31))
+        self.webEngineView.setStyleSheet(u"background-color: rgb(255, 255, 255);")
+        self.webEngineView.setUrl(QUrl(u"static/square.html"))
+        self.horizontalLayout.addWidget(self.webEngineView)
+        self.gridLayout = QGridLayout()
+        self.gridLayout.setObjectName(u"gridLayout")
+        self.gridLayout.setSizeConstraint(QLayout.SizeConstraint.SetFixedSize)
+        self.gridLayout.setHorizontalSpacing(3)
+        self.gridLayout.setVerticalSpacing(0)
+        self.doc_icon = QLabel(Frame)
+        self.doc_icon.setObjectName(u"doc_icon")
+        sizePolicy.setHeightForWidth(self.doc_icon.sizePolicy().hasHeightForWidth())
+        self.doc_icon.setSizePolicy(sizePolicy)
+        self.doc_icon.setMaximumSize(QSize(15, 16))
+        self.doc_icon.setTextFormat(Qt.TextFormat.RichText)
+        self.doc_icon.setPixmap(QPixmap(u"static/icons/icons8-document-ios-17-outlined-50.png"))
+        self.doc_icon.setScaledContents(True)
+        self.doc_icon.setAlignment(Qt.AlignmentFlag.AlignLeading|Qt.AlignmentFlag.AlignLeft|Qt.AlignmentFlag.AlignVCenter)
+        self.doc_icon.setMargin(0)
 
-        self.horizontalLayout.addWidget(self.ref_number)
+        self.gridLayout.addWidget(self.doc_icon, 0, 0, 1, 1)
 
-        self.frame_5 = QFrame(one_reference)
-        self.frame_5.setObjectName(u"frame_5")
-        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Minimum)
+        self.authors = QLabel(Frame)
+        self.authors.setObjectName(u"authors")
+        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.MinimumExpanding, QSizePolicy.Policy.Fixed)
         sizePolicy1.setHorizontalStretch(0)
         sizePolicy1.setVerticalStretch(0)
-        sizePolicy1.setHeightForWidth(self.frame_5.sizePolicy().hasHeightForWidth())
-        self.frame_5.setSizePolicy(sizePolicy1)
-        self.frame_5.setFrameShape(QFrame.Shape.NoFrame)
-        self.frame_5.setFrameShadow(QFrame.Shadow.Plain)
-        self.horizontalLayout_5 = QHBoxLayout(self.frame_5)
-        self.horizontalLayout_5.setSpacing(0)
-        self.horizontalLayout_5.setObjectName(u"horizontalLayout_5")
-        self.horizontalLayout_5.setContentsMargins(0, 0, 0, 0)
-        self.frame_6 = QFrame(self.frame_5)
-        self.frame_6.setObjectName(u"frame_6")
-        sizePolicy2 = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
-        sizePolicy2.setHorizontalStretch(0)
-        sizePolicy2.setVerticalStretch(0)
-        sizePolicy2.setHeightForWidth(self.frame_6.sizePolicy().hasHeightForWidth())
-        self.frame_6.setSizePolicy(sizePolicy2)
-        self.frame_6.setFrameShape(QFrame.Shape.NoFrame)
-        self.frame_6.setFrameShadow(QFrame.Shadow.Raised)
-        self.gridLayout_3 = QGridLayout(self.frame_6)
-        self.gridLayout_3.setSpacing(0)
-        self.gridLayout_3.setObjectName(u"gridLayout_3")
-        self.gridLayout_3.setContentsMargins(0, 0, 0, 0)
-        self.ref_start_icon = QLabel(self.frame_6)
-        self.ref_start_icon.setObjectName(u"ref_start_icon")
-        self.ref_start_icon.setMinimumSize(QSize(30, 30))
-        self.ref_start_icon.setMaximumSize(QSize(30, 30))
-        self.ref_start_icon.setPixmap(QPixmap(u":/icons/icons/icons8-document-ios-17-outlined-50.png"))
-        self.ref_start_icon.setScaledContents(True)
-        self.ref_start_icon.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.ref_start_icon.setIndent(0)
+        sizePolicy1.setHeightForWidth(self.authors.sizePolicy().hasHeightForWidth())
+        self.authors.setSizePolicy(sizePolicy1)
+        # self.authors.setTextFormat(Qt.TextFormat.RichText)
+        self.authors.setAlignment(Qt.AlignmentFlag.AlignLeading|Qt.AlignmentFlag.AlignLeft|Qt.AlignmentFlag.AlignTop)
+        self.authors.setIndent(0)
+        self.authors.setWordWrap(True)
+        self.authors.setMinimumWidth(500)
+        self.gridLayout.addWidget(self.authors, 1, 1, 1, 1)
 
-        self.gridLayout_3.addWidget(self.ref_start_icon, 0, 0, 1, 1)
+        self.titles = QLabel(Frame)
+        self.titles.setObjectName(u"titles")
+        sizePolicy.setHeightForWidth(self.titles.sizePolicy().hasHeightForWidth())
+        self.titles.setSizePolicy(sizePolicy)
+        # self.titles.setTextFormat(Qt.TextFormat.RichText)
+        self.titles.setAlignment(Qt.AlignmentFlag.AlignBottom|Qt.AlignmentFlag.AlignLeading|Qt.AlignmentFlag.AlignLeft)
+        self.titles.setWordWrap(True)
+        self.titles.setIndent(0)
+        self.titles.setMinimumWidth(500)
 
-        self.frame_7 = QFrame(self.frame_6)
-        self.frame_7.setObjectName(u"frame_7")
-        self.frame_7.setFrameShape(QFrame.Shape.NoFrame)
-        self.frame_7.setFrameShadow(QFrame.Shadow.Plain)
-        self.verticalLayout_2 = QVBoxLayout(self.frame_7)
-        self.verticalLayout_2.setSpacing(0)
-        self.verticalLayout_2.setObjectName(u"verticalLayout_2")
-        self.verticalLayout_2.setContentsMargins(0, 0, 0, 0)
-        self.ref_paper_title = QLabel(self.frame_7)
-        self.ref_paper_title.setObjectName(u"ref_paper_title")
-        sizePolicy1.setHeightForWidth(self.ref_paper_title.sizePolicy().hasHeightForWidth())
-        self.ref_paper_title.setSizePolicy(sizePolicy1)
-        self.ref_paper_title.setMinimumSize(QSize(191, 17))
-
-        self.verticalLayout_2.addWidget(self.ref_paper_title)
-
-        self.ref_authors = QLabel(self.frame_7)
-        self.ref_authors.setObjectName(u"ref_authors")
-        sizePolicy1.setHeightForWidth(self.ref_authors.sizePolicy().hasHeightForWidth())
-        self.ref_authors.setSizePolicy(sizePolicy1)
-        self.ref_authors.setMaximumSize(QSize(600, 16777215))
-        self.ref_authors.setStyleSheet(u"color: rgb(178, 179, 179);\n"
-"font: 10pt \"Arial\";")
-
-        self.verticalLayout_2.addWidget(self.ref_authors)
+        self.gridLayout.addWidget(self.titles, 0, 1, 1, 1)
 
 
-        self.gridLayout_3.addWidget(self.frame_7, 0, 1, 1, 1)
+        self.horizontalLayout.addLayout(self.gridLayout)
+
+        self.horizontalSpacer = QSpacerItem(3, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+
+        self.horizontalLayout.addItem(self.horizontalSpacer)
+
+        self.label_2 = QLabel(Frame)
+        self.label_2.setObjectName(u"label_2")
+        self.label_2.setMaximumSize(QSize(24, 24))
+        self.label_2.setPixmap(QPixmap(u"static/icons/icons/logo_openalex.png"))
+        self.label_2.setScaledContents(True)
+        self.label_2.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
+        self.horizontalLayout.addWidget(self.label_2)
 
 
-        self.horizontalLayout_5.addWidget(self.frame_6)
+        self.retranslateUi(Frame)
 
-        self.frame_8 = QFrame(self.frame_5)
-        self.frame_8.setObjectName(u"frame_8")
-        self.frame_8.setMaximumSize(QSize(16777215, 40))
-        self.frame_8.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
-        self.frame_8.setFrameShape(QFrame.Shape.NoFrame)
-        self.frame_8.setFrameShadow(QFrame.Shadow.Plain)
-        self.horizontalLayout_6 = QHBoxLayout(self.frame_8)
-        self.horizontalLayout_6.setSpacing(0)
-        self.horizontalLayout_6.setObjectName(u"horizontalLayout_6")
-        self.horizontalLayout_6.setContentsMargins(0, 0, 0, 0)
-        self.ref_last_icon = QLabel(self.frame_8)
-        self.ref_last_icon.setObjectName(u"ref_last_icon")
-        self.ref_last_icon.setMinimumSize(QSize(32, 32))
-        self.ref_last_icon.setMaximumSize(QSize(32, 32))
-        self.ref_last_icon.setPixmap(QPixmap(u":/icons/images/logo_openalex.png"))
-        self.ref_last_icon.setScaledContents(True)
-        self.ref_last_icon.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
-
-        self.horizontalLayout_6.addWidget(self.ref_last_icon)
-
-        self.ref_text = QLabel(self.frame_8)
-        self.ref_text.setObjectName(u"ref_text")
-        self.ref_text.setMinimumSize(QSize(30, 0))
-        self.ref_text.setMaximumSize(QSize(100, 16777215))
-        self.ref_text.setAlignment(Qt.AlignmentFlag.AlignLeading|Qt.AlignmentFlag.AlignLeft|Qt.AlignmentFlag.AlignVCenter)
-        self.ref_text.setIndent(0)
-
-        self.horizontalLayout_6.addWidget(self.ref_text)
-
-
-        self.horizontalLayout_5.addWidget(self.frame_8)
-
-
-        self.horizontalLayout.addWidget(self.frame_5)
-
-
-        self.retranslateUi(one_reference)
-
-        QMetaObject.connectSlotsByName(one_reference)
+        QMetaObject.connectSlotsByName(Frame)
     # setupUi
 
-    def retranslateUi(self, one_reference):
-        one_reference.setWindowTitle(QCoreApplication.translate("one_reference", u"Frame", None))
-        self.ref_number.setText(QCoreApplication.translate("one_reference", u"1", None))
-        self.ref_number.setProperty(u"class", QCoreApplication.translate("one_reference", u"reference", None))
-        self.ref_start_icon.setText("")
-        self.ref_paper_title.setText(QCoreApplication.translate("one_reference", u"Attention is All You Need.", None))
-        self.ref_authors.setText(QCoreApplication.translate("one_reference", u"2017 Ashish Vaswani, Noam Shazeer et al.", None))
-        self.ref_last_icon.setText("")
-        self.ref_text.setText(QCoreApplication.translate("one_reference", u"  OpenAlex", None))
+    def retranslateUi(self, Frame):
+        Frame.setWindowTitle(QCoreApplication.translate("Frame", u"Frame", None))
+        self.doc_icon.setText("")
+        self.authors.setText(QCoreApplication.translate("Frame", u"<html>\n"
+"    <head>\n"
+"        <style>\n"
+"            .authors {\n"
+"                margin-left: 20px;\n"
+"                font-family: \"SF Pro\", sans-serif;\n"
+"                font-size: 12px;\n"
+"                font-weight: 400;\n"
+"                line-height: 14.32px;\n"
+"                text-align: left;\n"
+"                text-underline-position: from-font;\n"
+"                text-decoration-skip-ink: none;\n"
+"                color: #828282;\n"
+"            }\n"
+"        </style>\n"
+"    </head>\n"
+"    <body>\n"
+"        <span class=\"authors\">Ashish Vaswani, Noam Shazeer et al.</span>\n"
+"    </body>\n"
+"</html>\n"
+"", None))
+        self.titles.setText(QCoreApplication.translate("Frame", u"<html>\n"
+"    <head>\n"
+"        <style>\n"
+"            .title {\n"
+"                font-family: \"SF Pro\", sans-serif;\n"
+"                font-size: 14px;\n"
+"                font-weight: 400;\n"
+"                line-height: 22px;\n"
+"                letter-spacing: -0.43px;\n"
+"                text-align: left;\n"
+"            }\n"
+"        </style>\n"
+"    </head>\n"
+"    <body>\n"
+"        <span class=\"title\">Attention is All You Need</span>\n"
+"    </body>\n"
+"</html>", None))
+        self.label_2.setText("")
     # retranslateUi
 

@@ -1,3 +1,5 @@
+from random import random
+
 import requests
 import time
 import json
@@ -12,16 +14,17 @@ def construct_prompt(results, user_message):
     Constructs a prompt with specific XML-style tags for LLM formatting
     """
     prompt = f"<|query_start|>{user_message}<|query_end|>\n"
-    
+
     for result in results:
         source = f"<|source_start|><|source_id_start|>{result.get('chunk_id', '')}<|source_id_end|>{result['text']}<|source_end|>\n"
         prompt += source
-    
+
     prompt += "<|source_analysis_start|>"
     return prompt
 
 
 def generate_with_llamafile_api(prompt):
+    full_response = None
     data = {
         "n_predict": 850,  # Predictions slider (max tokens)
         "temperature": 0,  # Temperature slider
@@ -90,25 +93,136 @@ def generate_with_llamafile_api(prompt):
 
     return full_response
 
-def return_span(number=1):
+
+def return_span(number=1, source="blue"):
     """Create a reference number styled consistently"""
-    return (
-        f'<a href="{number}" style="color: #007bff; cursor: pointer; text-decoration: none; '
-        f'background-color: #e7f3ff; padding: 2px 6px; margin: 0 2px; '
-        f'border-radius: 3px; border: 1px solid #007bff;">[{number}]</a>'
-    )
+    return f"""<span class="marker {source}">{number}</span>"""
 
-def replace_references(text, ref_map):
-    def ref_replacer(match):
-        ref_text = match.group(0)
-        ref_name = re.findall(r'<ref name="([^"]+)">', ref_text)[0]  
-        ref_content = re.findall(r'>(.*?)</ref>', ref_text)[0]
-        ref_key = f'<ref name="{ref_name}">'
-        span = ref_map[ref_key]
-        return span
 
-    updated_text = re.sub(r'<ref name="[^"]+">[^<]+</ref>', ref_replacer, text)
-    return updated_text
+def get_author_html(author):
+    return f"""
+<html>
+    <head>
+        <style>
+            .authors {{
+                margin-left: 20px;
+                font-family: "SF Pro", sans-serif;
+                font-size: 12px;
+                font-weight: 400;
+                line-height: 14.32px;
+                text-align: left;
+                text-underline-position: from-font;
+                text-decoration-skip-ink: none;
+                color: #828282;
+            }}
+        </style>
+    </head>
+    <body>
+        <span class="authors">{author}</span>
+    </body>
+</html>
+"""
+
+
+def get_title_html(title):
+    return f"""
+<html>
+    <head>
+        <style>
+            .title {{
+                font-family: "SF Pro", sans-serif;
+                font-size: 14px;
+                font-weight: 400;
+                line-height: 22px;
+                letter-spacing: -0.43px;
+                text-align: left;
+            }}
+        </style>
+    </head>
+    <body>
+        <span class="title">{title}</span>
+    </body>
+</html>
+"""
+
+
+def get_html(answer):
+    return f"""
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transformers Architecture</title>
+    <style>
+      body {{
+        font-family: SF Pro;
+        font-size: 16px;
+        font-weight: 400;
+        line-height: 22px;
+        letter-spacing: -0.4300000071525574px;
+        text-align: left;
+        text-underline-position: from-font;
+        text-decoration-skip-ink: none;
+      }}
+      .marker {{
+        width: 16px;
+        height: 18px;
+        padding: 0px 2px;
+        justify-content: center;
+        align-items: center;
+        border-radius: 3px;
+        text-decoration: none;
+      }}
+      .blue {{
+        color: #042FF4;
+        font-family: SF Pro;
+        font-size: 12px;
+        font-style: normal;
+        font-weight: 200;
+        line-height: normal;
+        background: #BFEFFF;
+      }}
+      .yellow {{
+        color: #B66400;
+        font-family: SF Pro;
+        font-size: 12px;
+        font-weight: 200;
+        line-height: 14.32px;
+        text-align: left;
+        text-underline-position: from-font;
+        text-decoration-skip-ink: none;
+        background: #FFE289;
+     .green {{
+        color: #e0f8d6;
+        font-family: SF Pro;
+        font-size: 12px;
+        font-weight: 200;
+        line-height: 14.32px;
+        text-align: left;
+        text-underline-position: from-font;
+        text-decoration-skip-ink: none;
+        background: #afed95;
+      }}
+     .pink {{
+        color: #9d6f7d;
+        font-family: SF Pro;
+        font-size: 12px;
+        font-weight: 200;
+        line-height: 14.32px;
+        text-align: left;
+        text-underline-position: from-font;
+        text-decoration-skip-ink: none;
+        background: #d7c5cb;
+      }}
+    </style>
+  </head>
+  <body>
+    <p>{answer}</p>
+  </body>
+</html>
+"""
+
 
 def convert_input_msg_to_html(answer):
     """
@@ -116,32 +230,40 @@ def convert_input_msg_to_html(answer):
     Fully compatible with ReferenceWidget's expected format
     """
     import re
-    
+
     # Track reference numbers
     ref_count = 1
     ref_map = {}
-    
+    sources = ["blue", "yellow", "green", "pink"]
     def replace_ref(match):
         nonlocal ref_count
-        ref_name = match.group(1)    # Gets "96" from name="96"
+        ref_name = match.group(1)  # Gets "96" from name="96"
         ref_content = match.group(2)  # Gets the quoted text
-        
+
         # Remove the surrounding quotes from content
         ref_content = ref_content.strip('"')
-        
+
         # Create a link that exactly matches what ReferenceWidget expects:
         # - href contains "id:content" format for tooltip
         # - style ensures it's visible and clickable
-        return (f'<a href="{ref_name}:{ref_content}" style="color: #007bff; '
-                f'text-decoration: none;">[{ref_count}]</a>')
 
+        if ref_name in ref_map:
+            source = ref_map[ref_name]
+        else:
+            source_id = len(ref_map)
+            if source_id < len(sources):
+                source = sources[source_id]
+                ref_map[ref_name] = source
+            else:
+                source = sources[-1]
+        return f'<a href="{ref_name}:{ref_content}" class="marker {source}">{ref_count}</a>'
     # Match exactly: <ref name="96">"content"</ref>
     pattern = r'<ref name="([^"]+)">"([^"]+)"</ref>'
-    
+
     # Process each match
     last_end = 0
     final_text = ""
-    
+    print("ANSWER", answer)
     for match in re.finditer(pattern, answer):
         # Add text before this match
         final_text += answer[last_end:match.start()]
@@ -149,56 +271,34 @@ def convert_input_msg_to_html(answer):
         final_text += replace_ref(match)
         last_end = match.end()
         ref_count += 1
-    
+
     # Add any remaining text
     final_text += answer[last_end:]
-    
-    return final_text
-
-
-
-def retrieve_from_open_alex(user_message, debug=True):
-    if debug:
-        return [
-            {"text": "put your text",
-             'title': "Short story about Anna", 'author': "Kamu", 'source_database': 'open_alex',
-             "creation_date": "01/12/12",
-             "document_id" : 1,
-             "chunk_id":1},
-            {"text": "put your text",
-             'title': "Short story about Anna", 'author': "CHUK", 'source_database': 'open_alex',
-             "creation_date": "01/12/12",
-             "document_id" : 2,
-             "chunk_id":2},
-            {"text": "put your text",
-             'title': "Short story about Anna", 'author': "LION", 'source_database': 'open_alex',
-             "creation_date": "01/12/12",
-             "doucment_id" : 3,
-             "chunk_id":3},
-        ]
+    ans_start = final_text.find("<|answer_start|>")
+    if ans_start == -1:
+        return final_text
     else:
-        r = OpenAlexReader()
-        results = r.retrieve_from_open_alex(user_query=user_message, max_results=3)
-        return results
+        return final_text[ans_start + len("<|answer_start|>"):]
+
+
+def retrieve_from_open_alex(user_message):
+    r = OpenAlexReader()
+    results = r.retrieve_from_open_alex(user_query=user_message, max_results=3)
+    return results
 
 
 def get_response_and_metadata(user_message, open_alex):
-    #print("In get_response_and_metadata")
     if open_alex:
-        #print("retrieving from open alex")
         results = retrieve_from_open_alex(user_message)
     else:
-        #print("retrieving from local db")
         connection = ConnectDB().connection
         results = retrieve(connection, user_message)
-
-    #print("RESULTS : ",results) 
     prompt = construct_prompt(results, user_message)
     raw_response = generate_with_llamafile_api(prompt)
-    
+
     # Convert to HTML with only reference formatting
     html_output = convert_input_msg_to_html(raw_response)
-    
+
     # Prepare reference information for tooltips
     references_info = []
     for result in results:
@@ -210,6 +310,5 @@ def get_response_and_metadata(user_message, open_alex):
             "document_id": result.get("document_id", "Unknown document id"),
             "chunk_id": result.get("chunk_id", "Unknown chunk id")
         })
-    
-    return references_info, html_output
 
+    return references_info, html_output

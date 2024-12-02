@@ -15,79 +15,16 @@ from ui_forms_v1.ui_uploaded_docs_widget import Ui_user_prompts as DocsWidget
 
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
-
+from pathlib import Path
 
 class ReferenceWidget(QWidget):
-    def __init__(self, message, reference_info):
+    def __init__(self, text):
         super().__init__()
-        self.reference_info = reference_info
-        
-        # Create label for message
-        self.label = QLabel()
-        self.label.setTextFormat(Qt.RichText)
-        self.label.setOpenExternalLinks(False)
-        self.label.setWordWrap(True)
-        
-        # Style the label - important for link rendering
-        self.label.setStyleSheet("""
-            QLabel {
-                background-color: white;
-                border: 1px solid #ccc;
-                padding: 10px;
-                border-radius: 10px;
-            }
-            QLabel a {
-                color: #007bff;
-                text-decoration: none;
-                background-color: #e7f3ff;
-                padding: 2px 6px;
-                border-radius: 3px;
-                border: 1px solid #007bff;
-            }
-        """)
-        
-        # Enable mouse tracking
-        self.label.setMouseTracking(True)
-        self.label.installEventFilter(self)
-        
-        # Set the text after styling is set up
-        self.label.setText(message)
-        
-        # Layout
-        layout = QVBoxLayout(self)
-        layout.addWidget(self.label)
-        layout.setContentsMargins(0, 0, 0, 0)
 
-    def eventFilter(self, obj, event):
-        if obj == self.label:
-            if event.type() == QEvent.MouseButtonPress:
-                pos = event.pos()
-                cursor = self.label.cursorForPosition(pos)
-                char_format = cursor.charFormat()
-                
-                if char_format.isAnchor():
-                    href = char_format.anchorHref()
-                    if ':' in href:
-                        ref_id, ref_content = href.split(':', 1)
-                        tooltip_text = f"{ref_id} : {ref_content}"
-                        
-                        QToolTip.showText(
-                            self.mapToGlobal(pos),
-                            tooltip_text,
-                            self,
-                            timeout=5000
-                        )
-                        return True
-            
-            elif event.type() == QEvent.MouseMove:
-                pos = event.pos()
-                cursor = self.label.cursorForPosition(pos)
-                if cursor.charFormat().isAnchor():
-                    self.setCursor(Qt.PointingHandCursor)
-                else:
-                    self.setCursor(Qt.ArrowCursor)
-        
-        return super().eventFilter(obj, event)
+        # Initialize of the main window
+        self.ui = ReferenceForm()
+        self.ui.setupUi(self)
+        self.ui.label_2.setText(Path(text).stem)
 
 class UploadedDocs(QWidget):
     """
@@ -127,6 +64,7 @@ class MainWindow(QMainWindow):
 
         # Hide scrollbar of scroll area
         self.ui.main_sroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.ui.main_sroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.show_conversation_frame()
 
         # OPEN ALEX BTN
@@ -136,7 +74,7 @@ class MainWindow(QMainWindow):
                 background-color: none;
             }
             QPushButton:checked {
-                background-color: grey;
+                background-color: #BFEFFF;
             }
         """)
 
@@ -147,7 +85,7 @@ class MainWindow(QMainWindow):
                 background-color: none;
             }
             QPushButton:checked {
-                background-color: grey;
+                background-color: #FFE289;
             }
         """)
 
@@ -194,6 +132,7 @@ class MainWindow(QMainWindow):
                 ]
                 chat_data = chat_db[select_row]
                 #print("chat_db : ",chat_db)
+
                 #print("chat_data : ",chat_data)
                 self.db.save_chat_data(chat_db)
                 #print("calling show_conversation_frame")
@@ -238,26 +177,39 @@ class MainWindow(QMainWindow):
     def show_conversation_frame(self, chat_data=None) -> None:
         """
         We have 3 different states for conversation frame. First case is showed by default
-            1. User didn't upload any documents yet and haven't started the conversation
-            2. User have uploaded a document and haven't started the conversation
-            3. User have started the conversation
-
+        1. User didn't upload any documents yet and haven't started the conversation
+        2. User have uploaded a document and haven't started the conversation
+        3. User have started the conversation
         """
         ###DEBUG
-        print("#####################DEBUG MODE###########################\n\n\n")
-        print("setting self.sources_is_empty to False")
+
+        print("#####################DEBUG MODE###########################")
+        print(f"dialog_is_empty: {self.dialog_is_empty}")
+        print(f"sources_is_empty: {self.sources_is_empty}")
+        print(f"chat_data: {chat_data}")
+        
         self.sources_is_empty = False
+
         if self.dialog_is_empty and not self.sources_is_empty:
+            print("State 2: Documents uploaded but no conversation yet")
             state_widget = UploadedDocs()
             grid_layout = self.ui.main_sroll_area
             grid_layout.setWidget(state_widget)
-
-        if not self.dialog_is_empty and not self.sources_is_empty:
+        elif not self.dialog_is_empty and not self.sources_is_empty:
+            print("State 3: Active conversation")
             grid_layout = self.ui.main_sroll_area
+            # If no chat_data is provided, preserve the existing widget
+            if chat_data is None:
+                print("Maintaining current conversation view")
+                return
+                
             dialog = ChatDialog(chat_data)
             grid_layout.setWidget(dialog)
             scroll_bar = self.ui.main_sroll_area.verticalScrollBar()
             scroll_bar.setValue(scroll_bar.maximum())
+            self.ui.main_sroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+            self.ui.main_sroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+
 
     def upload_files(self):
         """Open a file dialog to select one or more PDF files for upload."""
