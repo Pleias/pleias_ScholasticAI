@@ -41,7 +41,8 @@ class OpenAlexReader:
                 }
                 results.append(paper_metadata)
             except:
-                print(i, paper.get('doi'))
+                continue
+
         return results
 
     @staticmethod
@@ -67,10 +68,3 @@ class OpenAlexReader:
 
         # Join the words to form the complete abstract text
         return ' '.join(word for word in abstract_words if word)
-
-
-# USAGE EXAMPLE
-"""
-r = OpenAlexReader()
-metadata = r.retrieve_from_open_alex(user_query="Transformers", max_results=2)
-"""

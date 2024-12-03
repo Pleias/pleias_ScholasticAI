@@ -715,8 +715,6 @@ def format_pdf_date(date_str):
 
 def extract_pdf_metadata(pdf_path):
     """Extract metadata from a PDF file."""
-    # Note: often metadata is not complete or missing, we should take care of that
-    # Maybe we can extract it from openalex anyway
     with fitz.open(pdf_path) as doc:
         metadata = doc.metadata
     return {

@@ -29,7 +29,7 @@ def embed_query(query: List[str]) -> List[List[float]]:
 
 def format_for_vec_db(vector: Union[List[float], np.ndarray]):
     """Makes sure the object is valid to be stored in the SQLite-vec database.
-    If it a list of floats, converts it into a compact "raw bytes" format."""
+    If it is a list of floats, converts it into a compact "raw bytes" format."""
     if isinstance(vector, np.ndarray):
         return vector.astype(
             np.float32
