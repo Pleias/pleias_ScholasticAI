@@ -127,14 +127,3 @@ def retrieve(
     results = cursor.fetchall()
     columns = [description[0] for description in cursor.description]
     return [dict(zip(columns, row)) for row in results]
-
-
-if __name__ == "__main__":
-    from connect_db import ConnectDB
-
-    connection = ConnectDB().connection
-    query = "single task training on single domain datasets is a major contributor to the lack of generalization "
-    results = retrieve(connection, query)  # Will now return top 3 results
-    print(len(results))
-    print(results)
-    connection.close()
