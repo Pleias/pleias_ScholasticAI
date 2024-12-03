@@ -172,7 +172,7 @@ class OneReferenceFrame(QFrame):
             # Query the pdf_metadata table for the row with id = self.document_id
             cursor = connection.cursor()
 
-            ##### DOC METADATA
+            # DOC METADATA
             query = "SELECT * FROM pdf_metadata WHERE id = ?"
             cursor.execute(query, (self.document_id,))
 
@@ -186,7 +186,7 @@ class OneReferenceFrame(QFrame):
                 print(f"No metadata found for document_id: {self.document_id}")
                 return None
 
-            ##### CHUNK METADATA
+            # CHUNK METADATA
             query = "SELECT * FROM chunks WHERE document_id = ? AND chunk_id = ?"
             cursor.execute(query, (self.document_id, self.chunk_id))
             row = cursor.fetchone()
