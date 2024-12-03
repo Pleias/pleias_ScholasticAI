@@ -60,22 +60,9 @@ class ChatDialog(QScrollArea):
             message_layout.addStretch()
             message_layout.addWidget(message_label)
         else:
-            # System message (left-aligned)
             response_frame = ReferenceWidget(message, reference_info)
             response_frame.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Minimum)
             message_layout.addWidget(response_frame)
             message_layout.addStretch()
 
-        # Insert the message layout before the spacer
         self.verticalLayout.insertLayout(self.verticalLayout.count() - 1, message_layout)
-
-
-if __name__ == "__main__":
-    pass
-
-    # import sys
-    #
-    # app = QApplication(sys.argv)
-    # window = ChatDialog(chat_data[0])
-    # window.show()
-    # sys.exit(app.exec())

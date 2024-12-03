@@ -1,9 +1,6 @@
-from random import random
-
 import requests
 import time
 import json
-import re
 from connect_db import ConnectDB
 from RAG import retrieve
 from open_alex_retrieval import OpenAlexReader

@@ -6,11 +6,11 @@ def retrieve(
     connection,
     query: str,
     documents: Optional[List] = None,
-    k: int = 2,  # Changed to 2 to get top 2 from each method
+    k: int = 2,
     rrf_k: float = 10,
     weight_fts: float = 1.0,
     weight_vec: float = 1.0,
-    final_k: int = 3,  # New parameter to specify final number of results
+    final_k: int = 3,
 ):
     """
     Retrieve relevant document chunks based on a query using hybrid search (combination of vector search and full-text search (FTS)).
@@ -115,16 +115,15 @@ def retrieve(
         main_rag_query,
         {
             "embedded_query": format_for_vec_db(embedded_query),
-            "query": query.replace("?", ""),  # Remove question marks as they are not supported in FTS
+            "query": query.replace("?", ""),
             "k": k,
             "rrf_k": rrf_k,
             "weight_fts": weight_fts,
             "weight_vec": weight_vec,
-            "final_k": final_k,  # Added final_k parameter
+            "final_k": final_k,
         },
     )
 
-    # Fetch and return results
     results = cursor.fetchall()
     columns = [description[0] for description in cursor.description]
     return [dict(zip(columns, row)) for row in results]

@@ -615,5 +615,5 @@ class Ui_MainWindow(object):
         self.label_4.setProperty(u"class", QCoreApplication.translate("MainWindow", u"subheader", None))
         self.label_3.setText(QCoreApplication.translate("MainWindow", u"Include online databases in your search", None))
         self.label_3.setProperty(u"class", QCoreApplication.translate("MainWindow", u"caption", None))
-    # retranslateUi
+
 

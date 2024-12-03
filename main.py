@@ -9,11 +9,9 @@ from PySide6.QtWidgets import QWidget
 from connect_db import ConnectDB
 from dialog_display import ChatDialog
 from get_answer_from_api import get_response_and_metadata
-from ui_forms_v1.reference_ui import Ui_Form as ReferenceForm
-from ui_forms_v1.ui_chat_window import Ui_MainWindow as ChatWindow
-from ui_forms_v1.ui_uploaded_docs_widget import Ui_user_prompts as DocsWidget
-
-from watchdog.observers import Observer
+from ui_forms.reference_ui import Ui_Form as ReferenceForm
+from ui_forms.ui_chat_window import Ui_MainWindow as ChatWindow
+from ui_forms.ui_uploaded_docs_widget import Ui_user_prompts as DocsWidget
 from watchdog.events import FileSystemEventHandler
 from pathlib import Path
 

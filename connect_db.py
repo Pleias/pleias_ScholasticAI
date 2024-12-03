@@ -3,7 +3,7 @@ import sqlite3
 import sqlite_vec
 import json
 import os
-from typing import List, Dict, Optional, Sequence, Any
+from typing import List, Dict, Sequence, Any
 
 
 from pdf_processing_pipeline import process_pdfs_in_folder
