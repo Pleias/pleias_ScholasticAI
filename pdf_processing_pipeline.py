@@ -1,6 +1,8 @@
 import csv
+from datetime import datetime
 import gc
 import hashlib
+import json
 import os
 import random
 import re
@@ -9,13 +11,12 @@ import tempfile
 import time
 import traceback
 import xml.etree.ElementTree as ET
-from datetime import datetime
 from xml.dom import minidom
 
-import PIL.Image
 import fitz  # PyMuPDF
 import pandas as pd
 import pdfplumber
+import PIL.Image
 from joblib import Parallel, delayed
 from tqdm import tqdm
 from ultralytics import YOLO
@@ -70,7 +71,7 @@ def extract_text_tables_and_save(pdf_path, output_directory):
                 output_directory, f"{pdf_basename}_page{page_num + 1}.tsv"
             )
             with open(
-                    coord_tsv_filename, "w", newline="", encoding="utf-8"
+                coord_tsv_filename, "w", newline="", encoding="utf-8"
             ) as coord_file:
                 writer = csv.writer(coord_file, delimiter="\t")
                 writer.writerow(["text", "x1", "y1", "x2", "y2"])
@@ -89,10 +90,10 @@ def extract_text_tables_and_save(pdf_path, output_directory):
                 ]
                 table_tsv_filename = os.path.join(
                     output_directory,
-                    f"{pdf_basename}_page{page_num + 1}_table{global_table_counter}.tsv",
+                    f"{pdf_basename}_page{page_num+1}_table{global_table_counter}.tsv",
                 )
                 with open(
-                        table_tsv_filename, "w", newline="", encoding="utf-8"
+                    table_tsv_filename, "w", newline="", encoding="utf-8"
                 ) as tsv_file:
                     writer = csv.writer(tsv_file, delimiter="\t")
                     writer.writerows([[cell] for cell in tsv_content])
@@ -237,7 +238,7 @@ def process_images_in_output_folder(output_folder, model_path, batch_size=10):
     # batch_size = 10  # Adjusted for CPU processing
 
     for i in range(0, len(image_files), batch_size):
-        batch = image_files[i: i + batch_size]
+        batch = image_files[i : i + batch_size]
         process_image_batch(batch, results_yolo_folder, model_path)
 
         # Clear memory after each batch
@@ -303,7 +304,7 @@ def create_cvat_task_xml(output_directory, task_name):
             if os.path.exists(final_dir) and os.path.exists(images_dir):
                 for tsv_file in sorted(os.listdir(final_dir)):
                     if tsv_file.startswith("combined_page") and tsv_file.endswith(
-                            ".tsv"
+                        ".tsv"
                     ):
                         page_num = tsv_file.split("page")[1].split(".")[0]
                         tsv_path = os.path.join(final_dir, tsv_file)
@@ -329,11 +330,11 @@ def create_cvat_task_xml(output_directory, task_name):
 
                             for _, row in df.iterrows():
                                 if (
-                                        pd.isna(row["class_name"])
-                                        or pd.isna(row["x1"])
-                                        or pd.isna(row["y1"])
-                                        or pd.isna(row["x2"])
-                                        or pd.isna(row["y2"])
+                                    pd.isna(row["class_name"])
+                                    or pd.isna(row["x1"])
+                                    or pd.isna(row["y1"])
+                                    or pd.isna(row["x2"])
+                                    or pd.isna(row["y2"])
                                 ):
                                     continue
 
@@ -374,10 +375,10 @@ def process_page_for_text(pdf_path, page_num, base_output_directory):
 
     base_name = os.path.basename(pdf_path)[:-4]  # Remove '.pdf'
     page_df_path = os.path.join(
-        base_output_directory, f"results_yolo/{base_name}_page{page_num + 1}.tsv"
+        base_output_directory, f"results_yolo/{base_name}_page{page_num+1}.tsv"
     )
     bareme_df_path = os.path.join(
-        base_output_directory, f"{base_name}_page{page_num + 1}.tsv"
+        base_output_directory, f"{base_name}_page{page_num+1}.tsv"
     )
 
     tsv_files_produced = 0
@@ -410,7 +411,7 @@ def process_page_for_text(pdf_path, page_num, base_output_directory):
         os.makedirs(new_output_directory, exist_ok=True)
 
         combined_df_output_path = os.path.join(
-            new_output_directory, f"combined_page{page_num + 1}.tsv"
+            new_output_directory, f"combined_page{page_num+1}.tsv"
         )
         combined_df.to_csv(combined_df_output_path, sep="\t", index=False)
         tsv_files_produced = 1
@@ -553,6 +554,8 @@ def parse_tsvs_to_json(directory):
             try:
                 page_number = re.search(r"combined_page(\d+).tsv", file_name).group(1)
                 file_path = os.path.join(directory, file_name)
+
+
                 df = pd.read_csv(file_path, sep="\t", encoding="utf-8")
                 df["Category"] = df["class_name"].apply(classify_class_name)
                 df["text"] = df["text"].astype(str)
@@ -692,11 +695,11 @@ def format_pdf_date(date_str):
     """Format PDF date string to 'YYYY-MM-DD'"""
     if not date_str:
         return None
-
+        
     # Remove D: prefix and timezone if present
     date_str = date_str.replace('D:', '')
     date_str = re.sub(r'[+-]\d{2}\'\d{2}\'.*$', '', date_str)
-
+    
     try:
         # Try full format first (with time)
         date_obj = datetime.strptime(date_str, "%Y%m%d%H%M%S")
@@ -706,7 +709,7 @@ def format_pdf_date(date_str):
             date_obj = datetime.strptime(date_str, "%Y%m%d")
         except ValueError:
             return None
-
+    
     return date_obj.strftime("%Y-%m-%d")
 
 
@@ -725,11 +728,11 @@ def extract_pdf_metadata(pdf_path):
 
 # Final wrapper function
 def process_pdfs_in_folder(
-        pdf_folder="app_storage/pdfs",
-        yolo_model_path="models/yolo.pt",
-        output_folder=None,
-        pdf_chunk_size=25,
-        batch_size=10,
+    pdf_folder="app_storage/pdfs",
+    yolo_model_path="models/yolo.pt",
+    output_folder=None,
+    pdf_chunk_size=25,
+    batch_size=10,
 ):
     """
     Process PDFs in a folder, extracting tables, converting pages to images, processing with YOLO,
@@ -786,6 +789,7 @@ def process_pdfs_in_folder(
                 final_directories.append(subdir)
 
         for directory in final_directories:
+            document_data = []
             json_file_path, tsv_count = parse_tsvs_to_json(directory)
 
             if json_file_path:
