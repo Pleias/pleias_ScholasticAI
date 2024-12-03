@@ -1,7 +1,5 @@
-import json
-
-from PySide6.QtCore import QCoreApplication, Qt
-from PySide6.QtWidgets import QApplication, QLabel, QSizePolicy, QVBoxLayout, QHBoxLayout, QWidget, QSpacerItem, \
+from PySide6.QtCore import Qt
+from PySide6.QtWidgets import QLabel, QSizePolicy, QVBoxLayout, QHBoxLayout, QWidget, QSpacerItem, \
     QScrollArea
 
 from reference_widget import ReferenceWidget

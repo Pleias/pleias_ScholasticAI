@@ -48,6 +48,7 @@ def get_square(number=1):
 </html> 
     """
 
+
 class ReferenceViewer(QDialog):
     def __init__(self, image_path, coordinates, parent=None):
         super().__init__(parent)

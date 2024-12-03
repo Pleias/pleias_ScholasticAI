@@ -134,9 +134,9 @@ class ConnectDB:
         )
         if verbose:
             print(f"Inserted metadata for {file_name}")
-        id = cursor.lastrowid
+        ids = cursor.lastrowid
         self.connection.commit()
-        return id
+        return ids
 
     def insert_chunks(
             self, chunks: Sequence[str], document_id: int, verbose: bool = True
@@ -269,7 +269,8 @@ class ConnectDB:
         cursor.execute("DELETE FROM pdf_metadata WHERE id = ?", (pdf_id,))
         self.connection.commit()
 
-    def store_pdf(self, file_path: str):
+    @staticmethod
+    def store_pdf(file_path: str):
         """Store the PDF file in the local storage directory."""
         # Define storage directory
         save_directory = "app_storage/pdfs/to_process"
@@ -280,7 +281,8 @@ class ConnectDB:
         if not os.path.exists(target_path):
             shutil.copy(file_path, target_path)
 
-    def move_pdf(self, old_path: str, new_path: str):
+    @staticmethod
+    def move_pdf(old_path: str, new_path: str):
         """Move a PDF file from one location to another."""
         for item in os.listdir(old_path):
             item_old_path = os.path.join(old_path, item)

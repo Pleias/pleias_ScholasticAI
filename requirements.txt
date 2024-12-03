@@ -168,3 +168,5 @@ wheel==0.44.0
 widgetsnbextension==4.0.10
 wrapt==1.16.0
 yarl==1.15.1
+pdfplumber~=0.11.4
+ultralytics~=8.3.24

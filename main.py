@@ -1,10 +1,11 @@
 import os
 import sys
+from pathlib import Path
 from typing import List
 
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QStandardItem, QStandardItemModel
-from PySide6.QtWidgets import QApplication, QMainWindow, QFileDialog, QLabel
+from PySide6.QtWidgets import QApplication, QMainWindow, QFileDialog
 from PySide6.QtWidgets import QWidget
 from connect_db import ConnectDB
 from dialog_display import ChatDialog
@@ -12,8 +13,6 @@ from get_answer_from_api import get_response_and_metadata
 from ui_forms.reference_ui import Ui_Form as ReferenceForm
 from ui_forms.ui_chat_window import Ui_MainWindow as ChatWindow
 from ui_forms.ui_uploaded_docs_widget import Ui_user_prompts as DocsWidget
-from watchdog.events import FileSystemEventHandler
-from pathlib import Path
 
 
 class ReferenceWidget(QWidget):
@@ -162,7 +161,7 @@ class MainWindow(QMainWindow):
                 # Reload window
                 self.show_conversation_frame(chat_data)
 
-            ## Clear input after get response
+            # Clear input after get response
             self.ui.msg_input_text_edit.clear()
             return
 
@@ -181,25 +180,15 @@ class MainWindow(QMainWindow):
         2. User have uploaded a document and haven't started the conversation
         3. User have started the conversation
         """
-        ###DEBUG
-        print("#####################DEBUG MODE###########################")
-        print(f"dialog_is_empty: {self.dialog_is_empty}")
-        print(f"sources_is_empty: {self.sources_is_empty}")
-        print(f"chat_data: {chat_data}")
-
         self.sources_is_empty = False
 
         if self.dialog_is_empty and not self.sources_is_empty:
-            print("State 2: Documents uploaded but no conversation yet")
             state_widget = UploadedDocs()
             grid_layout = self.ui.main_sroll_area
             grid_layout.setWidget(state_widget)
         elif not self.dialog_is_empty and not self.sources_is_empty:
-            print("State 3: Active conversation")
             grid_layout = self.ui.main_sroll_area
-            # If no chat_data is provided, preserve the existing widget
             if chat_data is None:
-                print("Maintaining current conversation view")
                 return
 
             dialog = ChatDialog(chat_data)
@@ -252,21 +241,6 @@ class MainWindow(QMainWindow):
 
 
 # Reload the app when a Python file changes
-class ReloadHandler(FileSystemEventHandler):
-    def __init__(self, app_restart_callback):
-        super().__init__()
-        self.app_restart_callback = app_restart_callback
-
-    def on_modified(self, event):
-        if event.src_path.endswith(".py"):  # Only watch Python files
-            print(f"Detected change in {event.src_path}, restarting app...")
-            self.app_restart_callback()
-
-
-def restart_app():
-    # Kill the current process and restart it
-    python = sys.executable
-    os.execl(python, python, *sys.argv)
 
 
 if __name__ == "__main__":
@@ -274,21 +248,3 @@ if __name__ == "__main__":
     main_window = MainWindow()
     main_window.show()
     sys.exit(app.exec())
-
-## Uncomment this code to enable auto-reloading
-# if __name__ == "__main__":
-#     observer = Observer()
-#     handler = ReloadHandler(restart_app)
-#     observer.schedule(handler, path=".", recursive=True)
-#     observer.start()
-
-#     try:
-#         app = QApplication(sys.argv)
-#         main_window = MainWindow()
-#         main_window.show()
-#         sys.exit(app.exec())
-#     except KeyboardInterrupt:
-#         print("Stopping watcher...")
-#         observer.stop()
-#     finally:
-#         observer.join()
