@@ -3,19 +3,16 @@ import sqlite3
 import sqlite_vec
 import json
 import os
-from typing import Dict, Optional, Sequence, Any
-
+from typing import List, Dict, Sequence, Any
 
 from pdf_processing_pipeline import process_pdfs_in_folder
 from embedding import embed_query, format_for_vec_db
 
 
 class ConnectDB:
-    def __init__(
-        self,
-        chat_db_path: str = "app_storage/chat_data/data.json",
-        db_path: str = "app_storage/metadata/sqlite-poc.db",
-    ):
+    def __init__(self,
+                 chat_db_path: str = "app_storage/chat_data/data.json",
+                 db_path: str = "app_storage/metadata/sqlite-poc.db"):
         self.chat_db_path = chat_db_path
 
         # Database to database
@@ -59,10 +56,8 @@ class ConnectDB:
 
         self.save_chat_data(chat_db)
 
-    ### PDF Metadata Storage Methods ###
-
     def init_database(self):
-        """Creates the SQLite database if it doesn’t already exist.
+        """Creates the SQLite database if it does not already exist.
         Creates the 4 tables: pdf_metadata, chunks, chunks for FTS, and chunk_embeddings."""
 
         if not os.path.exists(self.db_path):
@@ -95,7 +90,8 @@ class ConnectDB:
                     text TEXT,
                     pages TEXT,
                     word_count INTEGER,
-                    document_id INTEGER
+                    document_id INTEGER,
+                    hash TEXT
                     )
                 """
             )
@@ -116,9 +112,7 @@ class ConnectDB:
 
             self.connection.commit()
 
-    def insert_pdf_metadata(
-        self, file_name: str, metadata: Dict[str, Any], verbose: bool = True
-    ):
+    def insert_pdf_metadata(self, file_name: str, metadata: Dict[str, Any], verbose: bool = True):
         """Inserts metadata for a PDF into the database.
         Accepts file_name, and a dictionary of metadata fields."""
         cursor = self.connection.cursor()
@@ -140,22 +134,22 @@ class ConnectDB:
         )
         if verbose:
             print(f"Inserted metadata for {file_name}")
-        id = cursor.lastrowid
+        ids = cursor.lastrowid
         self.connection.commit()
-        return id
+        return ids
 
     def insert_chunks(
-        self, chunks: Sequence[str], document_id: int, verbose: bool = True
+            self, chunks: Sequence[str], document_id: int, verbose: bool = True
     ):
-        """ "Accepts a list of chunks. The document_id is the id of the document in the metadata table.
-        Returns a list of the new chunk ids, which is useful to embed these new chunks afterwards."""
+        """Accepts a list of chunks. The document_id is the id of the document in the metadata table.
+        Returns a list of the new chunk ids, which is useful to embed these new chunks afterward."""
         cursor = self.connection.cursor()
         new_ids = []
         for chunk in chunks:
             cursor.execute(
                 """
-                INSERT INTO chunks (section, text, pages, word_count, document_id)
-                VALUES (?, ?, ?, ?, ?)
+                INSERT INTO chunks (section, text, pages, word_count, document_id, hash)
+                VALUES (?, ?, ?, ?, ?, ?)
             """,
                 (
                     chunk["section"],
@@ -163,6 +157,8 @@ class ConnectDB:
                     str(chunk["pages"]),
                     chunk["word_count"],
                     document_id,
+                    chunk["hash"],
+
                 ),
             )
             last_id = cursor.lastrowid
@@ -214,16 +210,14 @@ class ConnectDB:
 
         self.connection.commit()
 
-    def parse_pdf_to_db(
-        self,
-        parsed_pdf_list: Optional[Sequence[dict]] = None,
-        verbose: bool = True,
-        pdf_folder: str = "app_storage/pdfs/to_process",
-        yolo_model_path: str = "models/yolo.pt",
-        intermediate_store_folder: Optional[str] = None,
-        pdf_chunk_size: int = 25,
-        batch_size: int = 10,
-    ):
+    def parse_pdf_to_db(self,
+                        parsed_pdf_list: List[dict] = None,
+                        verbose: bool = True,
+                        pdf_folder: str = "app_storage/pdfs/to_process",
+                        yolo_model_path: str = "models/yolo.pt",
+                        intermediate_store_folder: str = None,
+                        pdf_chunk_size: int = 25,
+                        batch_size: int = 10):
         # to combine the functions earlier in a single function
         # combine with pdf parsing function
         if parsed_pdf_list is None:
@@ -275,7 +269,8 @@ class ConnectDB:
         cursor.execute("DELETE FROM pdf_metadata WHERE id = ?", (pdf_id,))
         self.connection.commit()
 
-    def store_pdf(self, file_path: str):
+    @staticmethod
+    def store_pdf(file_path: str):
         """Store the PDF file in the local storage directory."""
         # Define storage directory
         save_directory = "app_storage/pdfs/to_process"
@@ -286,7 +281,8 @@ class ConnectDB:
         if not os.path.exists(target_path):
             shutil.copy(file_path, target_path)
 
-    def move_pdf(self, old_path: str, new_path: str):
+    @staticmethod
+    def move_pdf(old_path: str, new_path: str):
         """Move a PDF file from one location to another."""
         for item in os.listdir(old_path):
             item_old_path = os.path.join(old_path, item)
@@ -307,5 +303,5 @@ class ConnectDB:
 
 if __name__ == "__main__":
     db = ConnectDB()
-    db.parse_pdf_to_db()
+    db.parse_pdf_to_db(intermediate_store_folder="temp/intermediate_folders")
     db.close()

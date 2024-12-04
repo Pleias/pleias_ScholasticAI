@@ -1,20 +1,18 @@
 import os
 import sys
+from pathlib import Path
 from typing import List
 
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QStandardItem, QStandardItemModel
-from PySide6.QtWidgets import QApplication, QMainWindow, QFileDialog, QLabel
+from PySide6.QtWidgets import QApplication, QMainWindow, QFileDialog
 from PySide6.QtWidgets import QWidget
 from connect_db import ConnectDB
 from dialog_display import ChatDialog
 from get_answer_from_api import get_response_and_metadata
-from ui_forms_v1.reference_ui import Ui_Form as ReferenceForm
-from ui_forms_v1.ui_chat_window import Ui_MainWindow as ChatWindow
-from ui_forms_v1.ui_uploaded_docs_widget import Ui_user_prompts as DocsWidget
-
-from watchdog.observers import Observer
-from watchdog.events import FileSystemEventHandler
+from ui_forms.reference_ui import Ui_Form as ReferenceForm
+from ui_forms.ui_chat_window import Ui_MainWindow as ChatWindow
+from ui_forms.ui_uploaded_docs_widget import Ui_user_prompts as DocsWidget
 
 
 class ReferenceWidget(QWidget):
@@ -24,7 +22,7 @@ class ReferenceWidget(QWidget):
         # Initialize of the main window
         self.ui = ReferenceForm()
         self.ui.setupUi(self)
-        self.ui.label_2.setText(text)
+        self.ui.label_2.setText(Path(text).stem)
 
 
 class UploadedDocs(QWidget):
@@ -65,6 +63,7 @@ class MainWindow(QMainWindow):
 
         # Hide scrollbar of scroll area
         self.ui.main_sroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.ui.main_sroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.show_conversation_frame()
 
         # OPEN ALEX BTN
@@ -74,7 +73,7 @@ class MainWindow(QMainWindow):
                 background-color: none;
             }
             QPushButton:checked {
-                background-color: grey;
+                background-color: #BFEFFF;
             }
         """)
 
@@ -85,14 +84,14 @@ class MainWindow(QMainWindow):
                 background-color: none;
             }
             QPushButton:checked {
-                background-color: grey;
+                background-color: #FFE289;
             }
         """)
 
     def closeEvent(self, event):
-        """Overide closing method to make sure the database connection is closed"""
-        self.db.close()  # Close the database connection
-        event.accept()  # Accept the close event
+        """Override closing method to make sure the database connection is closed"""
+        self.db.close()
+        event.accept()
 
     def archive_btn_clicked(self):
         pass
@@ -116,8 +115,10 @@ class MainWindow(QMainWindow):
         chat_db = self.db.get_chat_data()
         if message_input:
             open_alex = self.ui.open_alex_btn.isChecked()
+            # print("IN MAIN, CALLING GET_RESPONSE_AND_METADATA")
             references_info, html_output = get_response_and_metadata(message_input, open_alex)
             if not self.dialog_is_empty:
+                # print("IN MAIN, DIALOG IS NOT EMPTY")
                 # Get current selected chat index
                 select_row = 0  # In the future it must be project id
 
@@ -129,12 +130,16 @@ class MainWindow(QMainWindow):
                     }
                 ]
                 chat_data = chat_db[select_row]
+                # print("chat_db : ",chat_db)
 
+                # print("chat_data : ",chat_data)
                 self.db.save_chat_data(chat_db)
+                # print("calling show_conversation_frame")
                 self.show_conversation_frame(chat_data)
                 # self.show_reference_list(source_documents)
 
             else:
+                # print("IN MAIN, DIALOG IS EMPTY")
                 # Create new chat and save it into database
                 self.dialog_is_empty = False
                 chat_data = {
@@ -148,12 +153,15 @@ class MainWindow(QMainWindow):
                     ],
                 }
                 chat_db.insert(0, chat_data)
+                # print("chat_db : ",chat_db)
+                # print("chat_data : ",chat_data)
                 self.db.save_chat_data(chat_db)
 
+                # print("calling show_conversation_frame")
                 # Reload window
                 self.show_conversation_frame(chat_data)
 
-            ## Clear input after get response
+            # Clear input after get response
             self.ui.msg_input_text_edit.clear()
             return
 
@@ -168,23 +176,27 @@ class MainWindow(QMainWindow):
     def show_conversation_frame(self, chat_data=None) -> None:
         """
         We have 3 different states for conversation frame. First case is showed by default
-            1. User didn't upload any documents yet and haven't started the conversation
-            2. User have uploaded a document and haven't started the conversation
-            3. User have started the conversation
-
+        1. User didn't upload any documents yet and haven't started the conversation
+        2. User have uploaded a document and haven't started the conversation
+        3. User have started the conversation
         """
         self.sources_is_empty = False
+
         if self.dialog_is_empty and not self.sources_is_empty:
             state_widget = UploadedDocs()
             grid_layout = self.ui.main_sroll_area
             grid_layout.setWidget(state_widget)
-
-        if not self.dialog_is_empty and not self.sources_is_empty:
+        elif not self.dialog_is_empty and not self.sources_is_empty:
             grid_layout = self.ui.main_sroll_area
+            if chat_data is None:
+                return
+
             dialog = ChatDialog(chat_data)
             grid_layout.setWidget(dialog)
             scroll_bar = self.ui.main_sroll_area.verticalScrollBar()
             scroll_bar.setValue(scroll_bar.maximum())
+            self.ui.main_sroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+            self.ui.main_sroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
 
     def upload_files(self):
         """Open a file dialog to select one or more PDF files for upload."""
@@ -198,8 +210,6 @@ class MainWindow(QMainWindow):
         # Save copy of files
         for file_path in file_paths:
             self.db.store_pdf(file_path)
-            print(f"Sucessfully uploaded file at path: {file_path}")
-
         self.db.parse_pdf_to_db()
         self.db.move_pdf(
             old_path="app_storage/pdfs/to_process",
@@ -229,21 +239,8 @@ class MainWindow(QMainWindow):
         self.ui.uploaded_docs_list.setContentsMargins(5, 0, 5, 5)
         # self.ui.uploaded_docs_list.setViewMode(QListView.IconMode)
 
+
 # Reload the app when a Python file changes
-class ReloadHandler(FileSystemEventHandler):
-    def __init__(self, app_restart_callback):
-        super().__init__()
-        self.app_restart_callback = app_restart_callback
-
-    def on_modified(self, event):
-        if event.src_path.endswith(".py"):  # Only watch Python files
-            print(f"Detected change in {event.src_path}, restarting app...")
-            self.app_restart_callback()
-
-def restart_app():
-    # Kill the current process and restart it
-    python = sys.executable
-    os.execl(python, python, *sys.argv)
 
 
 if __name__ == "__main__":
@@ -251,21 +248,3 @@ if __name__ == "__main__":
     main_window = MainWindow()
     main_window.show()
     sys.exit(app.exec())
-
-## Uncomment this code to enable auto-reloading
-# if __name__ == "__main__":
-#     observer = Observer()
-#     handler = ReloadHandler(restart_app)
-#     observer.schedule(handler, path=".", recursive=True)
-#     observer.start()
-
-#     try:
-#         app = QApplication(sys.argv)
-#         main_window = MainWindow()
-#         main_window.show()
-#         sys.exit(app.exec())
-#     except KeyboardInterrupt:
-#         print("Stopping watcher...")
-#         observer.stop()
-#     finally:
-#         observer.join()

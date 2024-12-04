@@ -1,44 +1,45 @@
 import requests
 import time
 import json
-import re
 from connect_db import ConnectDB
 from RAG import retrieve
 from open_alex_retrieval import OpenAlexReader
 
 
 def construct_prompt(results, user_message):
-    # hash_ids = ['**7b3a9c2d4e8f5g1h**', '**9d4e2f7c8b5a3h1i**']
-    text_chunks = [res['text'] for res in results]
-    titles = [res['title'] for res in results]
-    sources = ''
-    for i in range(len(text_chunks)):
-        source = "\n".join([titles[i], text_chunks[i]])  # hash_ids[i],
-        sources += source
+    """
+    Constructs a prompt with specific XML-style tags for LLM formatting
+    """
+    prompt = f"<|query_start|>{user_message}<|query_end|>\n"
 
-    prompt = f"""### Query ###\n{user_message}\n\n### Source ###\n{sources}\n\n### Analysis ###\n"""
+    for result in results:
+        source = f"<|source_start|><|source_id_start|>{result.get('chunk_id', '')}<|source_id_end|>{result['text']}<|source_end|>\n"
+        prompt += source
+
+    prompt += "<|source_analysis_start|>"
     return prompt
 
 
 def generate_with_llamafile_api(prompt):
+    full_response = None
     data = {
-        "n_predict": 1000,  # Predictions slider (max tokens)
-        "temperature": 0.25,  # Temperature slider
-        "repeat_penalty": 1.0,  # Penalize repeat sequence slider
+        "n_predict": 850,  # Predictions slider (max tokens)
+        "temperature": 0,  # Temperature slider
+        "repeat_penalty": 1,  # Penalize repeat sequence slider
         "repeat_last_n": 256,  # Consider N last tokens for penalize slider
         "top_k": 40,  # Top-K sampling slider
         "top_p": 0.95,  # Top-P sampling slider
         "min_p": 0.05,  # Min-P sampling slider
         "tfs_z": 1,  # Tail-free sampling parameter, reduces the impact of low-probability tokens
         "typical_p": 1,  # Controls how "typical" the sampling should be (1 means standard sampling)
-        "presence_penalty": 0.2,  # penalty for tokens that have appeared at all
-        "frequency_penalty": 0.2,  # penalty based on how frequently tokens have appeared
+        "presence_penalty": 0,  # penalty for tokens that have appeared at all
+        "frequency_penalty": 0,  # penalty based on how frequently tokens have appeared
         "mirostat": 0,  # "no Mirostat" radio option
         "mirostat_tau": 5,  # Mirostat target complexity (only if mirostat enabled)
         "mirostat_eta": 0.1,  # Mirostat learning rate (only if mirostat enabled)
         "n_probs": 0,  # Show Probabilities slider
         "min_keep": 0,  # Mkeep minimum number of candidates per sampling
-        "stop": ["#END#"],
+        "stop": ["<|answer_end|>"],
         "stream": True,
         "prompt": prompt,
         "cache_prompt": False,
@@ -90,54 +91,193 @@ def generate_with_llamafile_api(prompt):
     return full_response
 
 
-def replace_references(text, ref_map):
-    def ref_replacer(match):
-        ref_name = re.findall(r'<ref name="[^"]+">', match.group(0))[0]
-        replacement = ref_map[ref_name]
-        return replacement
-
-    updated_text = re.sub(r'<ref name="[^"]+">[^<]+</ref>', ref_replacer, text)
-    return updated_text
+def return_span(number=1, source="blue"):
+    """Create a reference number styled consistently"""
+    return f"""<span class="marker {source}">{number}</span>"""
 
 
-def return_span(number=1):
-    return f"""<span style="border: 1px solid #007bff; padding: 2px; border-radius: 3px; background-color: #e7f3ff; color: #007bff; font-size: 12px;">{number}</span>"""
+def get_author_html(author):
+    return f"""
+<html>
+    <head>
+        <style>
+            .authors {{
+                margin-left: 20px;
+                font-family: "SF Pro", sans-serif;
+                font-size: 12px;
+                font-weight: 400;
+                line-height: 14.32px;
+                text-align: left;
+                text-underline-position: from-font;
+                text-decoration-skip-ink: none;
+                color: #828282;
+            }}
+        </style>
+    </head>
+    <body>
+        <span class="authors">{author}</span>
+    </body>
+</html>
+"""
+
+
+def get_title_html(title):
+    return f"""
+<html>
+    <head>
+        <style>
+            .title {{
+                font-family: "SF Pro", sans-serif;
+                font-size: 14px;
+                font-weight: 400;
+                line-height: 22px;
+                letter-spacing: -0.43px;
+                text-align: left;
+            }}
+        </style>
+    </head>
+    <body>
+        <span class="title">{title}</span>
+    </body>
+</html>
+"""
+
+
+def get_html(answer):
+    return f"""
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transformers Architecture</title>
+    <style>
+      body {{
+        font-family: SF Pro;
+        font-size: 16px;
+        font-weight: 400;
+        line-height: 22px;
+        letter-spacing: -0.4300000071525574px;
+        text-align: left;
+        text-underline-position: from-font;
+        text-decoration-skip-ink: none;
+      }}
+      .marker {{
+        width: 16px;
+        height: 18px;
+        padding: 0px 2px;
+        justify-content: center;
+        align-items: center;
+        border-radius: 3px;
+        text-decoration: none;
+      }}
+      .blue {{
+        color: #042FF4;
+        font-family: SF Pro;
+        font-size: 12px;
+        font-style: normal;
+        font-weight: 200;
+        line-height: normal;
+        background: #BFEFFF;
+      }}
+      .yellow {{
+        color: #B66400;
+        font-family: SF Pro;
+        font-size: 12px;
+        font-weight: 200;
+        line-height: 14.32px;
+        text-align: left;
+        text-underline-position: from-font;
+        text-decoration-skip-ink: none;
+        background: #FFE289;
+     .green {{
+        color: #e0f8d6;
+        font-family: SF Pro;
+        font-size: 12px;
+        font-weight: 200;
+        line-height: 14.32px;
+        text-align: left;
+        text-underline-position: from-font;
+        text-decoration-skip-ink: none;
+        background: #afed95;
+      }}
+     .pink {{
+        color: #9d6f7d;
+        font-family: SF Pro;
+        font-size: 12px;
+        font-weight: 200;
+        line-height: 14.32px;
+        text-align: left;
+        text-underline-position: from-font;
+        text-decoration-skip-ink: none;
+        background: #d7c5cb;
+      }}
+    </style>
+  </head>
+  <body>
+    <p>{answer}</p>
+  </body>
+</html>
+"""
 
 
 def convert_input_msg_to_html(answer):
-    pattern = r'###\s*Analysis\s*###'
-    match = re.search(pattern, answer)
-    start_answer = match.end() if match is not None else 0
-    end_answer = answer.find("#END#") if answer.find("###") == -1 else len(answer)
-    answer = answer[start_answer:end_answer]
-    references = re.findall(r'<ref name="[^"]+">', answer)
+    """
+    Converts <ref name="X">"content"</ref> into clickable links
+    Fully compatible with ReferenceWidget's expected format
+    """
+    import re
+
+    # Track reference numbers
+    ref_count = 1
     ref_map = {}
-    reference_count = 1
-    for ref in references:
-        if ref not in ref_map:
-            ref_map[ref] = return_span(reference_count)
-            reference_count += 1
-    updated_text = replace_references(answer, ref_map)
-    return updated_text
+    sources = ["blue", "yellow", "green", "pink"]
 
+    def replace_ref(match):
+        nonlocal ref_count
+        ref_name = match.group(1)  # Gets "96" from name="96"
+        ref_content = match.group(2)  # Gets the quoted text
 
-def retrieve_from_open_alex(user_message, debug=False):
-    if debug:
-        return [
-            {"text": "put your text",
-             'title': "Short story about Anna", 'author': "Kamu", 'source_database': 'open_alex',
-             "creation_date": "01/12/12"},
-            {"text": "put your text",
-             'title': "Short story about Anna", 'author': "CHUK", 'source_database': 'open_alex',
-             "creation_date": "01/12/12"},
-            {"text": "put your text",
-             'title': "Short story about Anna", 'author': "LION", 'source_database': 'open_alex',
-             "creation_date": "01/12/12"},
-        ]
+        ref_content = ref_content.strip('"')
+
+        if ref_name in ref_map:
+            source = ref_map[ref_name]
+        else:
+            source_id = len(ref_map)
+            if source_id < len(sources):
+                source = sources[source_id]
+                ref_map[ref_name] = source
+            else:
+                source = sources[-1]
+        return f'<a href="{ref_name}:{ref_content}" class="marker {source}">{ref_count}</a>'
+
+    # Match exactly: <ref name="96">"content"</ref>
+    pattern = r'<ref name="([^"]+)">"([^"]+)"</ref>'
+
+    # Process each match
+    last_end = 0
+    final_text = ""
+    for match in re.finditer(pattern, answer):
+        # Add text before this match
+        final_text += answer[last_end:match.start()]
+        # Add the replacement
+        final_text += replace_ref(match)
+        last_end = match.end()
+        ref_count += 1
+
+    # Add any remaining text
+    final_text += answer[last_end:]
+    ans_start = final_text.find("<|answer_start|>")
+    if ans_start == -1:
+        return final_text
     else:
-        r = OpenAlexReader()
-        results = r.retrieve_from_open_alex(user_query=user_message, max_results=3)
-        return results
+        return final_text[ans_start + len("<|answer_start|>"):]
+
+
+def retrieve_from_open_alex(user_message):
+    r = OpenAlexReader()
+    results = r.retrieve_from_open_alex(user_query=user_message, max_results=3)
+    return results
 
 
 def get_response_and_metadata(user_message, open_alex):
@@ -146,19 +286,22 @@ def get_response_and_metadata(user_message, open_alex):
     else:
         connection = ConnectDB().connection
         results = retrieve(connection, user_message)
-
     prompt = construct_prompt(results, user_message)
     raw_response = generate_with_llamafile_api(prompt)
-    print(raw_response)
+
+    # Convert to HTML with only reference formatting
     html_output = convert_input_msg_to_html(raw_response)
 
+    # Prepare reference information for tooltips
     references_info = []
-    for reference in results:
-        reference_info = {
-            "title": reference["title"],
-            "author": reference["author"],
-            "creation_date": reference["creation_date"],
-            "source_database": reference.get('source_database', 'local'),
-        }
-        references_info.append(reference_info)
+    for result in results:
+        references_info.append({
+            "title": result.get("title", "Unknown Title"),
+            "author": result.get("author", "Unknown Author"),
+            "creation_date": result.get("creation_date", "Unknown Date"),
+            "source_database": result.get("source_database", "local"),
+            "document_id": result.get("document_id", "Unknown document id"),
+            "chunk_id": result.get("chunk_id", "Unknown chunk id")
+        })
+
     return references_info, html_output
