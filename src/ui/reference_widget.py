@@ -3,6 +3,7 @@ from PySide6.QtWebEngineWidgets import QWebEngineView
 from PySide6.QtWidgets import QWidget, QFrame, QVBoxLayout, QLabel, QScrollArea, QDialog
 from src.core.get_answer_from_api import get_html, get_title_html, get_author_html
 from ui_forms.ui_one_reference_frame import Ui_Frame as Ui_one_reference
+from src.core.connect_db import ConnectDB
 import sqlite3
 import ast
 
@@ -174,7 +175,7 @@ class OneReferenceFrame(QFrame):
         connection = None
         try:
             # Connect to the database
-            connection = sqlite3.connect("app_storage/metadata/sqlite-poc.db")
+            connection = ConnectDB().connection
 
             # Query the pdf_metadata table for the row with id = self.document_id
             cursor = connection.cursor()
