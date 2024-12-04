@@ -15,7 +15,7 @@ The app was made under the philosphy of **complete local deployement**, running 
 
 <img src="static/mozilla_logo.png" alt="Mozilla logo" width="150">
 
-We are very grateful to the **Mozilla foundation** (Local AI builders program), who supported the development of this application.
+We are very grateful to the **Mozilla foundation** (Mozilla AI Builders program, https://builders.mozilla.org/ ), who supported the development of this application.
 
 ### Table of Contents
 
