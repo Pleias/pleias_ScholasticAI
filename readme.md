@@ -144,5 +144,6 @@ This application is optimized to run on CPU-only for local use. Running multiple
 This app leverages open-source tools and models, including:
 - **PleIAs-360m-RAG**: A retrieval-augmented generation language model designed by Pleias.
 - **llamafile**: Model loader and API server for efficient local inference.
+- **YOLOv8**: We use a fine-tuned version of this visual model for layout analysis.
 
 All models and tools are designed to comply with the **European AI Act** and respect open licensing standards.
