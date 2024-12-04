@@ -1,9 +1,6 @@
-from random import random
-
 import requests
 import time
 import json
-import re
 from connect_db import ConnectDB
 from RAG import retrieve
 from open_alex_retrieval import OpenAlexReader
@@ -235,17 +232,13 @@ def convert_input_msg_to_html(answer):
     ref_count = 1
     ref_map = {}
     sources = ["blue", "yellow", "green", "pink"]
+
     def replace_ref(match):
         nonlocal ref_count
         ref_name = match.group(1)  # Gets "96" from name="96"
         ref_content = match.group(2)  # Gets the quoted text
 
-        # Remove the surrounding quotes from content
         ref_content = ref_content.strip('"')
-
-        # Create a link that exactly matches what ReferenceWidget expects:
-        # - href contains "id:content" format for tooltip
-        # - style ensures it's visible and clickable
 
         if ref_name in ref_map:
             source = ref_map[ref_name]
@@ -257,13 +250,13 @@ def convert_input_msg_to_html(answer):
             else:
                 source = sources[-1]
         return f'<a href="{ref_name}:{ref_content}" class="marker {source}">{ref_count}</a>'
+
     # Match exactly: <ref name="96">"content"</ref>
     pattern = r'<ref name="([^"]+)">"([^"]+)"</ref>'
 
     # Process each match
     last_end = 0
     final_text = ""
-    print("ANSWER", answer)
     for match in re.finditer(pattern, answer):
         # Add text before this match
         final_text += answer[last_end:match.start()]

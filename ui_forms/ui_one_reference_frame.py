@@ -53,7 +53,7 @@ class Ui_Frame(object):
         self.doc_icon.setSizePolicy(sizePolicy)
         self.doc_icon.setMaximumSize(QSize(15, 16))
         self.doc_icon.setTextFormat(Qt.TextFormat.RichText)
-        self.doc_icon.setPixmap(QPixmap(u"static/icons/icons8-document-ios-17-outlined-50.png"))
+        self.doc_icon.setPixmap(QPixmap(u"../static/icons/icons8-document-ios-17-outlined-50.png"))
         self.doc_icon.setScaledContents(True)
         self.doc_icon.setAlignment(Qt.AlignmentFlag.AlignLeading|Qt.AlignmentFlag.AlignLeft|Qt.AlignmentFlag.AlignVCenter)
         self.doc_icon.setMargin(0)
