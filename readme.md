@@ -7,6 +7,12 @@
 
 The app is optimized for local use and can run efficiently on consumer grade **CPUs**, making it accessible without specialized hardware. It relies on **Pleias's own models**, which are **SoTA small models for RAG** and **European AI Act compliant.**
 
+**ScholasticAI** can run in systems having at least these specs:
+
+- OS : Windows - MacOS
+- Ryzen 5 3000 series processor , Intel Core i5 series (8th gen), Apple M1 Processor
+- 8GB of Ram
+
 <img src="static/mozilla_logo.png" alt="Mozilla logo" width="150">
 
 We are very grateful to the **Mozilla foundation** (Local AI builders program), who supported the development of this application.
@@ -47,6 +53,7 @@ cd pleias_ScholasticAI
    ```
 2. Download the **PleIAs-360m model**:
    - [Model Link](https://huggingface.co/PleIAs/Pleias-360m-RAG)
+   - [GGUF version] (https://huggingface.co/PleIAs/pleias360_gguf)
 
 3. Load the model locally:
    ```bash
@@ -66,6 +73,7 @@ pip install -r requirements.txt
 ```bash
 python -m src.main
 ```
+**Important** Due to the specialized nature of the training applied to our model, we suggest to always generate answers using a temperature of 0 (default parameter), in order to get results of the best quality. 
 
 ---
 
@@ -126,7 +134,7 @@ As a specialized language model, PleIAs-360m-RAG will be unable to work properly
 
 
 ### CPU Usage
-This application is optimized to run on CPU-only for local use. Running multiple applications simultaneously may slow it down.
+This application is optimized to run on CPU-only for local use. Running multiple other applications simultaneously may slow it down.
 
 ---
 
