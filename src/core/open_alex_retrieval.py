@@ -14,10 +14,16 @@ class OpenAlexReader:
     def _fetch_open_alex_results(search_query: str, max_results: int):
         """Fetch top scientific papers from OpenAlex based on search query."""
         base_url = "https://api.openalex.org/works"
-        params = {"search": search_query, "per_page": max_results, "mailto": "your-email@example.com"}
+        params = {
+            "search": search_query,
+            "per_page": max_results,
+            "mailto": "your-email@example.com",
+        }
         response = requests.get(base_url, params=params)
         if response.status_code != 200:
-            raise Exception(f"Failed to fetch data from OpenAlex. Status code: {response.status_code}")
+            raise Exception(
+                f"Failed to fetch data from OpenAlex. Status code: {response.status_code}"
+            )
         return response.json().get("results", [])
 
     def retrieve_from_open_alex(self, user_query: str, max_results=3) -> List[dict]:
@@ -31,13 +37,19 @@ class OpenAlexReader:
         for i, paper in enumerate(papers):
             try:
                 paper_metadata = {
-                    'title': paper.get('title', 'No title'),
-                    'author': ", ".join([author.get('author', {}).get('display_name', 'Unknown') for author in
-                                         paper.get('authorships', [])]),
-                    'creation_date': paper['publication_date'],
-                    'text': self.extract_abstract(paper.get('abstract_inverted_index', "")),
-                    'source_database': 'open_alex',
-                    'chunk_id': fake_ids[i]
+                    "title": paper.get("title", "No title"),
+                    "author": ", ".join(
+                        [
+                            author.get("author", {}).get("display_name", "Unknown")
+                            for author in paper.get("authorships", [])
+                        ]
+                    ),
+                    "creation_date": paper["publication_date"],
+                    "text": self.extract_abstract(
+                        paper.get("abstract_inverted_index", "")
+                    ),
+                    "source_database": "open_alex",
+                    "chunk_id": fake_ids[i],
                 }
                 results.append(paper_metadata)
             except:
@@ -67,4 +79,4 @@ class OpenAlexReader:
                 abstract_words[pos] = word
 
         # Join the words to form the complete abstract text
-        return ' '.join(word for word in abstract_words if word)
+        return " ".join(word for word in abstract_words if word)

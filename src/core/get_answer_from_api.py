@@ -1,9 +1,9 @@
 import requests
 import time
 import json
-from connect_db import ConnectDB
-from RAG import retrieve
-from open_alex_retrieval import OpenAlexReader
+from src.core.connect_db import ConnectDB
+from src.core.RAG import retrieve
+from src.core.open_alex_retrieval import OpenAlexReader
 
 
 def construct_prompt(results, user_message):
@@ -43,37 +43,31 @@ def generate_with_llamafile_api(prompt):
         "stream": True,
         "prompt": prompt,
         "cache_prompt": False,
-        "slot_id": 0
+        "slot_id": 0,
     }
 
-    headers = {
-        'Accept': 'text/event-stream',
-        'Content-Type': 'application/json'
-    }
+    headers = {"Accept": "text/event-stream", "Content-Type": "application/json"}
 
     try:
         print("Sending request...")
         start_time = time.time()
 
         response = requests.post(
-            'http://127.0.0.1:8080/completion',
-            json=data,
-            headers=headers,
-            stream=False
+            "http://127.0.0.1:8080/completion", json=data, headers=headers, stream=False
         )
 
         print("Receiving response...")
         full_response = ""
         for line in response.iter_lines():
             if line:
-                decoded_line = line.decode('utf-8')
-                if decoded_line.startswith('data: '):
+                decoded_line = line.decode("utf-8")
+                if decoded_line.startswith("data: "):
                     text = decoded_line[6:]  # Remove 'data: ' prefix
-                    if text != '[DONE]':
+                    if text != "[DONE]":
                         try:
                             json_response = json.loads(text)
-                            if 'content' in json_response:
-                                content = json_response['content']
+                            if "content" in json_response:
+                                content = json_response["content"]
                                 full_response += content
                         except json.JSONDecodeError:
                             print("Failed to parse JSON:", text)
@@ -81,7 +75,7 @@ def generate_with_llamafile_api(prompt):
         end_time = time.time()
         total_time = end_time - start_time
 
-        print(f"\n-------------------")
+        print("\n-------------------")
         print(f"Total time: {total_time:.2f} seconds")
 
     except Exception as e:
@@ -259,7 +253,7 @@ def convert_input_msg_to_html(answer):
     final_text = ""
     for match in re.finditer(pattern, answer):
         # Add text before this match
-        final_text += answer[last_end:match.start()]
+        final_text += answer[last_end : match.start()]
         # Add the replacement
         final_text += replace_ref(match)
         last_end = match.end()
@@ -271,7 +265,7 @@ def convert_input_msg_to_html(answer):
     if ans_start == -1:
         return final_text
     else:
-        return final_text[ans_start + len("<|answer_start|>"):]
+        return final_text[ans_start + len("<|answer_start|>") :]
 
 
 def retrieve_from_open_alex(user_message):
@@ -295,13 +289,15 @@ def get_response_and_metadata(user_message, open_alex):
     # Prepare reference information for tooltips
     references_info = []
     for result in results:
-        references_info.append({
-            "title": result.get("title", "Unknown Title"),
-            "author": result.get("author", "Unknown Author"),
-            "creation_date": result.get("creation_date", "Unknown Date"),
-            "source_database": result.get("source_database", "local"),
-            "document_id": result.get("document_id", "Unknown document id"),
-            "chunk_id": result.get("chunk_id", "Unknown chunk id")
-        })
+        references_info.append(
+            {
+                "title": result.get("title", "Unknown Title"),
+                "author": result.get("author", "Unknown Author"),
+                "creation_date": result.get("creation_date", "Unknown Date"),
+                "source_database": result.get("source_database", "local"),
+                "document_id": result.get("document_id", "Unknown document id"),
+                "chunk_id": result.get("chunk_id", "Unknown chunk id"),
+            }
+        )
 
     return references_info, html_output

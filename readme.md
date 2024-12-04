@@ -8,7 +8,7 @@ pleias350M https://drive.google.com/file/d/1PgFKgLmSdRGKNcX8EhqlThbrbo4gO_G8/vie
 To run the code you need llamafile running on the background, or get response key changed to debug mode. It is on debug mode by defailt now
 ```bash
 ./Llama-3.2-1B-Instruct.Q6_K.llamafile --server --nobrowser -n 20
-python main.py
+python -m src.main
 ```
 You can download the model [there](https://huggingface.co/Mozilla/Llama-3.2-1B-Instruct-llamafile/blob/main/Llama-3.2-1B-Instruct.Q6_K.llamafile)
 

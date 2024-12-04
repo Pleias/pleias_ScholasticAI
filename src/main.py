@@ -7,9 +7,9 @@ from PySide6.QtCore import Qt
 from PySide6.QtGui import QStandardItem, QStandardItemModel
 from PySide6.QtWidgets import QApplication, QMainWindow, QFileDialog
 from PySide6.QtWidgets import QWidget
-from connect_db import ConnectDB
-from dialog_display import ChatDialog
-from get_answer_from_api import get_response_and_metadata
+from src.core.connect_db import ConnectDB
+from src.ui.dialog_display import ChatDialog
+from src.core.get_answer_from_api import get_response_and_metadata
 from ui_forms.reference_ui import Ui_Form as ReferenceForm
 from ui_forms.ui_chat_window import Ui_MainWindow as ChatWindow
 from ui_forms.ui_uploaded_docs_widget import Ui_user_prompts as DocsWidget
@@ -116,7 +116,9 @@ class MainWindow(QMainWindow):
         if message_input:
             open_alex = self.ui.open_alex_btn.isChecked()
             # print("IN MAIN, CALLING GET_RESPONSE_AND_METADATA")
-            references_info, html_output = get_response_and_metadata(message_input, open_alex)
+            references_info, html_output = get_response_and_metadata(
+                message_input, open_alex
+            )
             if not self.dialog_is_empty:
                 # print("IN MAIN, DIALOG IS NOT EMPTY")
                 # Get current selected chat index

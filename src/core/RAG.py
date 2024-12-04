@@ -1,4 +1,4 @@
-from embedding import embed_query, format_for_vec_db
+from src.core.embedding import embed_query, format_for_vec_db
 from typing import List, Optional
 
 
@@ -109,7 +109,7 @@ def retrieve(
         
         SELECT * FROM ranking_query
         ORDER BY combined_rank DESC
-        LIMIT :final_k"""  # Added LIMIT clause for final top 3
+        LIMIT :final_k"""
 
     cursor.execute(
         main_rag_query,
