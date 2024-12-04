@@ -16,9 +16,9 @@ class ConnectDB:
         db_path: str = "app_storage/metadata/chunks_and_pdfs.db",
     ):
         # Init folders and database
-        self.ensure_directories_exist()
         self.chat_db_path = chat_db_path
         self.db_path = db_path
+        self.ensure_files_exist()
         self.init_database()
 
         # Persistent connection
@@ -57,7 +57,7 @@ class ConnectDB:
 
         self.save_chat_data(chat_db)
 
-    def ensure_directories_exist(self):
+    def ensure_files_exist(self):
         """Ensure all required directories exist."""
     
         required_folders = [
@@ -68,6 +68,10 @@ class ConnectDB:
         ]
         for folder in required_folders:
             os.makedirs(folder, exist_ok=True)
+            
+        if not os.path.exists(self.chat_db_path):
+            with open(self.chat_db_path, "w") as f:
+                json.dump([], f) 
 
         
     def init_database(self):
