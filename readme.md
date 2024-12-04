@@ -57,12 +57,12 @@ cd pleias_ScholasticAI
 
 3. Load the model locally:
    ```bash
-   ./llamafile-0.8.13 -m pleias360_bf16.gguf -c 2048 # adapt with your local paths
+   ./llamafile-0.8.13 -m pleias360_bf16.gguf -c 2048 # adapt using your local paths
    ```
-   - This will expose an API at `http://127.0.0.1:8080`.
+   - This will create a local API endpoint, accesible at `http://127.0.0.1:8080`.
 
 
-> Note: our implementation relies on [llamafiles](https://github.com/Mozilla-Ocho/llamafile) and Pleias's models. You can find the full list of available PLeias models [here](https://huggingface.co/collections/PleIAs/common-models-674cd0667951ab7c4ef84cc4). Alternatively, you can use any llamafile or model in the .gguf format with the code above
+> Note: our implementation relies on [llamafiles](https://github.com/Mozilla-Ocho/llamafile) and Pleias's models. You can find the full list of available PLeias models [here](https://huggingface.co/collections/PleIAs/common-models-674cd0667951ab7c4ef84cc4). 
 
 ### Step 3: Install Dependencies
 ```bash
