@@ -5,21 +5,20 @@ import json
 import os
 from typing import List, Dict, Sequence, Any
 
-from pdf_processing_pipeline import process_pdfs_in_folder
-from embedding import embed_query, format_for_vec_db
+from src.core.pdf_processing_pipeline import process_pdfs_in_folder
+from src.core.embedding import embed_query, format_for_vec_db
 
 
 class ConnectDB:
     def __init__(
         self,
         chat_db_path: str = "app_storage/chat_data/data.json",
-        db_path: str = "app_storage/metadata/sqlite-poc.db",
+        db_path: str = "app_storage/metadata/chunks_and_pdfs.db",
     ):
+        # Init folders and database
+        self.ensure_directories_exist()
         self.chat_db_path = chat_db_path
-
-        # Database to database
         self.db_path = db_path
-
         self.init_database()
 
         # Persistent connection
@@ -58,6 +57,19 @@ class ConnectDB:
 
         self.save_chat_data(chat_db)
 
+    def ensure_directories_exist(self):
+        """Ensure all required directories exist."""
+    
+        required_folders = [
+            "app_storage/pdfs/processed",
+            "app_storage/pdfs/to_process",
+            "app_storage/chat_data",
+            "app_storage/metadata",
+        ]
+        for folder in required_folders:
+            os.makedirs(folder, exist_ok=True)
+
+        
     def init_database(self):
         """Creates the SQLite database if it does not already exist.
         Creates the 4 tables: pdf_metadata, chunks, chunks for FTS, and chunk_embeddings."""

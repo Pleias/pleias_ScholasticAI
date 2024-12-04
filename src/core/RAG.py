@@ -1,4 +1,4 @@
-from embedding import embed_query, format_for_vec_db
+from src.core.embedding import embed_query, format_for_vec_db
 from typing import List, Optional
 
 

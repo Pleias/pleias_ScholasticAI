@@ -1,7 +1,7 @@
 from PySide6.QtGui import QPixmap, Qt, QPainter, QColor, QFontMetrics
 from PySide6.QtWebEngineWidgets import QWebEngineView
 from PySide6.QtWidgets import QWidget, QFrame, QVBoxLayout, QLabel, QScrollArea, QDialog
-from get_answer_from_api import get_html, get_title_html, get_author_html
+from src.core.get_answer_from_api import get_html, get_title_html, get_author_html
 from ui_forms.ui_one_reference_frame import Ui_Frame as Ui_one_reference
 import sqlite3
 import ast

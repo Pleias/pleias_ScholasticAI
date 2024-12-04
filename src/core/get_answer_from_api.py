@@ -1,9 +1,9 @@
 import requests
 import time
 import json
-from connect_db import ConnectDB
-from RAG import retrieve
-from open_alex_retrieval import OpenAlexReader
+from src.core.connect_db import ConnectDB
+from src.core.RAG import retrieve
+from src.core.open_alex_retrieval import OpenAlexReader
 
 
 def construct_prompt(results, user_message):

@@ -9,7 +9,7 @@ from PySide6.QtWidgets import (
     QScrollArea,
 )
 
-from reference_widget import ReferenceWidget
+from src.ui.reference_widget import ReferenceWidget
 
 
 class ChatDialog(QScrollArea):
