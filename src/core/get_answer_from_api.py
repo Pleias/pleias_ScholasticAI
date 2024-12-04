@@ -141,76 +141,121 @@ def get_html(answer):
     return f"""
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Transformers Architecture</title>
-    <style>
-      body {{
-        font-family: SF Pro;
-        font-size: 16px;
-        font-weight: 400;
-        line-height: 22px;
-        letter-spacing: -0.4300000071525574px;
-        text-align: left;
-        text-underline-position: from-font;
-        text-decoration-skip-ink: none;
-      }}
-      .marker {{
-        width: 16px;
-        height: 18px;
-        padding: 0px 2px;
-        justify-content: center;
-        align-items: center;
-        border-radius: 3px;
-        text-decoration: none;
-      }}
-      .blue {{
-        color: #042FF4;
-        font-family: SF Pro;
-        font-size: 12px;
-        font-style: normal;
-        font-weight: 200;
-        line-height: normal;
-        background: #BFEFFF;
-      }}
-      .yellow {{
-        color: #B66400;
-        font-family: SF Pro;
-        font-size: 12px;
-        font-weight: 200;
-        line-height: 14.32px;
-        text-align: left;
-        text-underline-position: from-font;
-        text-decoration-skip-ink: none;
-        background: #FFE289;
-     .green {{
-        color: #e0f8d6;
-        font-family: SF Pro;
-        font-size: 12px;
-        font-weight: 200;
-        line-height: 14.32px;
-        text-align: left;
-        text-underline-position: from-font;
-        text-decoration-skip-ink: none;
-        background: #afed95;
-      }}
-     .pink {{
-        color: #9d6f7d;
-        font-family: SF Pro;
-        font-size: 12px;
-        font-weight: 200;
-        line-height: 14.32px;
-        text-align: left;
-        text-underline-position: from-font;
-        text-decoration-skip-ink: none;
-        background: #d7c5cb;
-      }}
-    </style>
-  </head>
-  <body>
-    <p>{answer}</p>
-  </body>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Transformers Architecture</title>
+        <style>
+            body {{
+                font-family: SF Pro;
+                font-size: 16px;
+                font-weight: 400;
+                line-height: 22px;
+                letter-spacing: -0.4300000071525574px;
+                text-align: left;
+                text-underline-position: from-font;
+                text-decoration-skip-ink: none;
+            }}
+            .marker {{
+                width: 16px;
+                height: 18px;
+                padding: 0px 2px;
+                justify-content: center;
+                align-items: center;
+                border-radius: 3px;
+                text-decoration: none;
+                cursor: pointer;
+            }}
+            .blue {{
+                color: #042FF4;
+                font-family: SF Pro;
+                font-size: 12px;
+                font-style: normal;
+                font-weight: 200;
+                line-height: normal;
+                background: #BFEFFF;
+            }}
+            .yellow {{
+                color: #B66400;
+                font-family: SF Pro;
+                font-size: 12px;
+                font-weight: 200;
+                line-height: 14.32px;
+                text-align: left;
+                text-underline-position: from-font;
+                text-decoration-skip-ink: none;
+                background: #FFE289;
+            }}
+            .green {{
+                color: #e0f8d6;
+                font-family: SF Pro;
+                font-size: 12px;
+                font-weight: 200;
+                line-height: 14.32px;
+                text-align: left;
+                text-underline-position: from-font;
+                text-decoration-skip-ink: none;
+                background: #afed95;
+            }}
+            .pink {{
+                color: #9d6f7d;
+                font-family: SF Pro;
+                font-size: 12px;
+                font-weight: 200;
+                line-height: 14.32px;
+                text-align: left;
+                text-underline-position: from-font;
+                text-decoration-skip-ink: none;
+                background: #d7c5cb;
+            }}
+            .wololo-box {{
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background-color: white;
+                border: 1px solid #ccc;
+                border-radius: 4px;
+                padding: 20px;
+                z-index: 9999;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                display: none;
+            }}
+        </style>
+        <script>
+            function showReference(event) {{
+                event.preventDefault();
+                const existingBox = document.querySelector('.wololo-box');
+                if (existingBox) {{
+                    existingBox.remove();
+                }}
+                const box = document.createElement('div');
+                box.className = 'wololo-box';
+                const [id, content] = event.target.getAttribute('href').split(':');
+                box.textContent = content;
+                document.body.appendChild(box);
+                box.style.display = 'block';
+                function closePopup(e) {{
+                    if (!box.contains(e.target) && !e.target.classList.contains('marker')) {{
+                        box.style.display = 'none';
+                        document.removeEventListener('click', closePopup);
+                    }}
+                }}
+                setTimeout(() => {{
+                    document.addEventListener('click', closePopup);
+                }}, 100);
+            }}
+            document.addEventListener('DOMContentLoaded', function() {{
+                const referenceLinks = document.querySelectorAll('a.marker');
+                referenceLinks.forEach(link => {{
+                    link.addEventListener('click', showReference);
+                }});
+            }});
+        </script>
+    </head>
+    <body>
+        <p>{answer}</p>
+    </body>
 </html>
 """
 
