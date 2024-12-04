@@ -5,7 +5,7 @@
 
 **ScholasticAI** is a versatile desktop tool designed for **retrieval-augmented generation**. It allows you to upload and analyze local PDFs, retrieve information using conversational AI, and verify answers with references grounded in your own documents, as well as querying external databases. While we built this application mainly for research articles, you can use it for other purposes.
 
-The app is optimized for local use and can run efficiently on **CPUs**, making it accessible without specialized hardware. It relies on **Pleias's own models**, which are **SoTA small models for RAG** and **European AI Act compliant.**
+The app is optimized for local use and can run efficiently on consumer grade **CPUs**, making it accessible without specialized hardware. It relies on **Pleias's own models**, which are **SoTA small models for RAG** and **European AI Act compliant.**
 
 <img src="static/mozilla_logo.png" alt="Mozilla logo" width="150">
 
@@ -55,7 +55,7 @@ cd pleias_ScholasticAI
    - This will expose an API at `http://127.0.0.1:8080`.
 
 
-> Note: our implementation relies on [llamafiles](https://github.com/Mozilla-Ocho/llamafile) and Pleias's models. You can find the full list of available PLeias models [here](https://huggingface.co/collections/PleIAs/common-models-674cd0667951ab7c4ef84cc4). Alternatively, you can use any llamafile or model in the .gguf format with the code abose
+> Note: our implementation relies on [llamafiles](https://github.com/Mozilla-Ocho/llamafile) and Pleias's models. You can find the full list of available PLeias models [here](https://huggingface.co/collections/PleIAs/common-models-674cd0667951ab7c4ef84cc4). Alternatively, you can use any llamafile or model in the .gguf format with the code above
 
 ### Step 3: Install Dependencies
 ```bash
