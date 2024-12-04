@@ -3,7 +3,7 @@
 <img src="static/ScholasticAI_Pleias_logo.png" alt="ScholasticAI Pleias logo" width="700">
 
 
-**ScholasticAI** is a versatile desktop tool designed for **retrieval-augmented generation (RAG)**. It allows you to upload and analyze local PDFs, retrieve information using conversational AI, and verify answers with references grounded in your own documents, as well as querying external databases. While we built this application mainly for research articles, you can use it for other purposes.
+**ScholasticAI** is a versatile tool designed for **retrieval-augmented generation (RAG)**. It allows you to upload and analyze local PDFs, retrieve information using conversational AI, and verify answers with references grounded in your own documents, as well as querying external databases. While we built this application mainly for treating research articles, you can use it for different kinds of PDFs.
 
 The app was made under the philosphy of **complete local deployement**, running efficiently on consumer grade **GPU-less** laptops or desktops. In order to achieve that, we rely on **Pleias's own AI foundation models**, which are **SoTA small models for RAG**, **European AI Act compliant** and most importantly **completely open** (weights, corpus and code). 
 
