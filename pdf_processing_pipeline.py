@@ -371,7 +371,7 @@ def create_cvat_task_xml(output_directory, task_name):
 def process_page_for_text(pdf_path, page_num, base_output_directory):
     """Process a single page for text extraction"""
     doc = fitz.open(pdf_path)
-    page = doc.load_page(page_num)
+    # page = doc.load_page(page_num)
 
     base_name = os.path.basename(pdf_path)[:-4]  # Remove '.pdf'
     page_df_path = os.path.join(
@@ -555,7 +555,6 @@ def parse_tsvs_to_json(directory):
                 page_number = re.search(r"combined_page(\d+).tsv", file_name).group(1)
                 file_path = os.path.join(directory, file_name)
 
-
                 df = pd.read_csv(file_path, sep="\t", encoding="utf-8")
                 df["Category"] = df["class_name"].apply(classify_class_name)
                 df["text"] = df["text"].astype(str)
@@ -565,7 +564,6 @@ def parse_tsvs_to_json(directory):
                     text = row["text"].strip()
 
                     if category in ["Blank", "Margin"]:
-
                         json_data.append(
                             {
                                 "section": text,
@@ -691,15 +689,16 @@ def merge_json_files(json_files, output_file):
 
 # Metadata extractor
 
+
 def format_pdf_date(date_str):
     """Format PDF date string to 'YYYY-MM-DD'"""
     if not date_str:
         return None
-        
+
     # Remove D: prefix and timezone if present
-    date_str = date_str.replace('D:', '')
-    date_str = re.sub(r'[+-]\d{2}\'\d{2}\'.*$', '', date_str)
-    
+    date_str = date_str.replace("D:", "")
+    date_str = re.sub(r"[+-]\d{2}\'\d{2}\'.*$", "", date_str)
+
     try:
         # Try full format first (with time)
         date_obj = datetime.strptime(date_str, "%Y%m%d%H%M%S")
@@ -709,7 +708,7 @@ def format_pdf_date(date_str):
             date_obj = datetime.strptime(date_str, "%Y%m%d")
         except ValueError:
             return None
-    
+
     return date_obj.strftime("%Y-%m-%d")
 
 

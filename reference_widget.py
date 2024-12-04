@@ -100,16 +100,17 @@ class ReferenceViewer(QDialog):
 
 
 class OneReferenceFrame(QFrame):
-    def __init__(self,
-                 new_ref_number: int = 1,
-                 source_icon_local: bool = True,
-                 document_id: int = None,
-                 chunk_id: int = None,
-                 title: str = None,
-                 author: list = None,
-                 source_database: str = 'local',
-                 creation_date: str = None,
-                 ):
+    def __init__(
+        self,
+        new_ref_number: int = 1,
+        source_icon_local: bool = True,
+        document_id: int = None,
+        chunk_id: int = None,
+        title: str = None,
+        author: list = None,
+        source_database: str = "local",
+        creation_date: str = None,
+    ):
         super().__init__()
         self.ui = Ui_one_reference()
         self.ui.setupUi(self)
@@ -133,9 +134,11 @@ class OneReferenceFrame(QFrame):
         :return: None
         """
         if source_icon_local:
-            self.ui.doc_icon.setPixmap(QPixmap(u"static/icons/icons8-document-ios-17-outlined-50.png"))
+            self.ui.doc_icon.setPixmap(
+                QPixmap("static/icons/icons8-document-ios-17-outlined-50.png")
+            )
         else:
-            self.ui.doc_icon.setPixmap(QPixmap(u"static/icons/icon_web.svg"))
+            self.ui.doc_icon.setPixmap(QPixmap("static/icons/icon_web.svg"))
         title = title if len(title) else "No paper title identified"
         author = author if len(author) else "No paper author identified"
 
@@ -149,15 +152,19 @@ class OneReferenceFrame(QFrame):
             self.ui.label_2.clear()
             self.doc_metadata, self.chunk_metadata = self.fetch_metadata()
             if self.doc_metadata:
-                print(f"Fetched metadata for document_id {self.document_id}: {self.doc_metadata}")
+                print(
+                    f"Fetched metadata for document_id {self.document_id}: {self.doc_metadata}"
+                )
             if self.chunk_metadata is not None:
-                print(f"Fetched metadata for chunk_id {self.chunk_id}: {self.chunk_metadata}")
+                print(
+                    f"Fetched metadata for chunk_id {self.chunk_id}: {self.chunk_metadata}"
+                )
 
         elif source_database == "open_alex":
-            self.ui.label_2.setPixmap(QPixmap(u"static/icons/logo_openalex.png"))
+            self.ui.label_2.setPixmap(QPixmap("static/icons/logo_openalex.png"))
             pass
         elif source_database == "archive":
-            self.ui.label_2.setPixmap(QPixmap(u"static/icons/archive.svg"))
+            self.ui.label_2.setPixmap(QPixmap("static/icons/archive.svg"))
 
     def fetch_metadata(self):
         """Fetch metadata for the current document_id from the database."""
@@ -196,7 +203,9 @@ class OneReferenceFrame(QFrame):
                 columns = [description[0] for description in cursor.description]
                 chunk_metadata = dict(zip(columns, row))
             else:
-                print(f"No chunk data found for document_id: {self.document_id} and chunk_id: {self.chunk_id}")
+                print(
+                    f"No chunk data found for document_id: {self.document_id} and chunk_id: {self.chunk_id}"
+                )
                 return None
             return doc_metadata, chunk_metadata
 
@@ -247,7 +256,7 @@ class ReferenceWidget(QWidget):
         response_label = web_view
         self.layout.addWidget(response_label)
         for i, reference_info in enumerate(references_info):
-            reference_info['new_ref_number'] = str(i + 1)
+            reference_info["new_ref_number"] = str(i + 1)
             reference = OneReferenceFrame(**reference_info)
             self.layout.setAlignment(Qt.AlignmentFlag.AlignLeft)
             self.layout.addWidget(reference)

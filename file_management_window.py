@@ -1,4 +1,10 @@
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QPushButton, QFileDialog, QListWidget
+from PySide6.QtWidgets import (
+    QWidget,
+    QVBoxLayout,
+    QPushButton,
+    QFileDialog,
+    QListWidget,
+)
 
 
 class FileManagementWindow(QWidget):
@@ -24,7 +30,9 @@ class FileManagementWindow(QWidget):
 
     def add_file(self):
         # Open a file dialog to select a file
-        file_name, _ = QFileDialog.getOpenFileName(self, "Add File", "", "All Files (*)")
+        file_name, _ = QFileDialog.getOpenFileName(
+            self, "Add File", "", "All Files (*)"
+        )
         if file_name:
             # Add the selected file to the list
             self.file_list.addItem(file_name)

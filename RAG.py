@@ -109,7 +109,7 @@ def retrieve(
         
         SELECT * FROM ranking_query
         ORDER BY combined_rank DESC
-        LIMIT :final_k"""  # Added LIMIT clause for final top 3
+        LIMIT :final_k"""
 
     cursor.execute(
         main_rag_query,

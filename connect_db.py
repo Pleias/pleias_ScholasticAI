@@ -10,9 +10,11 @@ from embedding import embed_query, format_for_vec_db
 
 
 class ConnectDB:
-    def __init__(self,
-                 chat_db_path: str = "app_storage/chat_data/data.json",
-                 db_path: str = "app_storage/metadata/sqlite-poc.db"):
+    def __init__(
+        self,
+        chat_db_path: str = "app_storage/chat_data/data.json",
+        db_path: str = "app_storage/metadata/sqlite-poc.db",
+    ):
         self.chat_db_path = chat_db_path
 
         # Database to database
@@ -112,7 +114,9 @@ class ConnectDB:
 
             self.connection.commit()
 
-    def insert_pdf_metadata(self, file_name: str, metadata: Dict[str, Any], verbose: bool = True):
+    def insert_pdf_metadata(
+        self, file_name: str, metadata: Dict[str, Any], verbose: bool = True
+    ):
         """Inserts metadata for a PDF into the database.
         Accepts file_name, and a dictionary of metadata fields."""
         cursor = self.connection.cursor()
@@ -139,7 +143,7 @@ class ConnectDB:
         return ids
 
     def insert_chunks(
-            self, chunks: Sequence[str], document_id: int, verbose: bool = True
+        self, chunks: Sequence[str], document_id: int, verbose: bool = True
     ):
         """Accepts a list of chunks. The document_id is the id of the document in the metadata table.
         Returns a list of the new chunk ids, which is useful to embed these new chunks afterward."""
@@ -158,7 +162,6 @@ class ConnectDB:
                     chunk["word_count"],
                     document_id,
                     chunk["hash"],
-
                 ),
             )
             last_id = cursor.lastrowid
@@ -210,14 +213,16 @@ class ConnectDB:
 
         self.connection.commit()
 
-    def parse_pdf_to_db(self,
-                        parsed_pdf_list: List[dict] = None,
-                        verbose: bool = True,
-                        pdf_folder: str = "app_storage/pdfs/to_process",
-                        yolo_model_path: str = "models/yolo.pt",
-                        intermediate_store_folder: str = None,
-                        pdf_chunk_size: int = 25,
-                        batch_size: int = 10):
+    def parse_pdf_to_db(
+        self,
+        parsed_pdf_list: List[dict] = None,
+        verbose: bool = True,
+        pdf_folder: str = "app_storage/pdfs/to_process",
+        yolo_model_path: str = "models/yolo.pt",
+        intermediate_store_folder: str = None,
+        pdf_chunk_size: int = 25,
+        batch_size: int = 10,
+    ):
         # to combine the functions earlier in a single function
         # combine with pdf parsing function
         if parsed_pdf_list is None:
@@ -299,9 +304,3 @@ class ConnectDB:
         if self.connection:
             self.connection.close()
             print("Database connection closed.")
-
-
-if __name__ == "__main__":
-    db = ConnectDB()
-    db.parse_pdf_to_db(intermediate_store_folder="temp/intermediate_folders")
-    db.close()

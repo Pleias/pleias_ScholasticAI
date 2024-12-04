@@ -116,7 +116,9 @@ class MainWindow(QMainWindow):
         if message_input:
             open_alex = self.ui.open_alex_btn.isChecked()
             # print("IN MAIN, CALLING GET_RESPONSE_AND_METADATA")
-            references_info, html_output = get_response_and_metadata(message_input, open_alex)
+            references_info, html_output = get_response_and_metadata(
+                message_input, open_alex
+            )
             if not self.dialog_is_empty:
                 # print("IN MAIN, DIALOG IS NOT EMPTY")
                 # Get current selected chat index
