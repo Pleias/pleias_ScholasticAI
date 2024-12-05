@@ -3,9 +3,9 @@
 <img src="static/ScholasticAI_Pleias_logo.png" alt="ScholasticAI Pleias logo" width="700">
 
 
-**ScholasticAI** is a versatile tool designed for **retrieval-augmented generation (RAG)**. It allows you to upload and analyze local PDFs, retrieve information using conversational AI, and verify answers with references grounded in your own documents, as well as querying external knowledge databases, like the 250M+ documents OpenAlex. While we built this application mainly for working with research articles, you can use it for treating different kinds of PDFs.
+**ScholasticAI** is a versatile tool designed for **retrieval-augmented generation (RAG)**. It allows you to upload and analyze local PDFs, retrieve information using conversational AI, and verify answers with references from your own documents, as well as querying external knowledge databases, like the 250M+ documents OpenAlex. At the heart of this application, we can find **pleias-Pico (350m)**, member of the family of **Pleias's own AI foundation models**, which are **SoTA small models for RAG**, **European AI Act compliant** and most importantly **completely open** (weights, corpus and code).
 
-The app was made under the philosphy of **complete local deployement**, running efficiently on consumer grade **GPU-less** laptops or desktops. In order to achieve that, we rely on **Pleias's own AI foundation models**, which are **SoTA small models for RAG**, **European AI Act compliant** and most importantly **completely open** (weights, corpus and code). 
+**No GPU? No problem!**, the app was made under the philosphy of **complete local deployement**, running efficiently on consumer grade **GPU-less** laptops or desktops, achievaible by using our performant, lightweight models. While we built this application mainly for working with research articles, you can use it for treating different kinds of PDFs.
 
 **ScholasticAI** can run in systems having at least these specs:
 
