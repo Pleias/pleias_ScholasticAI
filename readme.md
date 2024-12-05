@@ -51,7 +51,7 @@ cd pleias_ScholasticAI
    wget https://github.com/Mozilla-Ocho/llamafile/releases/download/0.8.13/llamafile-0.8.13
    chmod +x llamafile-0.8.13
    ```
-2. Download the **PleIAs-350m model**:
+2. Download the **pleias-Pico(350M) model**:
    - [Model Link](https://huggingface.co/PleIAs/Pleias-Pico)
    - [GGUF version] (https://huggingface.co/PleIAs/Pleias-Pico-GGUF)
 
@@ -85,38 +85,38 @@ python -m src.main
 
 
 ## 3. Model
-**Pleias-350m-RAG 0.1** is a specialized language model designed by PleIAs for Retrieval-Augmented Generation.
+**Pleias-Pico 0.1** is a specialized 350m parameters language model designed by PleIAs for Retrieval-Augmented Generation.
 
-Similarly to its base model, Pleias-350m, Pleias-350m-RAG 0.1 aims to be a fully open model (weights, code, data), only trained on content with a permissible license and fully compliant with the European AI Act.
+Similarly to its base model, Pleias-350m, Pleias-Pico 0.1 aims to be a fully open model (weights, code, data), only trained on content with a permissible license and fully compliant with the European AI Act.
 
 ### Description
-PleIAs-350m-RAG is continuous pretraining of Pleias-350m on a new dataset of 45,088,768,000 tokens modeling common retrieval tasks. All the content of the dataset is ultimately coming from Common Corpus.
+PleIAs-Pico is continuous pretraining of Pleias-350m on a new dataset of 45,088,768,000 tokens modeling common retrieval tasks. All the content of the dataset is ultimately coming from Common Corpus.
 
-Pleias-350m-RAG includes the main features of the original base model:
+Pleias-Pico includes the main features of the original base model:
 * Only trained on open data under a permissible license and in compliance with the European AI Act. By design, all Pleias model are unable to output copyrighted content.
 * Extensive multilingual support for main European languages: English, French, German, Spanish, Italian, Dutch, Latin, Portuguese and Polish.
 * Extremely low level of toxicity and problematic content.
 
-Pleias-350m-RAG supports retrieval-augmented generation with enhanced verifiability, source analysis and grounding on submitted sources. This includes:
+Pleias-Pico supports retrieval-augmented generation with enhanced verifiability, source analysis and grounding on submitted sources. This includes:
 * Standardized structure and special tokens to include queries, sources, references.
 * Anticipation of various query forms in multiple languages, from actual drafted questions to unstructured list of keyword search.
 * Source analysis/criticism which also acts as an integrated reranker step.
 * Generation of ground answers with references and excerpts linked to the original sources.
 
-Given its small size, Pleias-350m-RAG 0.1 was originally conceived as an experimental model. 
+Given its small size (350m), Pleias-Pico 0.1 was originally conceived as an experimental model. 
 
 Initial tests have shown that the RAG design has significantly improved the factuality and verifiability of the model. Even when the grounding does not work perfectly, the information remains much closer to the original sources.
 
 ### Training
-PleIAs-350m-RAG was trained at Jean-Zay with 16 h100s with Nanotron, the pretraining library from HuggingFace. 
+PleIAs-Pico was trained at Jean-Zay with 16 h100s with Nanotron, the pretraining library from HuggingFace. 
 
-PleIAs-350m-RAG derives from the last checkpoint of PleIAs-350m (518,000). The training schedule reused the last learning rate value (6e-5) without decay for 90,000 steps.
+PleIAs-Pico derives from the last checkpoint of PleIAs-350m (518,000). The training schedule reused the last learning rate value (6e-5) without decay for 90,000 steps.
 
 Training covers the entire RAG dataset we have been designing out of Common Corpus for 1 epoch.
 
 Further experiments were made with different learning rate values: none of theses tests have provided a better convergence than the one obtained with the final learning rate from the base model.
 
-As a specialized language model, PleIAs-350m-RAG will be unable to work properly with prompts that detracts from that design.
+As a specialized language model, PleIAs-Pico will be unable to work properly with prompts that detracts from that design.
 
 
 ---
@@ -130,7 +130,7 @@ As a specialized language model, PleIAs-350m-RAG will be unable to work properly
   - Load additional documents at any time.
 
 ### Bright mode
-- Pleias RAG app was designed for the bright mode for the moment. We strongly recommend you switch your laptop to bright mode before launching the app.
+- ScholasticAI was designed for the bright mode for the moment. We strongly recommend you switch your laptop to bright mode before launching the app.
 
 
 ### CPU Usage
@@ -142,7 +142,7 @@ This application is optimized to run on CPU-only for local use. Running multiple
 ## 5. Attribution
 
 This app leverages open-source tools and models, including:
-- **pleIAs-pico(350M)**: A retrieval-augmented generation language model designed by Pleias.
+- **pleIAs-pico(350m)**: A retrieval-augmented generation language model designed by Pleias.
 - **llamafile**: Model loader and API server for efficient local inference.
 - **YOLOv8**: We use a fine-tuned version of this visual model for layout analysis.
 
