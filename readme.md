@@ -57,7 +57,7 @@ cd pleias_ScholasticAI
 
 3. Load the model locally:
    ```bash
-   ./llamafile-0.8.13 -m pleias_pico_bf16.gguf -c 2048 # adapt using your local paths
+   ./llamafile-0.8.13 -m pleias_pico_bf16.gguf -c 2048 --server --nobrowser # adapt using your local paths
    ```
    - This will create a local API endpoint, accesible at `http://127.0.0.1:8080`.
 
