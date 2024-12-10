@@ -14,3 +14,4 @@ Requests==2.32.3
 sqlite_vec==0.1.6
 tqdm==4.66.5
 ultralytics==8.3.5
+sqlite==3.45.3
