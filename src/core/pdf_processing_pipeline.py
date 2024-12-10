@@ -13,7 +13,7 @@ import traceback
 import xml.etree.ElementTree as ET
 from xml.dom import minidom
 
-import fitz  # PyMuPDF
+import pymupdf as fitz
 import pandas as pd
 import pdfplumber
 import PIL.Image
