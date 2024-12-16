@@ -371,7 +371,6 @@ def create_cvat_task_xml(output_directory, task_name):
 def process_page_for_text(pdf_path, page_num, base_output_directory):
     """Process a single page for text extraction"""
     doc = fitz.open(pdf_path)
-    # page = doc.load_page(page_num)
 
     base_name = os.path.basename(pdf_path)[:-4]  # Remove '.pdf'
     page_df_path = os.path.join(
@@ -386,6 +385,18 @@ def process_page_for_text(pdf_path, page_num, base_output_directory):
     if os.path.exists(page_df_path) and os.path.exists(bareme_df_path):
         page_df = pd.read_csv(page_df_path, delimiter="\t")
         bareme_df = pd.read_csv(bareme_df_path, delimiter="\t")
+
+        # Add page column to both dataframes
+        page_df["page"] = str(page_num + 1)
+        bareme_df["page"] = str(page_num + 1)
+
+        # Add coordinates column to both dataframes
+        page_df["coordinates"] = page_df.apply(lambda row: f"{row['x1']},{row['y1']},{row['x2']},{row['y2']}", axis=1)
+        bareme_df["coordinates"] = bareme_df.apply(lambda row: f"{row['x1']},{row['y1']},{row['x2']},{row['y2']}", axis=1)
+
+        # Add unique hash to each row
+        page_df["hash"] = [generate_hash() for _ in range(len(page_df))]
+        bareme_df["hash"] = [generate_hash() for _ in range(len(bareme_df))]
 
         filter_strings = "(MainZone|MarginText|Title|TableZone|GraphicZone)"
         page_df = page_df[
@@ -531,9 +542,8 @@ def count_total_files(root_directory):
             total += len([f for f in files if f.endswith(".tsv")])
     return total
 
-
 def parse_tsvs_to_json(directory):
-    """Parse TSV files in a directory to JSON format"""
+    """Parse TSV files in a directory to JSON format with coordinates and page tracking"""
     try:
         tsv_files = sorted(
             [f for f in os.listdir(directory) if f.endswith(".tsv")],
@@ -547,12 +557,10 @@ def parse_tsvs_to_json(directory):
         document_name = full_document_name.replace("_output", "")
         json_data = []
         current_section = None
-        current_text = ""
-        current_chunk_pages = []
-
+        current_text = []  # List of tuples (text, coordinates, page)
+        
         for file_name in tsv_files:
             try:
-                page_number = re.search(r"combined_page(\d+).tsv", file_name).group(1)
                 file_path = os.path.join(directory, file_name)
 
                 df = pd.read_csv(file_path, sep="\t", encoding="utf-8")
@@ -562,46 +570,107 @@ def parse_tsvs_to_json(directory):
                 for _, row in df.iterrows():
                     category = row["Category"]
                     text = row["text"].strip()
+                    # Remove both brackets and append page number
+                    coordinates = row["coordinates"].strip('[]') + "," + str(row["page"])
+                    page = row["page"]
 
                     if category in ["Blank", "Margin"]:
-                        json_data.append(
-                            {
-                                "section": text,
-                                "text": text,
-                                "pages": [page_number],
-                                "document": document_name,
-                                "word_count": len(text.split()),
-                                "hash": generate_hash(),
-                            }
-                        )
+                        json_data.append({
+                            "section": text,
+                            "text": text,
+                            "coordinates": [coordinates],  # Single coordinates for margin/blank entries
+                            "pages": [page],  # Single page for margin/blank entries
+                            "document": document_name,
+                            "word_count": len(text.split()),
+                            "hash": generate_hash(),
+                        })
                     elif category == "Special":
+                        # Process accumulated text before starting new section
                         if current_section is not None and current_text:
-                            for chunk in split_text(current_text):
-                                json_data.append(
-                                    {
-                                        "section": current_section,
-                                        "text": chunk,
-                                        "pages": current_chunk_pages,
-                                        "document": document_name,
-                                        "word_count": len(chunk.split()),
-                                        "hash": generate_hash(),
-                                    }
-                                )
+                            # Combine all accumulated text
+                            full_text = " ".join(text for text, _, _ in current_text)
+                            
+                            # Create word-to-metadata mapping
+                            word_metadata_mapping = []
+                            for orig_text, orig_coords, orig_page in current_text:
+                                word_count = len(orig_text.split())
+                                word_metadata_mapping.extend([(orig_coords, orig_page)] * word_count)
+                            
+                            # Split into chunks
+                            text_chunks = split_text(full_text)
+                            words_processed = 0
+                            
+                            for chunk in text_chunks:
+                                chunk_words = len(chunk.split())
+                                chunk_start = words_processed
+                                chunk_end = words_processed + chunk_words
+                                
+                                # Get metadata for this chunk's words
+                                chunk_metadata = word_metadata_mapping[chunk_start:chunk_end]
+                                chunk_coordinates = list(set(meta[0] for meta in chunk_metadata))
+                                chunk_pages = sorted(list(set(meta[1] for meta in chunk_metadata)))
+                                
+                                json_data.append({
+                                    "section": current_section,
+                                    "text": chunk,
+                                    "coordinates": chunk_coordinates,
+                                    "pages": chunk_pages,
+                                    "document": document_name,
+                                    "word_count": chunk_words,
+                                    "hash": generate_hash(),
+                                })
+                                
+                                words_processed += chunk_words
+                        
+                        # Start new section
                         current_section = text
-                        current_text = ""
-                        current_chunk_pages = [page_number]
+                        current_text = [(text, coordinates, page)]
                     else:
                         if current_section is None:
                             current_section = text
-                        current_text = (
-                            current_text + " " + text if current_text else text
-                        )
-                        if page_number not in current_chunk_pages:
-                            current_chunk_pages.append(page_number)
+                            current_text = [(text, coordinates, page)]
+                        else:
+                            current_text.append((text, coordinates, page))
 
             except Exception as e:
                 print(f"Error processing file {file_name}: {str(e)}")
                 continue
+
+        # Process any remaining text at the end
+        if current_section is not None and current_text:
+            full_text = " ".join(text for text, _, _ in current_text)
+            
+            # Create word-to-metadata mapping
+            word_metadata_mapping = []
+            for orig_text, orig_coords, orig_page in current_text:
+                word_count = len(orig_text.split())
+                word_metadata_mapping.extend([(orig_coords, orig_page)] * word_count)
+            
+            # Split into chunks
+            text_chunks = split_text(full_text)
+            words_processed = 0
+            
+            for chunk in text_chunks:
+                chunk_words = len(chunk.split())
+                chunk_start = words_processed
+                chunk_end = words_processed + chunk_words
+                
+                # Get metadata for this chunk's words
+                chunk_metadata = word_metadata_mapping[chunk_start:chunk_end]
+                chunk_coordinates = list(set(meta[0] for meta in chunk_metadata))
+                chunk_pages = sorted(list(set(meta[1] for meta in chunk_metadata)))
+                
+                json_data.append({
+                    "section": current_section,
+                    "text": chunk,
+                    "coordinates": chunk_coordinates,
+                    "pages": chunk_pages,
+                    "document": document_name,
+                    "word_count": chunk_words,
+                    "hash": generate_hash(),
+                })
+                
+                words_processed += chunk_words
 
         # Save JSON file
         json_file_name = f"{document_name}.json"
@@ -614,8 +683,7 @@ def parse_tsvs_to_json(directory):
     except Exception as e:
         print(f"Error processing directory {directory}: {str(e)}")
         return None, 0
-
-
+            
 def process_tsv_directory(output_directory):
     """Process all TSV files in the output directory"""
     print("Step 1: Processing TSV files to JSON...")
