@@ -235,7 +235,7 @@ class ConnectDB:
         verbose: bool = True,
         pdf_folder: str = "app_storage/pdfs/to_process",
         yolo_model_path: str = "models/yolo.pt",
-        intermediate_store_folder: str = None,
+        intermediate_store_folder: str = "temp/intermediate_folders",
         pdf_chunk_size: int = 25,
         batch_size: int = 10,
     ):

@@ -6,6 +6,7 @@ from ui_forms.ui_one_reference_frame import Ui_Frame as Ui_one_reference
 from src.core.connect_db import ConnectDB
 import sqlite3
 import ast
+import json
 
 
 def get_square(number=1):
@@ -24,13 +25,13 @@ def get_square(number=1):
             display: flex;
             justify-content: center;
             align-items: center;
-            background-color: white; /* Changed background to white */
+            background-color: white; 
         }}
 
         /* Square with text inside */
         .square {{
-            width: 16px; /* You can adjust this */
-            height: 18px; /* You can adjust this */
+            width: 16px;
+            height: 18px;
             background-color: #BFEFFF;
             color: #042FF4;
             border-radius: 3px; /* Rounded corners */
@@ -87,14 +88,17 @@ class ReferenceViewer(QDialog):
 
     def add_highlight_to_pixmap(self, pixmap, coordinates):
         """Draws a rectangle over the pixmap based on coordinates."""
-        x1, y1, x2, y2 = coordinates
-
         # Create a painter to draw on the pixmap
         highlighted_pixmap = pixmap.copy()
         painter = QPainter(highlighted_pixmap)
-        painter.setPen(QColor(100, 220, 240, 255))  # Red color with transparency
-        painter.setBrush(QColor(100, 220, 240, 100))  # Transparent red fill
-        painter.drawRect(x1, y1, x2 - x1, y2 - y1)
+        painter.setPen(QColor(100, 220, 240, 255))  # Pen color
+        painter.setBrush(QColor(100, 220, 240, 100))  # Fill color
+
+        # this line handles the fact that it's a list of sets of coordinates
+        for c in coordinates :
+            x1, y1, x2, y2 = c
+            painter.drawRect(x1, y1, x2 - x1, y2 - y1)
+
         painter.end()
 
         return highlighted_pixmap
@@ -222,21 +226,30 @@ class OneReferenceFrame(QFrame):
         if event.button() == Qt.LeftButton:
             self.setStyleSheet("background-color: lightgray;")
             # Specify the image and TSV file paths
-            doc_filename = self.doc_metadata["file_name"]
-            page_number = ast.literal_eval(self.chunk_metadata["pages"])[0]
-            image_path = f"temp/intermediate_folders/{doc_filename}_output/{doc_filename}_images/{doc_filename}_page{page_number}.jpg"
-            json_path = f"temp/intermediate_folders/{doc_filename}_output/final/{doc_filename}.json"
+            for page in ast.literal_eval(self.chunk_metadata["pages"]):
 
-            # Open the QScrollArea with the image and rectangle
-            self.show_image_with_highlight(image_path, json_path)
+                doc_filename = self.doc_metadata["file_name"]
+                page_number = page
+                image_path = f"temp/intermediate_folders/{doc_filename}_output/{doc_filename}_images/{doc_filename}_page{page_number}.jpg"
+                json_path = f"temp/intermediate_folders/{doc_filename}_output/final/{doc_filename}.json"
+
+                # Open the QScrollArea with the image and rectangle
+                self.show_image_with_highlight(image_path, json_path,page_number)
 
         super().mousePressEvent(event)
 
-    def show_image_with_highlight(self, image_path, json_path):
-        coordinates = (0, 0, 100, 100)
-        if not coordinates:
-            print("Invalid coordinates file.")
-            return
+    def show_image_with_highlight(self, image_path, json_path,page_number):
+        with open(json_path, "r", encoding="utf-8") as json_file:
+            json_data = json.load(json_file)
+        #coordinates = (0, 0, 100, 100)
+        coordinates_strings = next((item["coordinates"] for item in json_data if item["hash"] == self.chunk_metadata["hash"]), None)
+        coordinates = []
+        for coord_string in coordinates_strings:
+            coord_list = list(map(float, coord_string.split(',')))
+            # Check if the last element matches y
+            if coord_list[-1] == float(page_number):
+                # Append the list without the last element
+                coordinates.append(coord_list[:-1])
         viewer = ReferenceViewer(image_path, coordinates)
         viewer.exec()  # Use exec() to display the dialog modally
 
