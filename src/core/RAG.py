@@ -1,12 +1,16 @@
 from src.core.embedding import embed_query, format_for_vec_db
 from typing import List, Optional
+import re
 
+def barewords_only(query: str) -> str:
+    """Clean up punctuation for FTS"""
+    return re.sub(r'[^\w\s]', '', query).strip()
 
 def retrieve(
     connection,
     query: str,
     documents: Optional[List] = None,
-    k: int = 2,
+    k: int = 50,
     rrf_k: float = 10,
     weight_fts: float = 1.0,
     weight_vec: float = 1.0,
@@ -55,6 +59,7 @@ def retrieve(
         cursor.execute(create_temp_table_query)
 
     embedded_query = embed_query(query)
+    barewords_query = barewords_only(query)
 
     main_rag_query = """
         -- SQLite-vector KNN vector search results
@@ -70,7 +75,7 @@ def retrieve(
                 AND k = :k
         ),
 
-        -- FTS5 search results
+        -- FTS5 search results -- default search is bm25
         fts_matches AS (
             SELECT
                 rowid,
@@ -78,7 +83,7 @@ def retrieve(
                 rank AS score
             FROM chunks_fts
             WHERE 
-                text MATCH :query
+                text MATCH :barewords_query
                 AND rowid IN (SELECT chunk_id FROM temp_list_of_possible_chunks)
             LIMIT :k
         ),
@@ -115,7 +120,7 @@ def retrieve(
         main_rag_query,
         {
             "embedded_query": format_for_vec_db(embedded_query),
-            "query": query.replace("?", ""),
+            "barewords_query": barewords_query,
             "k": k,
             "rrf_k": rrf_k,
             "weight_fts": weight_fts,
@@ -127,3 +132,12 @@ def retrieve(
     results = cursor.fetchall()
     columns = [description[0] for description in cursor.description]
     return [dict(zip(columns, row)) for row in results]
+
+if __name__ == "__main__":
+    query = "GPT-2 summarization"
+    from src.core.connect_db import ConnectDB
+    db = ConnectDB()
+    connection = db.connection
+    print(retrieve(connection=connection,
+                   query=query))
+    db.close()
