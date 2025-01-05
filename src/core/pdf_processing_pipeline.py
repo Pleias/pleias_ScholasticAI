@@ -893,10 +893,4 @@ def process_pdfs_in_folder(
 
 if __name__ == "__main__":
     # Call the function
-    processed_data = process_pdfs_in_folder(output_folder="temp/")
-
-    # Print the result to inspect
-    import json
-
-    with open("temp.json", "w", encoding="utf-8") as f:
-        json.dump(processed_data, f, ensure_ascii=False, indent=4)
+    processed_data = process_pdfs_in_folder()

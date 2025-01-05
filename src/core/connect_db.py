@@ -125,8 +125,8 @@ class ConnectDB:
             cursor.execute("""
                     CREATE VIRTUAL TABLE IF NOT EXISTS chunk_embeddings USING vec0(
                     chunk_id INTEGER PRIMARY KEY,
-                    embedding float[1024])
-                """)  # replace 4 with the actual size of the embedding
+                    embedding float[384] distance_metric=cosine)
+                """)  # cosine similarity
 
             self.connection.commit()
 
@@ -235,7 +235,7 @@ class ConnectDB:
         verbose: bool = True,
         pdf_folder: str = "app_storage/pdfs/to_process",
         yolo_model_path: str = "models/yolo.pt",
-        intermediate_store_folder: str = "temp/intermediate_folders",
+        intermediate_store_folder: str = None,
         pdf_chunk_size: int = 25,
         batch_size: int = 10,
     ):
@@ -320,3 +320,8 @@ class ConnectDB:
         if self.connection:
             self.connection.close()
             print("Database connection closed.")
+
+if __name__ == "__main__":
+    db = ConnectDB()
+    db.parse_pdf_to_db()
+    db.close()
