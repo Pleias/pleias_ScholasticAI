@@ -32,7 +32,7 @@ We need to decide on chunks size, but the intuition behind it is the next: large
 
 **User query enhancement**
 
-This part could be done only with additional LLM, so I don't think it's possible without speed lost, but there are also some interesting techniques which helps to align user language with the stored chunks for more effective search. Such as query translation, splitting complicated query into subqueries etc. We could consider some option in the future.&#x20;
+This part could be done only with additional LLM, so I don't think it's possible without speed lost, but there are also some interesting techniques which helps to align user language with the stored chunks for more effective search. Such as query translation, splitting complicated query into subqueries etc. We could consider some option in the future. Do we actually support multilingual queries, if so we could also store metadata for queries such as language. Also, if we want to utilize conversation history is a question. But we can enhance user query based on previous conversation.&#x20;
 
 
 
