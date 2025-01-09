@@ -27,7 +27,7 @@ For **generation component** we need to evaluate different models given the assu
 
 And many others. This step is important for choosing the best model for response generation fiven the context length, inference speed and all other factors.&#x20;
 
-
+Relevant to both in case we would implement LLM judge this paper. [https://arxiv.org/pdf/2404.12272](https://arxiv.org/pdf/2404.12272)
 
 This research stage and app development requires us to adapt our code base. For the research stage saving each step of the pipeline is crucial, as we need properly log our experiments to analyse the results, whereas for application this approach just produce extra artifacts. So, at the reaserch stage we need to adapt the code base. In the future, when we come up with the best decision for each component, for the application we could restructure our code base, so that it might be easily integrated with another ui (React or whateever). My suggestion, would be split pipeline into 2 main end points. First endpoint is for document loading and building the document store. This step might be slower than the second one.  Second is a runtime endpoint - where user actually makes queries and retrieves the answer.&#x20;
 
