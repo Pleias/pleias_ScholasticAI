@@ -40,6 +40,10 @@ There are papers that shows that relevant chunks position affects the response g
 
 Hybrid search. We can also do bm25 + keyword + semantic and do rank fusion. Rank fusion is approach to combine rank of each chunk across sources via average score, or weighted sum etc.&#x20;
 
+What we have missed at the first implementation that we actually must test all frameworks and approaches (keyword vs bm25 vs semantic) as intuition about the speed might be wrong for some dataset / implementation. So, it easily could be the case where semantic works faster than BM25 etc.&#x20;
+
+
+
 
 
 
