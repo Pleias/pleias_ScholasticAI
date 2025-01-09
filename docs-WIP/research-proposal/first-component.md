@@ -32,7 +32,15 @@ We need to decide on chunks size, but the intuition behind it is the next: large
 
 **User query enhancement**
 
-This part could be done only with additional LLM, so I don't think it's possible without speed lost, but there are also some interesting techniques which helps to align user language with the stored chunks for more effective search. Such as query translation, splitting complicated query into subqueries etc. We could consider some option in the future. Do we actually support multilingual queries, if so we could also store metadata for queries such as language. Also, if we want to utilize conversation history is a question. But we can enhance user query based on previous conversation.&#x20;
+This part could be done only with additional LLM, so I don't think it's possible without speed lost, but there are also some interesting techniques which helps to align user language with the stored chunks for more effective search. Such as query translation, splitting complicated query into subqueries, abstract queries. We could consider some option in the future. Do we actually support multilingual queries, if so we could also store metadata for queries such as language. Also, if we want to utilize conversation history is a question. But we can enhance user query based on previous conversation.&#x20;
+
+**Retrieval**
+
+There are papers that shows that relevant chunks position affects the response generation quality. The goal is to position relevant chunks at the beginning or at the and of a prompt. Please see [https://arxiv.org/abs/2307.03172](https://arxiv.org/abs/2307.03172) - Lost in the middle paper. To create such prompts we need to utilize reranker. Reranker is a model which takes in query and context and returns relevancy score. Usually people train something small Bert Like model, but if we don't want to train we could utilize reranker from cohere. We shoud keep in mind that this is quite expensive operation, so we need first extract for ex 5 the most relevant chunks using bm25 or semantic serach and do rerank on top of it.&#x20;
+
+Hybrid search. We can also do bm25 + keyword + semantic and do rank fusion. Rank fusion is approach to combine rank of each chunk across sources via average score, or weighted sum etc.&#x20;
+
+
 
 
 
