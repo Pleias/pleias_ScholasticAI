@@ -36,11 +36,17 @@ This part could be done only with additional LLM, so I don't think it's possible
 
 **Retrieval**
 
-There are papers that shows that relevant chunks position affects the response generation quality. The goal is to position relevant chunks at the beginning or at the and of a prompt. Please see [https://arxiv.org/abs/2307.03172](https://arxiv.org/abs/2307.03172) - Lost in the middle paper. To create such prompts we need to utilize reranker. Reranker is a model which takes in query and context and returns relevancy score. Usually people train something small Bert Like model, but if we don't want to train we could utilize reranker from cohere. We shoud keep in mind that this is quite expensive operation, so we need first extract for ex 5 the most relevant chunks using bm25 or semantic serach and do rerank on top of it.&#x20;
+There are papers that shows that relevant chunks position affects the response generation quality. The goal is to position relevant chunks at the beginning or at the and of a prompt. Please see [https://arxiv.org/abs/2307.03172](https://arxiv.org/abs/2307.03172) - Lost in the middle paper. To create such prompts we need to utilize reranker. Reranker is a model which takes in query and context and returns relevancy score. Usually people train something small Bert Like model, but if we don't want to train we could utilize reranker from cohere. We should keep in mind that this is quite expensive operation, so we need first extract for ex 5 the most relevant chunks using bm25 or semantic searach and do rerank on top of it.&#x20;
 
 Hybrid search. We can also do bm25 + keyword + semantic and do rank fusion. Rank fusion is approach to combine rank of each chunk across sources via average score, or weighted sum etc.&#x20;
 
 What we have missed at the first implementation that we actually must test all frameworks and approaches (keyword vs bm25 vs semantic) as intuition about the speed might be wrong for some dataset / implementation. So, it easily could be the case where semantic works faster than BM25 etc.&#x20;
+
+Also, there are quite effective technique such as IRCot. It's Chain of thought retrieval in multiple steps. [https://arxiv.org/pdf/2212.10509](https://arxiv.org/pdf/2212.10509)
+
+What I didn't have enough time to read about is knowledge graphs [https://arxiv.org/pdf/2409.13731](https://arxiv.org/pdf/2409.13731)
+
+
 
 
 
