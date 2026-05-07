@@ -10,7 +10,7 @@ PyQt5_sip==12.15.0
 PySide6==6.8.0
 PySide6_Addons==6.8.0
 PySide6_Essentials==6.8.0
-Requests==2.32.3
+Requests==2.33.0
 sqlite_vec==0.1.6
 tqdm==4.66.5
 ultralytics==8.3.5
